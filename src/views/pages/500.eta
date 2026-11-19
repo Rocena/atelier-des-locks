@@ -1,0 +1,12 @@
+<% layout('../layouts/base', it) %>
+<section class="section grain" aria-labelledby="titre-500">
+  <div class="container stack">
+    <p class="eyebrow">Erreur 500</p>
+    <h1 id="titre-500" class="page-title">Un petit <em>nœud</em> s’est formé.</h1>
+    <p class="lead">Une erreur est survenue de notre côté. Réessayez dans un instant ; si elle persiste, contactez-nous.</p>
+    <div class="cluster">
+      <a class="btn btn--primary" href="/">Revenir à l’accueil</a>
+      <a class="btn btn--secondary" href="/contact">Nous contacter</a>
+    </div>
+  </div>
+</section>

@@ -1,7 +1,7 @@
 # Sécurité : checklist
 
 > Exigences du §13 du cahier des charges + OWASP Top 10 (2021). Cocher seulement ce qui est **en place et testé**.
-> Revue complète en phase 7.
+> Revue OWASP Top 10 réalisée en phase 7 (auditeur indépendant, constats corrigés ci-dessous).
 
 ## En-têtes et transport
 
@@ -55,15 +55,30 @@
 
 - [x] Secrets uniquement par variables d'environnement ; `.env` ignoré par git ; `.env.example` documenté
 - [x] `SESSION_SECRET` ≥ 32 caractères exigé au démarrage
-- [x] Logs : en-têtes `cookie` et `authorization` masqués ; événements de réservation journalisés par identifiant, sans donnée personnelle
+- [x] Logs : en-têtes `cookie` et `authorization` masqués, **URL sans jeton ni paramètres** (`/rdv/[jeton]`, `/avis/laisser/[jeton]`, `/agenda/[jeton]`, plus de `?_csrf=`), adresse IP non journalisée ; événements de réservation par identifiant — test `app.test.js`
+- [ ] Caddy : même masquage des URL à jeton et de l'IP dans ses journaux — phase 8
 - [x] Flux iCal privé : secret ≥ 32 caractères (`ICAL_FEED_TOKEN`), comparaison à temps constant, prénom + initiale uniquement
 - [x] Journal d'audit en ajout seul (déclencheur SQL), sans mot de passe, code ni secret (filtre testé), notifications_log avec destinataires masqués à l'affichage
 - [x] Export CSV protégé contre l'injection de formules, accès journalisé
 - [x] Suppression RGPD par anonymisation : identité, notes, photos (fichiers effacés), jetons et destinataires des messages — test `admin/flows.test.js`
-- [ ] `npm audit` en CI + Dependabot / Renovate — phase 7
+- [x] `npm audit` : 0 vulnérabilité ; CI GitHub (`.github/workflows/ci.yml`) avec `npm audit --audit-level=high`, audit hebdomadaire, Dependabot (`.github/dependabot.yml`)
 
 ## Exploitation
 
 - [ ] Sauvegardes quotidiennes chiffrées + test de restauration documenté — phase 8
 - [x] Base locale liée à 127.0.0.1 uniquement (`docker-compose.yml`)
-- [ ] Revue OWASP Top 10 complète — phase 7
+- [x] Revue OWASP Top 10 complète (phase 7) : aucune faille critique ; constats ci-dessous
+
+## Revue de phase 7 (OWASP Top 10, 2021)
+
+Auditeur indépendant (sous-agent, code relu sans modification), puis corrections :
+
+- [x] **A01/A04 : écrasement de fiche** : réserver avec l'email d'une cliente ne modifie plus son nom, son téléphone ni ses SMS (seule une fiche anonymisée est refaite) ; l'adresse `@sans-email.invalid` est refusée au public — tests `booking/routes.test.js`
+- [x] **A04 : plafond de RDV** : 3 rendez-vous à venir au plus par email (429), en plus de la limite par IP. Pas de plafond par téléphone (numéros partagés en famille)
+- [x] **A05 : gestionnaire d'erreur** : les erreurs 500 sont journalisées avec l'identifiant de requête et renvoient un message générique (page HTML ou JSON) ; une `ZodError` donne 400 — test `app.test.js`
+- [x] **A05 : `trustProxy`** limité aux proxys listés (`TRUST_PROXY`, défaut 127.0.0.1 et ::1) ; le port de l'application ne doit pas être exposé (phase 8)
+- [x] **A05/A02 : configuration de production** : le démarrage échoue si le secret est court ou d'exemple, si `PUBLIC_URL` n'est pas en https, si la base utilise le mot de passe de développement ou si le fournisseur d'envoi est `console` — tests `config.test.js`
+- [x] **A05 : `Permissions-Policy`** fermée (caméra, micro, géolocalisation, paiement, USB)
+- [x] **A09 : RGPD et journaux** : purge planifiée (sessions expirées, IP à 12 mois — le déclencheur d'audit autorise seulement de mettre `ip` à NULL —, destinataires à 12 mois, photos à 1 an, clientes inactives anonymisées) — test `retention/service.test.js`
+- [ ] **Résiduel, assumé** : verrouillage du compte propriétaire par un tiers (verrou par compte : 5 échecs puis 1 à 60 min ; la limite par IP freine mais n'empêche pas ; déblocage en base) ; preuve de travail légère et anti-rejeu en mémoire (réinitialisé au redémarrage, une seule instance) ; limites de débit en mémoire ; journal d'audit non protégé contre `DELETE` / `TRUNCATE` par un compte SQL compromis ; l'équipe voit toutes les clientes (règle métier à confirmer) ; cookie CSRF non lié à la session (atténué par SameSite)
+- [ ] **Phase 8** : sauvegardes chiffrées + test de restauration, HTTPS de bout en bout

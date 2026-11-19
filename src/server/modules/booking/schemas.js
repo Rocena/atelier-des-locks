@@ -85,6 +85,8 @@ export const bookingForm = z.object({
     .trim()
     .max(254)
     .pipe(z.email('Cette adresse email semble incomplète.'))
+    // Domaine réservé aux fiches sans email : jamais saisissable par le public.
+    .refine((v) => !/@sans-email.invalid$/i.test(v), 'Cette adresse email semble incomplète.')
     .transform((v) => v.toLowerCase()),
   phone: z
     .string()

@@ -226,6 +226,46 @@ describe('création d’un rendez-vous', () => {
     expect(stored.exif).toBeUndefined();
   });
 
+  it('un tiers ne peut pas écraser la fiche d’une cliente en réservant avec son email', async () => {
+    const email = `victime${++emailCounter}${EMAIL_DOMAIN}`;
+    expect(
+      (await book(app, { fields: { email, startsAt: '2026-12-08T08:00:00.000Z' } })).statusCode,
+    ).toBe(201);
+    const attack = await book(app, {
+      fields: {
+        email,
+        firstName: 'Pirate',
+        lastName: 'Intrus',
+        phone: '0699999999',
+        startsAt: '2026-12-09T08:00:00.000Z',
+      },
+    });
+    expect(attack.statusCode).toBe(201);
+    const { rows } = await pool.query(
+      'SELECT first_name, last_name, phone FROM clients WHERE email = $1',
+      [email],
+    );
+    expect(rows[0]).toMatchObject({ first_name: 'Awa', last_name: 'Diallo' });
+    expect(rows[0].phone).not.toContain('99999999');
+  });
+
+  it('refuse l’adresse réservée aux fiches sans email', async () => {
+    const res = await book(app, { fields: { email: 'tel-0612345678@sans-email.invalid' } });
+    expect(res.statusCode).toBe(422);
+  });
+
+  it('plafonne les rendez-vous à venir par email (429)', async () => {
+    const email = `plafond${++emailCounter}${EMAIL_DOMAIN}`;
+    const days = ['10', '11', '15', '16'];
+    const codes = [];
+    for (const d of days) {
+      codes.push(
+        (await book(app, { fields: { email, startsAt: `2026-12-${d}T08:00:00.000Z` } })).statusCode,
+      );
+    }
+    expect(codes).toEqual([201, 201, 201, 429]);
+  });
+
   it('refuse le même créneau une seconde fois (409)', async () => {
     const startsAt = '2026-12-03T13:00:00.000Z';
     expect((await book(app, { fields: { startsAt } })).statusCode).toBe(201);

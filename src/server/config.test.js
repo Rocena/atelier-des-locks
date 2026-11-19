@@ -3,6 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { loadConfig } from './config.js';
 
 const base = { SESSION_SECRET: 'x'.repeat(48) };
+const prod = {
+  NODE_ENV: 'production',
+  SESSION_SECRET: 'Zq3v9Lk2Pw8TnYb5Hd7Xc1RaE4MjUs6GfIo0VtNiKyBu',
+  PUBLIC_URL: 'https://exemple.fr',
+  DATABASE_URL: 'postgres://atelier:motdepasse-fort@db:5432/atelier',
+  NOTIFICATIONS_PROVIDER: 'brevo',
+  BREVO_API_KEY: 'cle',
+  BREVO_SENDER_EMAIL: 'salon@exemple.fr',
+};
 
 describe('loadConfig', () => {
   it('applique des valeurs par défaut sûres', () => {
@@ -14,9 +23,31 @@ describe('loadConfig', () => {
   });
 
   it('désactive le styleguide par défaut en production', () => {
-    const config = loadConfig({ ...base, NODE_ENV: 'production' });
+    const config = loadConfig({ ...prod });
     expect(config.isProd).toBe(true);
     expect(config.styleguideEnabled).toBe(false);
+  });
+
+  it('production : refuse les valeurs d’exemple et de développement', () => {
+    expect(() =>
+      loadConfig({ ...prod, SESSION_SECRET: 'remplacer-par-un-secret-long-et-aleatoire-00' }),
+    ).toThrow(/SESSION_SECRET/);
+    expect(() => loadConfig({ ...prod, SESSION_SECRET: 'a'.repeat(32) })).toThrow(/SESSION_SECRET/);
+    expect(() => loadConfig({ ...prod, PUBLIC_URL: 'http://exemple.fr' })).toThrow(/PUBLIC_URL/);
+    expect(() =>
+      loadConfig({ ...prod, DATABASE_URL: 'postgres://atelier:atelier_dev@db/x' }),
+    ).toThrow(/DATABASE_URL/);
+    expect(() => loadConfig({ ...prod, NOTIFICATIONS_PROVIDER: 'console' })).toThrow(
+      /NOTIFICATIONS_PROVIDER/,
+    );
+  });
+
+  it('proxys de confiance : Caddy local par défaut', () => {
+    expect(loadConfig(base).trustProxy).toEqual(['127.0.0.1', '::1']);
+    expect(loadConfig({ ...base, TRUST_PROXY: '10.0.0.0/8, 127.0.0.1' }).trustProxy).toEqual([
+      '10.0.0.0/8',
+      '127.0.0.1',
+    ]);
   });
 
   it('refuse un secret de session trop court', () => {

@@ -186,7 +186,21 @@ export async function findPlanning(db, q) {
 }
 
 /**
- * Crée ou met à jour la fiche cliente (clé : email). La newsletter n'est jamais décochée ici :
+ * Rendez-vous à venir (en attente ou confirmés) rattachés à cet email : plafond anti-abus de la
+ * réservation publique. Pas de plafond par téléphone : un numéro est souvent partagé (famille).
+ * @param {Db} db @param {string} email @param {Date} now
+ */
+export async function countUpcomingForEmail(db, email, now) {
+  const { rows } = await db.query(
+    `SELECT count(*)::int AS n FROM appointments a JOIN clients c ON c.id = a.client_id
+      WHERE a.status IN ('pending', 'confirmed') AND a.starts_at > $2 AND c.email = $1`,
+    [email, now],
+  );
+  return /** @type {number} */ (rows[0].n);
+}
+
+/**
+ * Crée la fiche cliente (clé : email) ou rattache le RDV à la fiche existante, sans la modifier. La newsletter n'est jamais décochée ici :
  * seule une inscription explicite l'active, avec sa date (preuve du consentement).
  * @param {Db} db
  * @param {{ firstName: string, lastName: string, email: string, phone: string, smsReminders: boolean, newsletter: boolean }} c
@@ -198,10 +212,12 @@ export async function upsertClient(db, c) {
                           newsletter_opt_in, newsletter_opt_in_at)
      VALUES ($1, $2, $3, $4, $5, $6, CASE WHEN $6 THEN now() END)
      ON CONFLICT (email) DO UPDATE SET
-       first_name = EXCLUDED.first_name,
-       last_name = EXCLUDED.last_name,
-       phone = EXCLUDED.phone,
-       sms_reminders = EXCLUDED.sms_reminders,
+       -- Fiche existante : identité, téléphone et SMS ne sont JAMAIS écrasés depuis le public
+       -- (n'importe qui peut saisir l'email d'une autre). Seule une fiche anonymisée est refaite.
+       first_name = CASE WHEN clients.anonymized_at IS NULL THEN clients.first_name ELSE EXCLUDED.first_name END,
+       last_name = CASE WHEN clients.anonymized_at IS NULL THEN clients.last_name ELSE EXCLUDED.last_name END,
+       phone = CASE WHEN clients.anonymized_at IS NULL THEN COALESCE(clients.phone, EXCLUDED.phone) ELSE EXCLUDED.phone END,
+       sms_reminders = CASE WHEN clients.anonymized_at IS NULL THEN clients.sms_reminders ELSE EXCLUDED.sms_reminders END,
        newsletter_opt_in = clients.newsletter_opt_in OR EXCLUDED.newsletter_opt_in,
        newsletter_opt_in_at = COALESCE(clients.newsletter_opt_in_at, EXCLUDED.newsletter_opt_in_at),
        anonymized_at = NULL

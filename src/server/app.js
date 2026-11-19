@@ -69,16 +69,33 @@ function cspDirectives(dev) {
   };
 }
 
+/**
+ * URL sans paramètres et sans jeton : /rdv/<jeton>, /avis/laisser/<jeton>, /agenda/<jeton>.ics.
+ * @param {string} url
+ */
+export function redactUrl(url) {
+  const path = url.split('?')[0];
+  return path.replace(/^(\/(?:rdv|avis\/laisser|agenda))\/[^/]+/, '$1/[jeton]');
+}
+
 /** @param {BuildOptions} options */
 export async function buildApp({ config, vite, logger = true, db, now, queue, provider }) {
   const dev = !config.isProd;
   const app = Fastify({
     logger: logger && {
       level: config.env === 'test' ? 'silent' : 'info',
-      // Jamais de données personnelles dans les logs : on masque les en-têtes sensibles.
+      // Jamais de données personnelles dans les logs : en-têtes sensibles masqués, URL sans jeton
+      // ni paramètres, adresse IP non journalisée.
       redact: ['req.headers.cookie', 'req.headers.authorization'],
+      serializers: {
+        req: (/** @type {{ method?: string, url?: string }} */ request) => ({
+          method: request.method,
+          url: redactUrl(request.url ?? ''),
+        }),
+      },
     },
-    trustProxy: config.isProd,
+    // Seuls les proxys listés (Caddy en local) peuvent fixer l'adresse du visiteur.
+    trustProxy: config.isProd ? config.trustProxy : false,
   });
 
   await app.register(helmet, {
@@ -90,6 +107,13 @@ export async function buildApp({ config, vite, logger = true, db, now, queue, pr
   });
 
   // Cookies signés (jeton CSRF), formulaires classiques, uploads limités, limitation de débit.
+  app.addHook('onSend', async (_request, reply) => {
+    reply.header(
+      'permissions-policy',
+      'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+    );
+  });
+
   await app.register(cookie, { secret: config.sessionSecret });
   await app.register(csrf, {
     sessionPlugin: '@fastify/cookie',
@@ -243,6 +267,24 @@ export async function buildApp({ config, vite, logger = true, db, now, queue, pr
     views: { render, assets: resolveAssets },
   });
   if (config.styleguideEnabled) await app.register(styleguideRoutes);
+
+  // Erreurs inattendues : journalisées avec l'identifiant de requête, jamais détaillées au visiteur.
+  app.setErrorHandler((/** @type {any} */ error, request, reply) => {
+    const status = Number(error.statusCode);
+    // Erreurs de validation (400, 413, 429…) : réponse standard de Fastify, déjà sans détail interne.
+    if (status >= 400 && status < 500) return reply.send(error);
+    if (error.name === 'ZodError') return reply.code(400).send({ error: 'Bad Request' });
+    request.log.error({ err: error, reqId: request.id }, 'erreur interne');
+    reply.code(500);
+    if (request.headers.accept?.includes('text/html')) {
+      return reply.page('pages/500', 'editorial', {
+        title: 'Une erreur est survenue · L’Atelier des Locks',
+        description: 'Une erreur est survenue.',
+        noindex: true,
+      });
+    }
+    return { error: 'Internal Server Error', reqId: request.id };
+  });
 
   app.setNotFoundHandler((request, reply) => {
     reply.code(404);

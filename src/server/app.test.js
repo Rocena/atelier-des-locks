@@ -1,6 +1,6 @@
 // @ts-check
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { buildApp } from './app.js';
+import { buildApp, redactUrl } from './app.js';
 import { testConfig } from './test-helpers.js';
 
 const config = testConfig();
@@ -17,6 +17,37 @@ describe('application (mode test, sans Vite)', () => {
     const res = await app.inject({ method: 'GET', url: '/health' });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ status: 'ok' });
+  });
+
+  it('Permissions-Policy fermée', async () => {
+    const res = await app.inject({ method: 'GET', url: '/health' });
+    expect(res.headers['permissions-policy']).toContain('camera=()');
+  });
+
+  it('erreur interne : message générique, jamais le détail', async () => {
+    const local = await buildApp({ config, logger: false });
+    local.get('/boom', async () => {
+      throw new Error('relation "clients" violates constraint secret');
+    });
+    const res = await local.inject({ method: 'GET', url: '/boom' });
+    expect(res.statusCode).toBe(500);
+    expect(res.body).not.toContain('clients');
+    const html = await local.inject({
+      method: 'GET',
+      url: '/boom',
+      headers: { accept: 'text/html' },
+    });
+    expect(html.statusCode).toBe(500);
+    expect(html.body).toContain('Erreur 500');
+    await local.close();
+  });
+
+  it('journaux : jetons et paramètres retirés des URL', () => {
+    expect(redactUrl('/rdv/abcDEF123/annuler?x=1')).toBe('/rdv/[jeton]/annuler');
+    expect(redactUrl('/avis/laisser/tok_en')).toBe('/avis/laisser/[jeton]');
+    expect(redactUrl('/agenda/secret.ics')).toBe('/agenda/[jeton]');
+    expect(redactUrl('/admin/galerie/1/photo?_csrf=abc')).toBe('/admin/galerie/1/photo');
+    expect(redactUrl('/prestations/locks')).toBe('/prestations/locks');
   });
 
   it('pose une CSP stricte à nonces et les en-têtes de sécurité', async () => {

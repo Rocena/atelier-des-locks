@@ -481,9 +481,9 @@ describe('statuts', () => {
   });
 
   it('valider une demande : nouveau lien, message à la cliente (sauf si on ne veut pas la prévenir)', async () => {
-    const pending = (id) =>
+    const pending = (/** @type {string} */ id) =>
       pool.query("UPDATE appointments SET status = 'pending' WHERE id = $1", [id]);
-    const hashOf = async (id) =>
+    const hashOf = async (/** @type {string} */ id) =>
       (await pool.query('SELECT manage_token_hash FROM appointments WHERE id = $1', [id])).rows[0]
         .manage_token_hash;
     const a = await createManual(

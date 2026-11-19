@@ -17,9 +17,12 @@ export const MANAGE_LINK_DAYS_AFTER = 30;
 /** Période maximale demandée en une fois par le calendrier public. */
 export const MAX_SLOTS_RANGE_DAYS = 42;
 
+/** Rendez-vous à venir autorisés par email ou téléphone (réservation en ligne). */
+export const MAX_UPCOMING_PER_CONTACT = 3;
+
 export class BookingError extends Error {
   /**
-   * @param {'not_found'|'not_bookable'|'invalid_options'|'slot_taken'|'bad_range'|'too_late'|'inactive'|'past'} code
+   * @param {'not_found'|'not_bookable'|'invalid_options'|'slot_taken'|'bad_range'|'too_late'|'inactive'|'past'|'too_many'} code
    */
   constructor(code) {
     super(code);
@@ -180,6 +183,9 @@ export async function createAppointment(pool, { form, photoPath, now }) {
     const slot = findSlot(input, form.startsAt);
     if (!slot) throw new BookingError('slot_taken');
 
+    // Anti-abus : au plus 3 rendez-vous à venir par email.
+    if ((await repo.countUpcomingForEmail(client, form.email, now)) >= MAX_UPCOMING_PER_CONTACT)
+      throw new BookingError('too_many');
     const clientId = await repo.upsertClient(client, form);
     const { token, hash } = generateToken();
     const endsAt = new Date(slot.endsAt);

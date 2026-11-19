@@ -36,6 +36,7 @@ const MESSAGES = {
   too_late: 'Le délai pour modifier ce rendez-vous en ligne est dépassé. Appelez le salon.',
   inactive: 'Ce rendez-vous ne peut plus être modifié.',
   past: 'Ce rendez-vous est passé.',
+  too_many: 'Vous avez déjà plusieurs rendez-vous à venir. Appelez le salon pour en ajouter un.',
   bot_check: 'La vérification anti-robot a échoué. Rechargez la page et réessayez.',
   rejected: 'Votre demande n’a pas pu être envoyée.',
   validation: 'Certains champs sont à corriger.',
@@ -55,6 +56,7 @@ const STATUS = {
   too_late: 403,
   inactive: 403,
   past: 403,
+  too_many: 429,
 };
 
 /** @param {import('fastify').FastifyReply} reply */

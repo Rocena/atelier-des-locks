@@ -10,6 +10,36 @@ const booleanString = z
   .enum(['true', 'false', '1', '0'])
   .transform((value) => value === 'true' || value === '1');
 
+/** Valeurs d'exemple refusées en production (§13). */
+const PLACEHOLDER_SECRET = /remplacer|changeme|change-me|example|exemple|x{16}/i;
+
+/**
+ * Exigences de production : aucune valeur par défaut de développement ne doit survivre.
+ * @param {Record<string, any>} env
+ * @param {z.RefinementCtx} ctx
+ */
+function checkProduction(env, ctx) {
+  /** @param {string} path @param {string} message */
+  const fail = (path, message) => ctx.addIssue({ code: 'custom', path: [path], message });
+  if (env.SESSION_SECRET.length < 43 || PLACEHOLDER_SECRET.test(env.SESSION_SECRET)) {
+    fail(
+      'SESSION_SECRET',
+      "en production : secret aléatoire de 43 caractères ou plus, jamais la valeur d'exemple (openssl rand -base64 48)",
+    );
+  }
+  if (!env.PUBLIC_URL.startsWith('https://'))
+    fail('PUBLIC_URL', 'en production : adresse https obligatoire');
+  if (env.DATABASE_URL.includes('atelier_dev'))
+    fail('DATABASE_URL', 'en production : le mot de passe de développement est interdit');
+  if (env.NOTIFICATIONS_PROVIDER === 'console')
+    fail(
+      'NOTIFICATIONS_PROVIDER',
+      'en production : « brevo » obligatoire (« console » écrirait les emails dans les logs)',
+    );
+  if (env.ICAL_FEED_TOKEN && PLACEHOLDER_SECRET.test(env.ICAL_FEED_TOKEN))
+    fail('ICAL_FEED_TOKEN', "valeur d'exemple interdite");
+}
+
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -52,8 +82,12 @@ const envSchema = z
     OWNER_EMAIL: z.union([z.email(), z.literal('')]).default(''),
     // Lien « Laisser un avis Google » proposé après le dépôt d'un avis (§8). Vide = pas de lien.
     GOOGLE_REVIEW_URL: z.union([z.url(), z.literal('')]).default(''),
+    // Proxys de confiance pour X-Forwarded-For (adresses séparées par des virgules).
+    // Par défaut : Caddy sur la même machine. Le port de l'application ne doit pas être exposé.
+    TRUST_PROXY: z.string().min(1).default('127.0.0.1,::1'),
   })
   .superRefine((env, ctx) => {
+    if (env.NODE_ENV === 'production') checkProduction(env, ctx);
     if (env.NOTIFICATIONS_PROVIDER === 'brevo') {
       for (const key of /** @type {const} */ (['BREVO_API_KEY', 'BREVO_SENDER_EMAIL'])) {
         if (!env[key]) {
@@ -83,6 +117,7 @@ const envSchema = z
  * @property {string} publicUrl
  * @property {string} databaseUrl
  * @property {string} sessionSecret
+ * @property {string[]} trustProxy  proxys de confiance (X-Forwarded-For)
  * @property {{ provider: 'internal'|'fresha_link', freshaUrl: string, icalFeedToken: string, uploadDir: string, rateLimit: number }} booking
  * @property {{ provider: 'console'|'brevo', brevoApiKey: string, senderEmail: string, senderName: string, smsSender: string, ownerEmail: string }} notifications
  * @property {{ googleUrl: string }} reviews
@@ -113,6 +148,9 @@ export function loadConfig(source = process.env) {
     publicUrl: env.PUBLIC_URL.replace(/\/$/, ''),
     databaseUrl: env.DATABASE_URL,
     sessionSecret: env.SESSION_SECRET,
+    trustProxy: env.TRUST_PROXY.split(',')
+      .map((a) => a.trim())
+      .filter(Boolean),
     booking: {
       provider: env.BOOKING_PROVIDER,
       freshaUrl: env.FRESHA_BOOKING_URL,
