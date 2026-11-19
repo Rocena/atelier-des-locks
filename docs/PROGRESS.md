@@ -14,6 +14,7 @@
 | 4 · Réservation           | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
 | 5 · Notifications et avis | ✅ terminée (2026-11-19), Brevo à tester avec une vraie clé                     | Tests de planification des jobs                       |
 | 6 · Back-office           | ✅ terminée (2026-11-19), à essayer sur téléphone par la propriétaire           | Contrôle d'accès prouvé, e2e des parcours principaux  |
+| 7 · Durcissement          | ✅ terminée (2026-11-19) ; performance à re-mesurer sur une machine saine       | Checklists `SECURITY.md` et accessibilité             |
 
 ## Phase 0 : fait
 
@@ -191,7 +192,21 @@ Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélior
 - Réservation en ligne : un interblocage PostgreSQL (`40P01`) lors de trois réservations simultanées du même créneau est maintenant traité comme « créneau pris » (le test pouvait échouer de façon aléatoire).
 - Défauts trouvés par les tests et corrigés : horizon de réservation appliqué au déplacement par le salon ; barre de dates et filtres qui débordaient à 390 px ; boutons dont l'étiquette visible n'était pas dans le nom accessible ; prestation sans praticienne associée impossible à réserver par le salon ; erreurs affichées en JSON brut sur les formulaires classiques ; recherche par téléphone en format national.
 
-## Reste à faire (phase 7 et suivantes)
+## Phase 7 : fait
+
+- **Audit sécurité indépendant** (sous-agent, lecture seule) : aucune faille critique, 1 haute, 5 moyennes, 10 basses. Corrigés : écrasement de fiche par la réservation publique (H1), jetons et IP dans les logs (M1), gestionnaire d'erreur 500 (M2), `trustProxy` (M5), configuration de production exigeante (M6), plafond de RDV par email (M4, partiel), `Permissions-Policy`, jeton CSRF d'URL masqué des logs (B1). **Assumés et documentés** dans `SECURITY.md` : verrouillage du compte propriétaire par un tiers (M3), preuve de travail légère, audit_log sans protection DELETE, droits de l'équipe.
+- **`npm audit`** : 0 vulnérabilité. CI GitHub (audit, lint, types, contrastes, tests sur PostgreSQL) et Dependabot ajoutés.
+- **RGPD** : pages légales complétées (photo de cheveux, lettre, durées exactes, cookies strictement nécessaires) ; **export JSON des données d'une cliente** (droit d'accès, propriétaire, tracé) ; **purge quotidienne** (`modules/retention`) : clientes inactives anonymisées après 3 ans (réglage `privacy.client_retention_years`), photos de cheveux à 1 an, destinataires et IP à 12 mois, sessions expirées. Consentements séparés : SMS de rappel (transactionnel), lettre (opt-in non coché), politique de RDV (obligatoire). Les informations légales restent `TODO-PROPRIO` (SIRET, hébergeur, adresse).
+- **SEO** : déjà en place depuis la phase 2 et vérifié (title et meta uniques, Open Graph avec visuel de marque, canonical, `sitemap.xml`, `robots.txt`, JSON-LD `HairSalon`, `Service`, `FAQPage`).
+- **Accessibilité et performance** (Lighthouse, mobile, serveur en mode production, 6 pages : accueil, prestations, méthodes, réserver, contact, confidentialité) : **accessibilité 100, bonnes pratiques 100, SEO 100 partout**, CLS 0 à 0,001, JS initial de l'accueil **≈ 4 ko gzip** (GSAP chargé à la demande), transfert de l'accueil 283 ko. axe-core WCAG A/AA déjà couvert par les e2e (20 pages admin).
+- **Performance : à re-mesurer.** Scores mesurés ici : 98 (confidentialité), 89 (prestations), 77 (réserver) ; accueil, contact et méthodes autour de 60 (avant correctif : 33 à 65). Le temps de blocage (TBT) y est dominé par « Style & Layout », « Autre » et le ramasse-miettes, alors que le script ne pèse que 300 ms : la machine de test (4 Go de RAM, disque plein, benchmark Lighthouse 600) fausse la mesure. **Budget §16 (≥ 90) non confirmé** : refaire `lighthouse` sur une machine saine ou en ligne.
+- **Correctif de performance** : le grain papier n'utilise plus `mix-blend-mode` (recomposition d'un calque plein écran par section) ; accueil 33 → 60 et prestations 65 → 89 sur cette machine. Rendu quasi identique (grain très léger).
+
+## Reste à faire (phase 8 et suivantes)
+
+- **Performance** : mesurer Lighthouse sur une machine saine ; si l'accueil reste sous 90, auditer le coût de Style & Layout (animations de révélation, SVG décoratifs, polices) ; vidéo du hero < 2 Mo quand elle existera.
+- **Durée de conservation** : pas d'écran d'admin pour `privacy.client_retention_years` (3 ans par défaut).
+- **Sécurité** : verrouillage du compte propriétaire (verrou par compte et IP, script `admin:unlock`), plafond par téléphone, preuve de travail renforcée, DELETE / TRUNCATE sur `audit_log`.
 
 - **Notifications en production** : créer le compte Brevo, valider l'expéditeur (SPF, DKIM), renseigner `NOTIFICATIONS_PROVIDER=brevo`, `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `OWNER_EMAIL`, `GOOGLE_REVIEW_URL`, puis envoyer un message réel. Le fournisseur Brevo n'a été testé qu'avec un faux `fetch`. Tester aussi les emails dans Gmail, Outlook et Apple Mail (§7.6).
 - **Phase 6 : suites** :
@@ -200,8 +215,6 @@ Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélior
   - **Réglages d'infrastructure** (`BOOKING_PROVIDER`, lien Fresha, lien avis Google, fournisseur d'envoi) : restent dans l'environnement du serveur.
   - **Horaires par praticienne** : l'écran applique la même grille à toutes les praticiennes actives (une seule aujourd'hui).
   - **Gestion des comptes** (créer une employée, désactiver, réinitialiser la 2FA) : aujourd'hui par script (`npm run admin:create`) et en base.
-- Purge RGPD **automatique** des photos de cheveux après le RDV et anonymisation des clientes inactives après 3 ans (durées à fixer, cf. `docs/DATABASE.md`) : la suppression à la demande existe (phase 6), pas la purge planifiée.
-
 - Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
 - Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
 - Textes d'interface dans des fichiers de traduction (i18n, §18) : non fait en phase 2, les contenus métier sont déjà séparés des templates (seeds JSON).
