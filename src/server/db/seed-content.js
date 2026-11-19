@@ -6,9 +6,9 @@
  *
  * Les prix, durées et options sont des valeurs d'exemple : is_placeholder = true (§6).
  * Les avis sont des exemples : is_placeholder = true, à remplacer avant la mise en ligne (§8).
- * Horaires par défaut : 9h-18h (donnés par la propriétaire), du lundi au samedi (jours à confirmer,
- * TODO-PROPRIO). Ils ne sont semés que si la praticienne n'en a aucun : une modification (future
- * admin) n'est jamais écrasée.
+ * Horaires par défaut (donnés par la propriétaire) : mardi à vendredi 9h-12h puis 14h-18h, samedi
+ * 14h-18h, fermé lundi et dimanche. Semés seulement si la praticienne n'en a aucun : une
+ * modification faite en admin n'est jamais écrasée.
  */
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -298,8 +298,13 @@ async function seedStaff(db) {
   );
   await db.query(
     `INSERT INTO opening_hours (staff_id, weekday, opens_at, closes_at)
-     SELECT st.id, d, '09:00', '18:00'
-       FROM (SELECT min(id) AS id FROM staff) st, generate_series(1, 6) AS d
+     SELECT st.id, h.weekday, h.opens_at::time, h.closes_at::time
+       FROM (SELECT min(id) AS id FROM staff) st,
+            (VALUES (2, '09:00', '12:00'), (2, '14:00', '18:00'),
+                    (3, '09:00', '12:00'), (3, '14:00', '18:00'),
+                    (4, '09:00', '12:00'), (4, '14:00', '18:00'),
+                    (5, '09:00', '12:00'), (5, '14:00', '18:00'),
+                    (6, '14:00', '18:00')) AS h (weekday, opens_at, closes_at)
       WHERE NOT EXISTS (SELECT 1 FROM opening_hours WHERE staff_id = st.id)`,
   );
 }

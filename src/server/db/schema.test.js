@@ -153,13 +153,19 @@ describe('autres garde-fous du schéma', () => {
     expect(rows[0]).toEqual({ services: '0', options: '0', reviews: '0' });
   });
 
-  it('sème les horaires 9h-18h du lundi au samedi, sans écraser une modification', async () => {
+  it('sème les horaires : mar-ven 9h-12h/14h-18h, samedi 14h-18h, fermé lundi et dimanche', async () => {
     const { rows } = await pool.query(
-      `SELECT weekday, opens_at::text AS o, closes_at::text AS c FROM opening_hours ORDER BY weekday`,
+      `SELECT weekday, to_char(opens_at, 'HH24:MI') AS o, to_char(closes_at, 'HH24:MI') AS c
+         FROM opening_hours ORDER BY weekday, opens_at`,
     );
-    expect(rows).toHaveLength(6);
-    expect(rows[0]).toEqual({ weekday: 1, o: '09:00:00', c: '18:00:00' });
-    expect(rows.at(-1)?.weekday).toBe(6);
+    expect(rows).toHaveLength(9);
+    expect(rows.map((r) => r.weekday)).not.toContain(1);
+    expect(rows.map((r) => r.weekday)).not.toContain(7);
+    expect(rows.filter((r) => r.weekday === 3)).toEqual([
+      { weekday: 3, o: '09:00', c: '12:00' },
+      { weekday: 3, o: '14:00', c: '18:00' },
+    ]);
+    expect(rows.filter((r) => r.weekday === 6)).toEqual([{ weekday: 6, o: '14:00', c: '18:00' }]);
   });
 
   it('le seed est idempotent (deux exécutions, mêmes effectifs)', async () => {

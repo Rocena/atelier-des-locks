@@ -124,7 +124,7 @@
 ## Points d'attention
 
 - **Avis d'exemple en base** : ils sont publiés (`approved`) comme en phase 2. Avant la mise en ligne, les supprimer (`is_placeholder`) : tant qu'il n'y a pas de vrai avis, le §8 demande de masquer les blocs.
-- **Horaires** : 9h-18h semés du lundi au samedi (la propriétaire a donné 9h et 18h, **pas les jours** : à confirmer). Modifiables depuis l'admin (phase 6), jamais écrasés par le seed.
+- **Horaires** : mardi-vendredi 9h-12h puis 14h-18h, samedi 14h-18h, fermé lundi et dimanche (donnés par la propriétaire). Modifiables et blocables depuis l'admin (phase 6, tables `opening_hours`, `closures`, `blocks`), jamais écrasés par le seed.
 - Les e2e et `npm run dev` utilisent la base de dev : lancer `npm run db:up && npm run db:migrate && npm run db:seed` d'abord.
 
 - Le projet est dans **OneDrive** : `node_modules` et `dist/` sont synchronisés en continu, ce qui ralentit et peut verrouiller des fichiers. Il est conseillé de déplacer le dépôt hors de OneDrive, ou d'exclure ces dossiers de la synchronisation. La base, elle, est dans un volume Docker.

@@ -45,6 +45,8 @@ export default async function setup() {
   const pool = createPool(testUrl);
   try {
     await migrate(pool);
+    // Horaires remis à leur valeur par défaut (le seed ne remplace jamais des horaires existants).
+    await pool.query('DELETE FROM opening_hours');
     await runSeeds(pool);
   } finally {
     await pool.end();
