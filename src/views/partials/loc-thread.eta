@@ -1,0 +1,17 @@
+<%
+  /* Fil de loc. Paramètres : id (unique dans la page), d (tracé), viewBox, variant ('fine'), animate (bool), className */
+  var id = it.id || 'loc';
+  var d = it.d || 'M24 12 C 140 60, 60 180, 200 220 S 420 260, 380 420 S 180 600, 320 700';
+  var viewBox = it.viewBox || '0 0 440 720';
+%>
+<svg class="loc-thread<%= it.variant ? ' loc-thread--' + it.variant : '' %><%= it.className ? ' ' + it.className : '' %>" viewBox="<%= viewBox %>" aria-hidden="true" focusable="false"<% if (it.animate) { %> data-animate<% } %>>
+  <defs>
+    <mask id="<%= id %>-mask" maskUnits="userSpaceOnUse">
+      <path class="loc-thread__draw" d="<%= d %>" pathLength="1" />
+    </mask>
+  </defs>
+  <g mask="url(#<%= id %>-mask)">
+    <path class="loc-thread__body" d="<%= d %>" />
+    <path class="loc-thread__twist" d="<%= d %>" />
+  </g>
+</svg>

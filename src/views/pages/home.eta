@@ -1,0 +1,25 @@
+<% layout('../layouts/base', it) %>
+<section class="section grain home-soon" aria-labelledby="titre-accueil">
+  <div class="bogolan bogolan--fade" aria-hidden="true"></div>
+  <div class="container home-soon__grid">
+    <div class="home-soon__text stack">
+      <p class="eyebrow">Locticienne · Toulouse</p>
+      <h1 id="titre-accueil" class="display">L’art de la <em>loc</em>, à&nbsp;Toulouse.</h1>
+      <p class="lead">Création, entretien et soin des locks, par une locticienne passionnée. Notre nouveau site ouvre très bientôt.</p>
+      <div class="cluster home-soon__actions">
+        <a class="btn btn--primary btn--lg" href="/reserver">Réserver</a>
+        <a class="btn btn--ghost" href="/prestations"><span class="btn__label">Découvrir les prestations</span>
+          <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </div>
+    </div>
+    <figure class="arch arch--sun arch--framed home-soon__arch" data-reveal="arch">
+      <div class="arch__frame">
+        <div class="placeholder"><span class="placeholder__label">Portrait à venir</span></div>
+      </div>
+    </figure>
+  </div>
+<% if (it.dev) { %>
+  <p class="container home-soon__dev"><a class="link" href="/styleguide">Ouvrir le styleguide (dev)</a></p>
+<% } %>
+</section>

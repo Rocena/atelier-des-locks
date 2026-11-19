@@ -1,0 +1,450 @@
+<% layout('../layouts/base', it) %>
+<%
+  var sections = [
+    ['couleurs', 'Couleurs'], ['typographie', 'Typographie'], ['espacements', 'Espacements'],
+    ['formes', 'Rayons et ombres'], ['mouvement', 'Mouvement'], ['boutons', 'Boutons'],
+    ['liens', 'Liens et badges'], ['formulaires', 'Formulaires'], ['cartes', 'Cartes prestation'],
+    ['arches', 'Arches et visuels'], ['fil', 'Fil de loc'], ['textures', 'Grain et bogolan'],
+    ['navigation', 'Header et menu'], ['sombre', 'Sur fond ébène']
+  ];
+  var brand = [
+    { key: 'ebene', name: 'Ébène', hex: '#1C1310', oklch: '19.7% 0.016 39', use: 'Texte principal, sections sombres', share: '20 %' },
+    { key: 'cacao', name: 'Cacao', hex: '#3A2A22', oklch: '30.1% 0.028 48', use: 'Texte secondaire, surfaces sombres élevées', share: '' },
+    { key: 'terre', name: 'Terre cuite', hex: '#A9472E', oklch: '52.3% 0.135 35', use: 'L’accent unique : CTA, liens, mot en italique', share: '8 %' },
+    { key: 'laiton', name: 'Laiton', hex: '#B8914A', oklch: '67.9% 0.101 81', use: 'Filets et détails. Jamais en texte sur clair', share: '2 %' },
+    { key: 'lin', name: 'Lin', hex: '#E6D6C1', oklch: '88.4% 0.033 75', use: 'Surfaces alternées, cartes', share: '70 %' },
+    { key: 'karite', name: 'Karité', hex: '#F4ECE2', oklch: '94.7% 0.016 74', use: 'Fond principal, jamais de blanc pur', share: '' }
+  ];
+  var semantic = [
+    ['--surface', 'Fond de page'], ['--surface-raised', 'Carte, champ'], ['--surface-alt', 'Section alternée'],
+    ['--text', 'Texte'], ['--text-muted', 'Texte secondaire'], ['--accent', 'Accent (fond)'],
+    ['--accent-text', 'Lien, petit texte accent'], ['--line', 'Filet'], ['--line-strong', 'Bordure de champ'],
+    ['--brass', 'Laiton décoratif'], ['--success', 'Succès'], ['--warning', 'Alerte'], ['--error', 'Erreur']
+  ];
+  var steps = [
+    ['--step-7', 'Display', '57 → 128 px', 'Racines'], ['--step-6', 'H1', '48 → 100 px', 'Racines'], ['--step-5', 'H2', '40 → 75 px', 'Vos racines'],
+    ['--step-4', 'Grand intertitre', '33 → 57 px', 'Prenez soin de vos racines'], ['--step-3', 'H3', '28 → 43 px'], ['--step-2', 'H4', '23 → 32 px'],
+    ['--step-1', 'Chapô', '19 → 24 px'], ['--step-0', 'Texte', '16 → 18 px'], ['--step--1', 'Petit texte', '13 → 14 px']
+  ];
+  var spaces = [['1','4'],['2','8'],['3','12'],['4','16'],['5','24'],['6','32'],['7','48'],['8','64'],['9','96'],['10','128'],['11','160']];
+  var services = [
+    { index: '01', category: 'Installation', title: 'Création de locks', text: 'Comb coils, vanilles, tresses ou interlocking : nous choisissons ensemble la méthode adaptée à vos cheveux.', duration: '5h – 7h', price: '180 €', from: true, href: '/prestations/installation' },
+    { index: '02', category: 'Entretien', title: 'Resserrage', text: 'Racines reprises au palm rolling ou à l’interlocking, pour des locks nettes et durables.', duration: '2h – 3h', price: '70 €', from: true, href: '/prestations/resserrage', state: 'hover' },
+    { index: '05', category: 'Coiffure', title: 'Mariage et événement', text: 'Chignons, pétales ou coiffures de soirée, imaginés pour votre grand jour.', duration: '2h – 4h', quote: true, href: '/prestations/coiffure-evenement' }
+  ];
+%>
+
+<div class="sg">
+  <header class="sg-hero section grain" aria-labelledby="sg-titre">
+    <div class="bogolan bogolan--fade" aria-hidden="true"></div>
+    <div class="container sg-hero__grid">
+      <div class="stack sg-hero__text">
+        <p class="eyebrow">Design system · v0.1</p>
+        <h1 id="sg-titre">Le style de <em>l’atelier</em>.</h1>
+        <p class="lead">Éditorial afro-luxe : l’élégance d’une maison de couture, la chaleur d’un atelier toulousain. Chaque page applique ces tokens et ces composants, sans exception.</p>
+        <div class="cluster">
+          <button class="btn btn--secondary btn--sm" type="button" data-theme-toggle>Basculer clair / sombre</button>
+          <span class="sg-note">Le choix est mémorisé. Par défaut, le site suit le réglage de votre appareil.</span>
+        </div>
+      </div>
+      <%~ include('../partials/loc-thread', { id: 'loc-hero', animate: false, className: 'sg-hero__thread', d: 'M30 20 C 160 90, 40 220, 190 290 S 400 330, 340 520', viewBox: '0 0 420 560' }) %>
+    </div>
+  </header>
+
+  <div class="container sg-layout">
+    <nav class="sg-toc" aria-label="Sommaire du styleguide">
+      <p class="eyebrow">Sommaire</p>
+      <ol class="sg-toc__list" role="list">
+<% sections.forEach(function (s, i) { %>
+        <li><a class="link link--quiet" href="#<%= s[0] %>"><span class="sg-toc__num"><%= String(i + 1).padStart(2, '0') %></span><%= s[1] %></a></li>
+<% }) %>
+      </ol>
+    </nav>
+
+    <div class="sg-content">
+
+      <!-- 01 · Couleurs -->
+      <section class="sg-section" id="couleurs" aria-labelledby="h-couleurs">
+        <header class="sg-section__head">
+          <p class="sg-section__num">01</p>
+          <h2 id="h-couleurs" class="h3">Couleurs</h2>
+          <p>Six couleurs de marque, converties en OKLCH. Une seule couleur d’accent : la terre cuite. Les neutres sont teintés chaud, jamais de gris pur.</p>
+        </header>
+        <ul class="sg-swatches" role="list">
+<% brand.forEach(function (c) { %>
+          <li class="sg-swatch">
+            <div class="sg-swatch__chip sg-chip--<%= c.key %>"></div>
+            <div class="sg-swatch__meta">
+              <p class="sg-swatch__name"><%= c.name %></p>
+              <p class="sg-mono"><%= c.hex %> · oklch(<%= c.oklch %>)</p>
+              <p class="sg-swatch__use"><%= c.use %></p>
+              <p class="sg-mono">--color-<%= c.key %></p>
+            </div>
+          </li>
+<% }) %>
+        </ul>
+        <div class="sg-proportions" aria-label="Proportions de la palette">
+          <span class="sg-prop sg-prop--clair">Karité et lin · 70 %</span>
+          <span class="sg-prop sg-prop--sombre">Ébène et cacao · 20 %</span>
+          <span class="sg-prop sg-prop--terre">8 %</span>
+          <span class="sg-prop sg-prop--laiton"><span class="visually-hidden">Laiton 2 %</span></span>
+        </div>
+
+        <h3 class="sg-sub">Tokens sémantiques</h3>
+        <p class="sg-note">Ils changent de valeur selon le thème. Les composants n’utilisent qu’eux. Contrastes vérifiés par <code>npm run check:contrast</code>.</p>
+        <ul class="sg-tokens" role="list">
+<% semantic.forEach(function (t) { %>
+          <li class="sg-token"><span class="sg-token__chip" data-token="<%= t[0] %>"></span><code><%= t[0] %></code><span><%= t[1] %></span></li>
+<% }) %>
+        </ul>
+      </section>
+
+      <!-- 02 · Typographie -->
+      <section class="sg-section" id="typographie" aria-labelledby="h-typo">
+        <header class="sg-section__head">
+          <p class="sg-section__num">02</p>
+          <h2 id="h-typo" class="h3">Typographie</h2>
+          <p>Bodoni Moda pour les titres, avec l’axe optique élevé. Manrope pour le texte et l’interface. Échelle fluide en <code>clamp()</code>, ratio 1,2 sur mobile et 1,333 sur desktop.</p>
+        </header>
+
+        <div class="sg-type-hero">
+          <p class="display">Vos locks, <em>un art</em>.</p>
+          <p class="sg-note">Display · Bodoni Moda 500 · mot-clé en italique 400 terre cuite</p>
+        </div>
+
+        <ol class="sg-scale" role="list">
+<% steps.forEach(function (s) { %>
+          <li class="sg-scale__row">
+            <span class="sg-scale__meta"><code><%= s[0] %></code><span><%= s[1] %> · <%= s[2] %></span></span>
+            <span class="sg-scale__sample sg-size<%= s[0].replace("--step", "") %>"><%= s[3] || "Prenez soin de vos racines" %></span>
+          </li>
+<% }) %>
+        </ol>
+
+        <div class="sg-type-grid">
+          <div class="stack">
+            <p class="eyebrow">Surtitre · Manrope 500 · +0,2 em</p>
+            <h3 class="h2">Prenez soin de <em>vos racines</em>.</h3>
+            <p class="lead">Chapô : une phrase qui pose l’intention de la section, en Manrope 400, plus grande et plus douce.</p>
+            <p>Texte courant : une loc se construit avec patience. Nous prenons le temps d’observer la texture de vos cheveux, leur densité et votre rythme de vie, avant de vous proposer une méthode. Interligne 1,6, environ 65 caractères par ligne.</p>
+            <p><strong>Texte appuyé en 600</strong>, pour souligner l’essentiel sans crier.</p>
+          </div>
+          <dl class="sg-prices">
+            <div><dt>Resserrage + coiffure</dt><dd class="price">60 €</dd></div>
+            <div><dt>Détox + resserrage</dt><dd class="price">80 €</dd></div>
+            <div><dt>Installation microlocks</dt><dd class="price">à partir de 350 €</dd></div>
+            <div><dt>Durée moyenne</dt><dd class="price">5h – 7h</dd></div>
+          </dl>
+          <!-- TODO-PROPRIO : prix d'exemple, à valider -->
+        </div>
+      </section>
+
+      <!-- 03 · Espacements -->
+      <section class="sg-section" id="espacements" aria-labelledby="h-espaces">
+        <header class="sg-section__head">
+          <p class="sg-section__num">03</p>
+          <h2 id="h-espaces" class="h3">Espacements</h2>
+          <p>Base 4 et 8. Aucune valeur hors de cette échelle. Les sections respirent entre 64 et 160 px selon l’écran (<code>--space-section</code>).</p>
+        </header>
+        <ol class="sg-spaces" role="list">
+<% spaces.forEach(function (s) { %>
+          <li class="sg-space"><code>--space-<%= s[0] %></code><span class="sg-space__bar sg-w-<%= s[0] %>"></span><span class="num"><%= s[1] %> px</span></li>
+<% }) %>
+        </ol>
+      </section>
+
+      <!-- 04 · Rayons et ombres -->
+      <section class="sg-section" id="formes" aria-labelledby="h-formes">
+        <header class="sg-section__head">
+          <p class="sg-section__num">04</p>
+          <h2 id="h-formes" class="h3">Rayons et ombres</h2>
+          <p>Des angles presque droits pour l’éditorial, la pilule pour les actions, l’arche pour les portraits. Ombres en couches, teintées ébène, toujours discrètes.</p>
+        </header>
+        <ul class="sg-shapes" role="list">
+          <li class="sg-shape sg-r-xs"><code>--radius-xs</code><span>2 px · focus</span></li>
+          <li class="sg-shape sg-r-sm"><code>--radius-sm</code><span>4 px · cartes, images</span></li>
+          <li class="sg-shape sg-r-md"><code>--radius-md</code><span>8 px · champs</span></li>
+          <li class="sg-shape sg-r-pill"><code>--radius-pill</code><span>boutons, badges</span></li>
+          <li class="sg-shape sg-r-arch"><code>--radius-arch</code><span>portraits</span></li>
+        </ul>
+        <ul class="sg-shadows" role="list">
+          <li class="sg-shadow sg-sh-sm"><code>--shadow-sm</code></li>
+          <li class="sg-shadow sg-sh-md"><code>--shadow-md</code></li>
+          <li class="sg-shadow sg-sh-lg"><code>--shadow-lg</code></li>
+        </ul>
+      </section>
+
+      <!-- 05 · Mouvement -->
+      <section class="sg-section" id="mouvement" aria-labelledby="h-mouvement">
+        <header class="sg-section__head">
+          <p class="sg-section__num">05</p>
+          <h2 id="h-mouvement" class="h3">Mouvement</h2>
+          <p>Survolez ou mettez le focus sur une ligne pour voir la courbe. Interface : 100 à 300 ms. Révélations éditoriales : 900 ms. Si votre appareil demande moins d’animations, tout devient instantané.</p>
+        </header>
+        <ul class="sg-motion" role="list">
+          <li><button class="sg-motion__row sg-ease-out" type="button"><span><code>--ease-out</code> · entrées · <code>--duration-base</code> 220 ms</span><span class="sg-motion__dot"></span></button></li>
+          <li><button class="sg-motion__row sg-ease-in-out" type="button"><span><code>--ease-in-out</code> · transformations · <code>--duration-panel</code> 300 ms</span><span class="sg-motion__dot"></span></button></li>
+          <li><button class="sg-motion__row sg-ease-in" type="button"><span><code>--ease-in</code> · sorties · <code>--duration-exit</code> 180 ms</span><span class="sg-motion__dot"></span></button></li>
+          <li><button class="sg-motion__row sg-ease-reveal" type="button"><span><code>--ease-out</code> · révélation · <code>--duration-reveal</code> 900 ms</span><span class="sg-motion__dot"></span></button></li>
+        </ul>
+      </section>
+
+      <!-- 06 · Boutons -->
+      <section class="sg-section" id="boutons" aria-labelledby="h-boutons">
+        <header class="sg-section__head">
+          <p class="sg-section__num">06</p>
+          <h2 id="h-boutons" class="h3">Boutons</h2>
+          <p>Un seul bouton primaire par vue. Libellé = verbe + objet. Zone cliquable de 44 px minimum. Pression : légère réduction (0,97).</p>
+        </header>
+        <div class="sg-states" role="table" aria-label="États des boutons">
+          <div class="sg-states__row sg-states__head" role="row">
+            <span role="columnheader">Variante</span><span role="columnheader">Repos</span><span role="columnheader">Survol</span><span role="columnheader">Focus</span><span role="columnheader">Pression</span><span role="columnheader">Désactivé</span><span role="columnheader">Chargement</span>
+          </div>
+<% [['primary', 'Primaire', 'Réserver'], ['secondary', 'Secondaire', 'Voir les tarifs']].forEach(function (v) { %>
+          <div class="sg-states__row" role="row">
+            <span role="rowheader" class="sg-states__label"><%= v[1] %></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %>" type="button"><%= v[2] %></button></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %> is-hover" type="button" tabindex="-1"><%= v[2] %></button></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %> is-focus" type="button" tabindex="-1"><%= v[2] %></button></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %> is-active is-hover" type="button" tabindex="-1"><%= v[2] %></button></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %>" type="button" disabled><%= v[2] %></button></span>
+            <span role="cell"><button class="btn btn--<%= v[0] %>" type="button" aria-busy="true" tabindex="-1"><span><%= v[2] %></span><span class="btn__loader" aria-hidden="true"><span></span><span></span><span></span></span><span class="visually-hidden">Envoi en cours</span></button></span>
+          </div>
+<% }) %>
+          <div class="sg-states__row" role="row">
+            <span role="rowheader" class="sg-states__label">Discret</span>
+            <span role="cell"><a class="btn btn--ghost" href="#boutons"><span class="btn__label">Découvrir</span><svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a></span>
+            <span role="cell"><a class="btn btn--ghost is-hover" href="#boutons" tabindex="-1"><span class="btn__label">Découvrir</span><svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a></span>
+            <span role="cell"><a class="btn btn--ghost is-focus" href="#boutons" tabindex="-1"><span class="btn__label">Découvrir</span><svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a></span>
+            <span role="cell" class="sg-na">–</span>
+            <span role="cell"><a class="btn btn--ghost" aria-disabled="true"><span class="btn__label">Découvrir</span></a></span>
+            <span role="cell" class="sg-na">–</span>
+          </div>
+        </div>
+        <div class="cluster sg-sizes">
+          <button class="btn btn--primary btn--sm" type="button">Réserver</button>
+          <button class="btn btn--primary" type="button">Réserver un créneau</button>
+          <button class="btn btn--primary btn--lg" type="button">Réserver mon rendez-vous</button>
+        </div>
+      </section>
+
+      <!-- 07 · Liens et badges -->
+      <section class="sg-section" id="liens" aria-labelledby="h-liens">
+        <header class="sg-section__head">
+          <p class="sg-section__num">07</p>
+          <h2 id="h-liens" class="h3">Liens et badges</h2>
+          <p>Dans un texte, le lien est terre cuite et souligné. Dans la navigation et le footer, il reste discret et se souligne au survol.</p>
+        </header>
+        <div class="sg-two">
+          <div class="stack">
+            <p>Avant votre rendez-vous, lisez <a class="link" href="#liens">nos conseils de préparation</a> : venez cheveux propres et démêlés.</p>
+            <ul class="cluster sg-link-states" role="list">
+              <li><a class="link" href="#liens">Repos</a></li>
+              <li><a class="link is-hover" href="#liens" tabindex="-1">Survol</a></li>
+              <li><a class="link is-focus" href="#liens" tabindex="-1">Focus</a></li>
+              <li><a class="link" aria-disabled="true">Indisponible</a></li>
+              <li><a class="link link--quiet" href="#liens">Discret</a></li>
+              <li><a class="link link--quiet is-hover" href="#liens" tabindex="-1">Discret survolé</a></li>
+            </ul>
+          </div>
+          <ul class="cluster" role="list">
+            <li><span class="badge">Microlocks</span></li>
+            <li><span class="badge badge--soft">5h – 7h</span></li>
+            <li><span class="badge badge--accent">Avis vérifié</span></li>
+            <li><span class="badge badge--status badge--success">Confirmé</span></li>
+            <li><span class="badge badge--status badge--warning">En attente</span></li>
+            <li><span class="badge badge--status badge--error">Annulé</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 08 · Formulaires -->
+      <section class="sg-section" id="formulaires" aria-labelledby="h-form">
+        <header class="sg-section__head">
+          <p class="sg-section__num">08</p>
+          <h2 id="h-form" class="h3">Formulaires</h2>
+          <p>Label toujours visible, aide sous le champ, erreur reliée au champ et annoncée. Police de 16 px minimum pour éviter le zoom sur iPhone.</p>
+        </header>
+        <form class="sg-form" novalidate data-sg-form>
+          <div class="field">
+            <label class="field__label" for="sg-prenom">Prénom</label>
+            <input class="field__control" id="sg-prenom" name="prenom" type="text" autocomplete="given-name" placeholder="Aïssatou" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="sg-email-hover">Email <span class="field__optional">(survol)</span></label>
+            <input class="field__control is-hover" id="sg-email-hover" type="email" autocomplete="off" value="aissatou@exemple.fr" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="sg-tel">Téléphone <span class="field__optional">(focus)</span></label>
+            <input class="field__control is-focus" id="sg-tel" type="tel" inputmode="tel" autocomplete="tel" value="06 12 34 56 78" aria-describedby="sg-tel-hint" />
+            <p class="field__hint" id="sg-tel-hint">Format français ou international. Nous l’utilisons seulement pour vos rappels.</p>
+          </div>
+          <div class="field field--invalid">
+            <label class="field__label" for="sg-email">Email</label>
+            <input class="field__control" id="sg-email" type="email" autocomplete="email" value="aissatou@exemple" aria-invalid="true" aria-describedby="sg-email-error" />
+            <p class="field__message" id="sg-email-error">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5v.01" /></svg>
+              Il manque la fin de l’adresse, par exemple « @gmail.com ».
+            </p>
+          </div>
+          <div class="field field--valid">
+            <label class="field__label" for="sg-nom">Nom</label>
+            <input class="field__control" id="sg-nom" type="text" autocomplete="family-name" value="Diallo" aria-describedby="sg-nom-ok" />
+            <p class="field__message" id="sg-nom-ok">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+              Parfait.
+            </p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="sg-disabled">Prestation choisie <span class="field__optional">(désactivé)</span></label>
+            <input class="field__control" id="sg-disabled" type="text" value="Resserrage + coiffure" disabled />
+          </div>
+          <div class="field">
+            <label class="field__label" for="sg-etat">État actuel de vos cheveux</label>
+            <select class="field__control" id="sg-etat">
+              <option>Cheveux naturels, sans locks</option>
+              <option>Locks de moins d’un an</option>
+              <option>Locks installées depuis plus d’un an</option>
+              <option>Locks à réparer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="sg-notes">Notes pour la locticienne <span class="field__optional">(facultatif)</span></label>
+            <textarea class="field__control" id="sg-notes" placeholder="Par exemple : cuir chevelu sensible, longueur souhaitée…"></textarea>
+          </div>
+          <div class="sg-checks stack">
+            <label class="check"><input type="checkbox" checked /> <span>Je reçois un SMS de rappel la veille de mon rendez-vous.</span></label>
+            <label class="check"><input type="checkbox" /> <span>Je souhaite recevoir la lettre de l’atelier (conseils, nouveautés). Une à deux fois par mois, désinscription en un clic.</span></label>
+            <label class="check"><input type="checkbox" disabled /> <span>Option indisponible pour cette prestation.</span></label>
+          </div>
+          <div class="cluster">
+            <button class="btn btn--primary" type="submit"><span>Envoyer ma demande</span><span class="btn__loader" aria-hidden="true"><span></span><span></span><span></span></span></button>
+            <p class="sg-note" data-sg-form-status aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+
+      <!-- 09 · Cartes prestation -->
+      <section class="sg-section" id="cartes" aria-labelledby="h-cartes">
+        <header class="sg-section__head">
+          <p class="sg-section__num">09</p>
+          <h2 id="h-cartes" class="h3">Cartes prestation</h2>
+          <p>Le visuel s’ouvre au survol ou au focus. Toute la carte est cliquable, avec un seul arrêt au clavier. La deuxième carte montre l’état survolé.</p>
+        </header>
+        <div class="sg-cards">
+<% services.forEach(function (s) { %>
+          <%~ include('../partials/service-card', s) %>
+<% }) %>
+        </div>
+        <div class="sg-cards sg-cards--arch">
+          <%~ include('../partials/service-card', { index: '03', category: 'Soin', title: 'Locks détox', text: 'Un bain clarifiant pour libérer vos locks des résidus et leur rendre légèreté et éclat.', duration: '2h – 3h', price: '80 €', from: false, href: '/prestations/detox', variant: 'arch' }) %>
+          <%~ include('../partials/service-card', { index: '04', category: 'Couleur', title: 'Coloration', text: 'Couleur complète, mèches ou pointes, avec un test d’allergie 48 h avant.', duration: '3h – 5h', price: '90 €', from: true, href: '/prestations/coloration', variant: 'arch' }) %>
+        </div>
+      </section>
+
+      <!-- 10 · Arches -->
+      <section class="sg-section" id="arches" aria-labelledby="h-arches">
+        <header class="sg-section__head">
+          <p class="sg-section__num">10</p>
+          <h2 id="h-arches" class="h3">Arches et visuels</h2>
+          <p>Les portraits vivent dans des arches qui s’ouvrent à l’apparition. Tant que les photos de l’atelier ne sont pas importées, un visuel de marque les remplace, clairement signalé.</p>
+        </header>
+        <div class="sg-arches">
+          <figure class="arch arch--sun arch--framed" data-reveal="arch">
+            <div class="arch__frame"><div class="placeholder"><span class="placeholder__label">Portrait de la fondatrice</span></div></div>
+            <figcaption class="arch__caption">Arche, soleil et filet laiton · révélation au scroll</figcaption>
+          </figure>
+          <figure class="arch" data-reveal="arch">
+            <div class="arch__frame"><div class="placeholder"><span class="placeholder__label">Réalisation</span></div></div>
+            <figcaption class="arch__caption">Arche simple · galerie</figcaption>
+          </figure>
+          <figure class="arch sg-arch-wide">
+            <div class="arch__frame sg-placeholder-rect"><div class="placeholder"><span class="placeholder__label">Photo à venir</span></div></div>
+            <figcaption class="arch__caption">Placeholder rectangulaire · 4:5</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- 11 · Fil de loc -->
+      <section class="sg-section sg-thread-section" id="fil" aria-labelledby="h-fil">
+        <header class="sg-section__head">
+          <p class="sg-section__num">11</p>
+          <h2 id="h-fil" class="h3">Le fil de <em>loc</em></h2>
+          <p>L’élément signature. Une ligne striée comme une loc, qui se dessine pendant que vous faites défiler la page et relie les sections. Si votre appareil demande moins d’animations, il s’affiche entier.</p>
+        </header>
+        <div class="sg-thread">
+          <%~ include('../partials/loc-thread', { id: 'loc-demo', animate: true, d: 'M20 40 C 260 10, 380 160, 300 260 S 60 360, 160 470 S 520 560, 700 500', viewBox: '0 0 720 560' }) %>
+          <div class="sg-thread__fine">
+            <p class="eyebrow">Variante fine · laiton</p>
+            <%~ include('../partials/loc-thread', { id: 'loc-fine', variant: 'fine', d: 'M4 20 C 120 4, 220 36, 340 20 S 560 4, 676 20', viewBox: '0 0 680 40' }) %>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 · Textures -->
+      <section class="sg-section" id="textures" aria-labelledby="h-textures">
+        <header class="sg-section__head">
+          <p class="sg-section__num">12</p>
+          <h2 id="h-textures" class="h3">Grain et bogolan</h2>
+          <p>Un grain papier très léger (4 à 6 %) réchauffe les fonds. La trame bogolan, faite de losanges et de lignes, reste en filigrane.</p>
+        </header>
+        <div class="sg-textures">
+          <div class="sg-texture grain"><span class="eyebrow">Grain papier</span></div>
+          <div class="sg-texture"><div class="bogolan" aria-hidden="true"></div><span class="eyebrow">Bogolan · lin sur karité</span></div>
+          <div class="sg-texture" data-surface="ebene"><div class="bogolan" aria-hidden="true"></div><span class="eyebrow">Bogolan · cacao sur ébène</span></div>
+        </div>
+      </section>
+
+      <!-- 13 · Navigation -->
+      <section class="sg-section" id="navigation" aria-labelledby="h-nav">
+        <header class="sg-section__head">
+          <p class="sg-section__num">13</p>
+          <h2 id="h-nav" class="h3">Header et menu mobile</h2>
+          <p>Le header en haut de cette page est le vrai composant : il se rétracte quand vous descendez et revient quand vous remontez. En dessous de 1024 px, le bouton « Menu » ouvre le menu plein écran. Aperçu figé ci-dessous.</p>
+        </header>
+        <div class="sg-menu-preview" data-surface="ebene">
+          <div class="sg-menu-preview__bar">
+            <img src="/brand/logo-horizontal-sombre.svg" alt="" width="150" height="33" />
+            <span class="menu-toggle" aria-hidden="true"><span class="menu-toggle__label">Fermer</span><span class="menu-toggle__bars sg-bars-open"><span></span><span></span></span></span>
+          </div>
+          <ol class="mobile-menu__list" role="list" aria-label="Aperçu du menu">
+<% it.site.nav.slice(0, 4).forEach(function (item, i) { %>
+            <li><span class="mobile-menu__link"><span class="mobile-menu__index"><%= String(i + 1).padStart(2, '0') %></span><%= item.label %></span></li>
+<% }) %>
+          </ol>
+          <span class="btn btn--primary btn--block" aria-hidden="true">Réserver un rendez-vous</span>
+        </div>
+      </section>
+
+      <!-- 14 · Sur fond ébène -->
+      <section class="sg-section sg-dark-demo grain" id="sombre" data-surface="ebene" aria-labelledby="h-sombre">
+        <div class="bogolan bogolan--dark" aria-hidden="true"></div>
+        <header class="sg-section__head">
+          <p class="sg-section__num">14</p>
+          <h2 id="h-sombre" class="h3">Sur fond <em>ébène</em></h2>
+          <p>Les sections sombres réutilisent les mêmes composants : les tokens basculent seuls. Le laiton peut alors porter du texte.</p>
+        </header>
+        <div class="sg-two">
+          <div class="stack">
+            <p class="eyebrow sg-brass">Le parcours d’une cliente</p>
+            <p class="h2">Consultation, <em>installation</em>, entretien.</p>
+            <div class="cluster">
+              <a class="btn btn--primary" href="#sombre">Réserver</a>
+              <a class="btn btn--secondary" href="#sombre">Voir les tarifs</a>
+            </div>
+            <p>Un doute sur la méthode ? <a class="link" href="#sombre">Lisez notre guide</a>.</p>
+          </div>
+          <div class="field field--invalid">
+            <label class="field__label" for="sg-dark-email">Email</label>
+            <input class="field__control" id="sg-dark-email" type="email" value="aissatou@" aria-invalid="true" aria-describedby="sg-dark-err" />
+            <p class="field__message" id="sg-dark-err">Il manque la fin de l’adresse.</p>
+            <div class="cluster">
+              <span class="badge badge--status badge--success">Confirmé</span>
+              <span class="badge">Toulouse</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

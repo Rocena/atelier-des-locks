@@ -1,0 +1,146 @@
+/* Menu mobile plein écran : fond ébène, soleil terre cuite qui se lève, liens Bodoni en cascade.
+   Ouverture : [data-open='true'] posé par scripts/components/mobile-menu.js (focus piégé, Échap). */
+@layer components {
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-menu);
+    display: grid;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background-color: var(--color-ebene);
+    color: var(--color-karite);
+    padding: calc(var(--header-height) + var(--space-6)) var(--space-gutter) var(--space-6);
+    clip-path: inset(0 0 100% 0);
+    transition: clip-path var(--duration-panel) var(--ease-in-out);
+  }
+  .mobile-menu[data-open='true'] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* Le soleil de l'emblème, en haut à droite */
+  .mobile-menu::before {
+    content: '';
+    position: absolute;
+    top: 18%;
+    right: -30vw;
+    width: 80vw;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-terre);
+    opacity: 0.9;
+    transform: translateY(20%) scale(0.9);
+    transition: transform 600ms var(--ease-out);
+    pointer-events: none;
+  }
+  .mobile-menu[data-open='true']::before {
+    transform: none;
+  }
+
+  .mobile-menu__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+
+  .mobile-menu__list {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .mobile-menu__item {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-panel) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * var(--stagger) + 80ms);
+  }
+  .mobile-menu__item:nth-child(2) {
+    --i: 1;
+  }
+  .mobile-menu__item:nth-child(3) {
+    --i: 2;
+  }
+  .mobile-menu__item:nth-child(4) {
+    --i: 3;
+  }
+  .mobile-menu__item:nth-child(5) {
+    --i: 4;
+  }
+  .mobile-menu__item:nth-child(6) {
+    --i: 5;
+  }
+  .mobile-menu__item:nth-child(n + 7) {
+    --i: 6;
+  }
+  .mobile-menu[data-open='true'] .mobile-menu__item {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mobile-menu__link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-4);
+    min-height: var(--tap-target);
+    padding-block: var(--space-2);
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.5rem + 4vw, 3.5rem);
+    font-weight: var(--weight-medium);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-display);
+    color: inherit;
+    text-decoration: none;
+  }
+  .mobile-menu__link:hover,
+  .mobile-menu__link:focus-visible {
+    font-style: italic;
+    color: var(--color-terre-400);
+  }
+  .mobile-menu__index {
+    font-family: var(--font-text);
+    font-size: var(--text-label);
+    letter-spacing: 0.1em;
+    color: var(--color-laiton);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mobile-menu__footer {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .mobile-menu__meta {
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-laiton);
+  }
+
+  /* Le contenu sous le menu ne défile pas */
+  html[data-menu-open='true'] {
+    overflow: hidden;
+  }
+  /* Quand le menu est ouvert, le header passe en couleurs claires sur l'ébène */
+  html[data-menu-open='true'] .site-header {
+    color-scheme: dark;
+    --text: var(--color-karite);
+  }
+  html[data-menu-open='true'] .site-header .logo--light {
+    display: none;
+  }
+  html[data-menu-open='true'] .site-header .logo--dark {
+    display: block;
+  }
+  html[data-menu-open='true'] .site-header__cta,
+  html[data-menu-open='true'] .theme-toggle {
+    visibility: hidden;
+  }
+
+  @media (min-width: 64rem) {
+    .mobile-menu {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,158 @@
+/* Carte prestation : visuel en arche ou portrait, numéro, catégorie, titre Bodoni, durée et prix.
+   Survol / focus : l'image s'ouvre (clip-path) et se rapproche, la flèche avance.
+   Le lien couvre toute la carte (pseudo-élément) : un seul arrêt de tabulation. */
+@layer components {
+  .service-card {
+    position: relative;
+    container-type: inline-size;
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    color: var(--text);
+  }
+
+  .service-card__media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    clip-path: inset(4% 4% 0 4% round var(--radius-sm));
+    transition: clip-path var(--duration-panel) var(--ease-out);
+  }
+  .service-card__media .placeholder {
+    padding: var(--space-6);
+  }
+  .service-card__media > * {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.06);
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .service-card__index {
+    position: absolute;
+    top: var(--space-5);
+    left: var(--space-5);
+    z-index: 1;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-1);
+    color: var(--text);
+  }
+
+  .service-card__body {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .service-card__title {
+    font-size: var(--step-3);
+    line-height: 1.08;
+  }
+
+  .service-card__text {
+    color: var(--text-muted);
+    font-size: var(--step--1);
+  }
+
+  .service-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-4);
+    padding-top: var(--space-3);
+    margin-top: var(--space-2);
+    border-top: var(--border-hairline) solid var(--line);
+    font-size: var(--step--1);
+  }
+  .service-card__price {
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
+  .service-card__price small {
+    font-size: inherit;
+    font-weight: var(--weight-regular);
+    color: var(--text-muted);
+  }
+  .service-card__duration {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .service-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--weight-medium);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .service-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+  .service-card__link:focus-visible {
+    outline: none;
+  }
+  .service-card:has(.service-card__link:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 6px;
+    border-radius: var(--radius-sm);
+  }
+  .service-card__link .icon {
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+
+  /* États : survol, focus clavier, forcé pour le styleguide */
+  .service-card:hover .service-card__media,
+  .service-card:focus-within .service-card__media,
+  .service-card.is-hover .service-card__media {
+    clip-path: inset(0 0 0 0 round var(--radius-sm));
+  }
+  .service-card:hover .service-card__media > *,
+  .service-card:focus-within .service-card__media > *,
+  .service-card.is-hover .service-card__media > * {
+    transform: scale(1);
+  }
+  .service-card:hover .service-card__link .icon,
+  .service-card.is-hover .service-card__link .icon {
+    transform: translateX(4px);
+  }
+  .service-card:hover .service-card__title,
+  .service-card.is-hover .service-card__title {
+    color: var(--accent-text);
+  }
+  .service-card__title {
+    transition: color var(--duration-fast) var(--ease-standard);
+  }
+
+  /* Prestation non réservable en ligne (sur devis) */
+  .service-card--quote .service-card__price {
+    font-weight: var(--weight-medium);
+    color: var(--text-muted);
+  }
+
+  /* Variante arche (accueil, prestations phares) */
+  .service-card--arch .service-card__media {
+    border-radius: var(--radius-arch);
+    clip-path: inset(4% 4% 0 4% round 999px 999px 0 0);
+  }
+  .service-card--arch:hover .service-card__media,
+  .service-card--arch:focus-within .service-card__media,
+  .service-card--arch.is-hover .service-card__media {
+    clip-path: inset(0 round 999px 999px 0 0);
+  }
+
+  /* Carte large : image et texte côte à côte quand la carte a la place */
+  @container (min-width: 36rem) {
+    .service-card--wide {
+      grid-template-columns: 5fr 7fr;
+      align-items: end;
+      gap: var(--space-6);
+    }
+  }
+}

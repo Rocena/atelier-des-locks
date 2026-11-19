@@ -1,0 +1,31 @@
+<%
+  /* Carte prestation. Paramètres : index, category, title, text, duration, price, from (bool), quote (bool), href, variant ('arch'|'wide'), state ('hover'), media (label du placeholder) */
+  var classes = ['service-card'];
+  if (it.variant) classes.push('service-card--' + it.variant);
+  if (it.quote) classes.push('service-card--quote');
+  if (it.state) classes.push('is-' + it.state);
+%>
+<article class="<%= classes.join(' ') %>">
+  <div class="service-card__media">
+    <div class="placeholder"><span class="placeholder__label"><%= it.media || 'Photo à venir' %></span></div>
+  </div>
+  <span class="service-card__index" aria-hidden="true"><%= it.index %></span>
+  <div class="service-card__body">
+    <p class="eyebrow"><%= it.category %></p>
+    <h3 class="service-card__title"><%= it.title %></h3>
+    <p class="service-card__text"><%= it.text %></p>
+    <!-- TODO-PROPRIO : durée et prix à confirmer -->
+    <div class="service-card__meta">
+      <span class="service-card__duration"><span class="visually-hidden">Durée : </span><%= it.duration %></span>
+<% if (it.quote) { %>
+      <span class="service-card__price">Sur devis</span>
+<% } else { %>
+      <span class="service-card__price"><% if (it.from) { %><small>à partir de </small><% } %><%= it.price %></span>
+<% } %>
+    </div>
+    <a class="service-card__link" href="<%= it.href %>">
+      Découvrir<span class="visually-hidden"> : <%= it.title %></span>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+    </a>
+  </div>
+</article>

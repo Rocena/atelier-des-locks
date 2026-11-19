@@ -1,0 +1,44 @@
+/* Liens. Par défaut dans un texte : terre cuite, souligné fin qui s'épaissit au survol. */
+@layer components {
+  .link,
+  .prose a {
+    color: var(--accent-text);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.22em;
+    text-decoration-color: color-mix(in oklch, currentColor 45%, transparent);
+    transition:
+      text-decoration-color var(--duration-fast) var(--ease-standard),
+      text-decoration-thickness var(--duration-fast) var(--ease-standard);
+  }
+  .link:hover,
+  .link.is-hover,
+  .prose a:hover {
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 2px;
+  }
+  .link.is-focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Lien discret (navigation, footer) : couleur du texte, soulignement au survol */
+  .link--quiet {
+    color: inherit;
+    text-decoration-color: transparent;
+  }
+  .link--quiet:hover,
+  .link--quiet.is-hover {
+    color: var(--accent-text);
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+  }
+
+  .link[aria-disabled='true'] {
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

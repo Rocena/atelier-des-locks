@@ -1,0 +1,156 @@
+/* Champ de formulaire : label visible, aide, message d'erreur relié (aria-describedby).
+   États : :hover, :focus-visible, [aria-invalid='true'], :disabled, succès (.field--valid). */
+@layer components {
+  .field {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    max-width: 32rem;
+  }
+
+  .field__label {
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    color: var(--text);
+  }
+  .field__optional {
+    font-weight: var(--weight-regular);
+    color: var(--text-muted);
+  }
+
+  .field__control {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    color: var(--text);
+    font-size: var(--step-0); /* ≥ 16 px : pas de zoom auto sur iOS */
+    line-height: 1.4;
+    transition:
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-fast) var(--ease-standard);
+  }
+  textarea.field__control {
+    min-height: 8rem;
+    resize: vertical;
+  }
+  select.field__control {
+    appearance: none;
+    padding-right: var(--space-8);
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 22px) 52%,
+      calc(100% - 16px) 52%;
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+  }
+  .field__control::placeholder {
+    color: var(--text-muted);
+    opacity: 0.75;
+  }
+  .field__control:hover,
+  .field__control.is-hover {
+    border-color: var(--text);
+  }
+  .field__control:focus-visible,
+  .field__control.is-focus {
+    outline: none;
+    border-color: var(--focus);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--focus) 28%, transparent);
+  }
+  .field__control:disabled {
+    cursor: not-allowed;
+    background-color: var(--surface-alt);
+    border-style: dashed;
+    color: var(--text-muted);
+  }
+
+  .field__hint {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+
+  .field__message {
+    display: flex;
+    gap: var(--space-2);
+    align-items: flex-start;
+    font-size: var(--step--1);
+    font-weight: var(--weight-medium);
+  }
+  .field__message .icon {
+    margin-top: 0.1em;
+  }
+
+  .field--invalid .field__control,
+  .field__control[aria-invalid='true'] {
+    border-color: var(--error);
+    border-width: var(--border-strong);
+  }
+  .field--invalid .field__control:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--error) 25%, transparent);
+  }
+  .field--invalid .field__message {
+    color: var(--error);
+  }
+  .field--valid .field__control {
+    border-color: var(--success);
+  }
+  .field--valid .field__message {
+    color: var(--success);
+  }
+
+  /* Case à cocher / consentement */
+  .check {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+    max-width: 36rem;
+    font-size: var(--step--1);
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .check input {
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin-top: 0.05em;
+    border: var(--border-strong) solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-raised);
+    cursor: pointer;
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard);
+  }
+  .check input::after {
+    content: '';
+    width: 0.375rem;
+    height: 0.7rem;
+    border: solid var(--on-accent);
+    border-width: 0 2px 2px 0;
+    transform: translateY(-1px) rotate(45deg) scale(0);
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+  .check input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .check input:checked::after {
+    transform: translateY(-1px) rotate(45deg) scale(1);
+  }
+  .check input:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .check input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

@@ -1,0 +1,184 @@
+/* Boutons : primaire (terre cuite, un seul par vue), secondaire (contour), discret (texte + flèche).
+   États : :hover, :focus-visible, :active, [disabled]/[aria-disabled], [aria-busy] (chargement).
+   Les classes .is-hover / .is-focus / .is-active forcent un état (styleguide uniquement). */
+@layer components {
+  .btn {
+    --btn-bg: transparent;
+    --btn-fg: var(--text);
+    --btn-border: transparent;
+    --btn-pad-y: var(--space-3);
+    --btn-pad-x: var(--space-6);
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--tap-target);
+    padding: var(--btn-pad-y) var(--btn-pad-x);
+    border: var(--border-hairline) solid var(--btn-border);
+    border-radius: var(--radius-pill);
+    background-color: var(--btn-bg);
+    color: var(--btn-fg);
+    font-family: var(--font-text);
+    font-size: var(--step-0);
+    font-weight: var(--weight-medium);
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      transform var(--duration-instant) var(--ease-out);
+  }
+
+  .btn:active,
+  .btn.is-active {
+    transform: scale(0.97);
+  }
+  .btn.is-focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .btn--ghost:focus-visible,
+  .btn--ghost.is-focus {
+    border-radius: var(--radius-xs);
+  }
+
+  /* Primaire */
+  .btn--primary {
+    --btn-bg: var(--accent);
+    --btn-fg: var(--on-accent);
+    --btn-border: var(--accent);
+  }
+  .btn--primary:hover,
+  .btn--primary.is-hover {
+    --btn-bg: var(--accent-hover);
+    --btn-border: var(--accent-hover);
+  }
+
+  /* Secondaire : contour fin, se remplit au survol */
+  .btn--secondary {
+    --btn-fg: var(--text);
+    --btn-border: var(--text);
+  }
+  .btn--secondary:hover,
+  .btn--secondary.is-hover {
+    --btn-bg: var(--text);
+    --btn-fg: var(--surface);
+  }
+
+  /* Discret : texte souligné d'un filet laiton, flèche qui avance */
+  .btn--ghost {
+    --btn-pad-x: 0;
+    --btn-fg: var(--text);
+    border-radius: 0;
+    min-height: var(--tap-target);
+  }
+  .btn--ghost .btn__label {
+    background: linear-gradient(var(--brass), var(--brass)) 0 100% / 100% 1px no-repeat;
+    padding-bottom: 2px;
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+  .btn--ghost:hover .btn__label,
+  .btn--ghost.is-hover .btn__label {
+    background-image: linear-gradient(var(--accent-text), var(--accent-text));
+  }
+  .btn--ghost:active {
+    transform: none;
+  }
+  .btn__arrow {
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .btn:hover .btn__arrow,
+  .btn.is-hover .btn__arrow {
+    transform: translateX(4px);
+  }
+
+  /* Tailles */
+  .btn--sm {
+    --btn-pad-y: var(--space-2);
+    --btn-pad-x: var(--space-5);
+    font-size: var(--step--1);
+  }
+  .btn--lg {
+    --btn-pad-y: var(--space-4);
+    --btn-pad-x: var(--space-7);
+    font-size: var(--step-1);
+  }
+  .btn--block {
+    display: flex;
+    width: 100%;
+  }
+
+  /* Désactivé : lisible mais clairement inerte */
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.45;
+    transform: none;
+    pointer-events: none;
+  }
+
+  /* Chargement : le libellé reste pour garder la largeur, trois points prennent le relais */
+  .btn[aria-busy='true'] {
+    cursor: progress;
+    pointer-events: none;
+  }
+  .btn[aria-busy='true'] > :not(.btn__loader) {
+    visibility: hidden;
+  }
+  .btn__loader {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .btn[aria-busy='true'] .btn__loader {
+    display: flex;
+  }
+  .btn__loader span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: btn-dot 900ms var(--ease-in-out) infinite;
+  }
+  .btn__loader span:nth-child(2) {
+    animation-delay: 120ms;
+  }
+  .btn__loader span:nth-child(3) {
+    animation-delay: 240ms;
+  }
+  @keyframes btn-dot {
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+  }
+
+  /* Bouton icône (thème, fermer…) */
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: var(--tap-target);
+    height: var(--tap-target);
+    border-radius: 50%;
+    color: var(--text);
+    transition: background-color var(--duration-fast) var(--ease-standard);
+  }
+  .icon-btn:hover {
+    background-color: color-mix(in oklch, var(--text) 8%, transparent);
+  }
+}

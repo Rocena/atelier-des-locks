@@ -1,0 +1,20 @@
+/* Feuille commune à toutes les pages publiques.
+   Ordre des couches : ce qui est déclaré plus bas l'emporte, quelle que soit la spécificité. */
+@layer reset, tokens, base, layout, components, utilities, pages;
+
+@import './fonts.css';
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './components/button.css';
+@import './components/link.css';
+@import './components/badge.css';
+@import './components/field.css';
+@import './components/service-card.css';
+@import './components/header.css';
+@import './components/mobile-menu.css';
+@import './components/footer.css';
+@import './components/arch.css';
+@import './components/loc-thread.css';
+@import './components/textures.css';
+@import './utilities.css';

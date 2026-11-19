@@ -1,0 +1,60 @@
+/* Le fil de loc : élément signature. Une ligne striée comme une loc, qui se dessine au scroll
+   et relie les sections. Structure SVG (partials/loc-thread.eta) :
+   - .loc-thread__body   : le corps de la loc (trait épais terre cuite)
+   - .loc-thread__twist  : les stries (pointillé court karité par-dessus = torsades)
+   - masque .loc-thread__draw : révèle progressivement le fil selon --loc-progress (0 → 1)
+   Mouvement réduit ou sans JS : le fil est affiché entier, statique. */
+@layer components {
+  .loc-thread {
+    --loc-progress: 1;
+    --loc-width: 7px;
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+    color: var(--accent);
+  }
+
+  .loc-thread__body,
+  .loc-thread__twist,
+  .loc-thread__draw {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .loc-thread__body {
+    stroke: currentColor;
+    stroke-width: var(--loc-width);
+  }
+  .loc-thread__twist {
+    stroke: var(--surface);
+    stroke-width: calc(var(--loc-width) - 2.5px);
+    stroke-dasharray: 1.4 5.2;
+    opacity: 0.55;
+  }
+  .loc-thread__tip {
+    fill: currentColor;
+  }
+  .loc-thread__draw {
+    stroke: #fff; /* blanc du masque SVG : valeur technique, non visible */
+    stroke-width: calc(var(--loc-width) + 6px);
+    stroke-dasharray: 1px 1px;
+    stroke-dashoffset: calc((1 - var(--loc-progress)) * 1px);
+  }
+
+  /* Variante fine et laiton (séparateurs, footer) */
+  .loc-thread--fine {
+    --loc-width: 3.5px;
+    color: var(--brass);
+  }
+
+  .js .loc-thread[data-animate] {
+    --loc-progress: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .js .loc-thread[data-animate] {
+      --loc-progress: 1;
+    }
+  }
+}

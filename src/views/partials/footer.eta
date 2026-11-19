@@ -1,0 +1,47 @@
+<footer class="site-footer" data-surface="ebene">
+  <div class="bogolan bogolan--dark" aria-hidden="true"></div>
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <img src="/brand/logo-vertical-sombre.svg" alt="L’Atelier des Locks" width="200" height="155" loading="lazy" />
+      <p class="site-footer__pitch">Création, entretien et soin des locks, avec patience et savoir-faire.</p>
+    </div>
+
+    <div class="site-footer__col">
+      <h2 class="eyebrow">Le salon</h2>
+      <!-- TODO-PROPRIO : adresse exacte -->
+      <address class="site-footer__address">
+        <%= it.site.address.street %><br />
+        <%= it.site.address.postalCode %> <%= it.site.address.city %>
+      </address>
+    </div>
+
+    <div class="site-footer__col">
+      <h2 class="eyebrow">Horaires</h2>
+      <!-- TODO-PROPRIO : horaires réels -->
+      <dl class="hours">
+<% it.site.hours.forEach(function (h) { %>
+        <div class="hours__row"><dt><%= h.days %></dt><dd><%= h.time %></dd></div>
+<% }) %>
+      </dl>
+    </div>
+
+    <div class="site-footer__col">
+      <h2 class="eyebrow">Explorer</h2>
+      <ul class="site-footer__links" role="list">
+        <li><a class="link link--quiet" href="/prestations">Prestations</a></li>
+        <li><a class="link link--quiet" href="/tarifs">Tarifs</a></li>
+        <li><a class="link link--quiet" href="/faq">Questions fréquentes</a></li>
+        <li><a class="link link--quiet" href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="site-footer__legal">
+    <p>© <%= new Date().getFullYear() %> L’Atelier des Locks · Toulouse</p>
+    <ul class="site-footer__legal-links" role="list">
+      <li><a class="link link--quiet" href="/mentions-legales">Mentions légales</a></li>
+      <li><a class="link link--quiet" href="/confidentialite">Confidentialité</a></li>
+      <li><a class="link link--quiet" href="/cgv-politique-rdv">Politique de rendez-vous</a></li>
+    </ul>
+  </div>
+</footer>
