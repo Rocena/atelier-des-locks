@@ -31,9 +31,14 @@ Le design system est visible sur http://127.0.0.1:3000/styleguide (hors producti
 
 Première installation de Playwright : `npx playwright install chromium`.
 
+## Production
+
+Déploiement sur un VPS de l'UE avec Docker Compose (application, PostgreSQL, Caddy pour HTTPS, sauvegardes chiffrées quotidiennes) : suivre **[docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md)** (pas à pas, pour une personne non technique). Fichiers : `Dockerfile`, `docker-compose.prod.yml`, `deploy/` (Caddyfile, sauvegarde et restauration, contrôle du `.env`), `.env.production.example`. Utilisation de l'admin : **[docs/GUIDE_PROPRIETAIRE.md](docs/GUIDE_PROPRIETAIRE.md)**.
+
 ## Documentation
 
 - [CLAUDE.md](CLAUDE.md) : règles du projet (humains et agents IA)
 - [docs/CAHIER_DES_CHARGES.md](docs/CAHIER_DES_CHARGES.md) : la référence fonctionnelle
+- [docs/DEPLOIEMENT.md](docs/DEPLOIEMENT.md) · [docs/GUIDE_PROPRIETAIRE.md](docs/GUIDE_PROPRIETAIRE.md)
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/SECURITY.md](docs/SECURITY.md) · [docs/PROGRESS.md](docs/PROGRESS.md)
 - [brand/BRAND.md](brand/BRAND.md) : identité visuelle

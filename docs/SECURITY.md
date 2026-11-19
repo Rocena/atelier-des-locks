@@ -8,7 +8,7 @@
 - [x] `@fastify/helmet` actif (nosniff, frame-ancestors 'none', referrer-policy) — test `app.test.js`
 - [x] CSP stricte à nonces, sans `unsafe-inline` en production — test `app.test.js`
 - [x] HSTS (2 ans, includeSubDomains, preload) en production
-- [ ] HTTPS de bout en bout (Caddy) — phase 8
+- [x] HTTPS de bout en bout (Caddy) : testé en local (redirection, HSTS, CSP) ; certificat réel à confirmer au premier démarrage
 - [x] Aucun attribut `style=""` ni gestionnaire `on*=` dans les templates (compatibilité CSP)
 
 ## Entrées et données (A03 Injection)
@@ -56,7 +56,7 @@
 - [x] Secrets uniquement par variables d'environnement ; `.env` ignoré par git ; `.env.example` documenté
 - [x] `SESSION_SECRET` ≥ 32 caractères exigé au démarrage
 - [x] Logs : en-têtes `cookie` et `authorization` masqués, **URL sans jeton ni paramètres** (`/rdv/[jeton]`, `/avis/laisser/[jeton]`, `/agenda/[jeton]`, plus de `?_csrf=`), adresse IP non journalisée ; événements de réservation par identifiant — test `app.test.js`
-- [ ] Caddy : même masquage des URL à jeton et de l'IP dans ses journaux — phase 8
+- [x] Caddy : journal sans IP, en-têtes, jetons ni paramètres — testé (`/rdv/<jeton>?x=1` journalisé `/rdv/`)
 - [x] Flux iCal privé : secret ≥ 32 caractères (`ICAL_FEED_TOKEN`), comparaison à temps constant, prénom + initiale uniquement
 - [x] Journal d'audit en ajout seul (déclencheur SQL), sans mot de passe, code ni secret (filtre testé), notifications_log avec destinataires masqués à l'affichage
 - [x] Export CSV protégé contre l'injection de formules, accès journalisé
@@ -65,8 +65,10 @@
 
 ## Exploitation
 
-- [ ] Sauvegardes quotidiennes chiffrées + test de restauration documenté — phase 8
+- [x] Sauvegardes quotidiennes chiffrées (age, clé publique sur le serveur, clé privée hors serveur, copies en clair en tmpfs) ; `restore verify` **testé** (effectifs vérifiés, mauvaise clé refusée) ; procédure documentée (`DEPLOIEMENT.md`, étape 12)
+- [x] Restauration réelle (`restore.sh live`) testée en local ; copie hors serveur : écrite, à tester au premier déploiement
 - [x] Base locale liée à 127.0.0.1 uniquement (`docker-compose.yml`)
+- [x] Production : aucun port publié pour la base ni l'application (seul Caddy : 80/443), réseau de la base `internal`, conteneurs non-root / lecture seule / `cap_drop: ALL` (`docker-compose.prod.yml`)
 - [x] Revue OWASP Top 10 complète (phase 7) : aucune faille critique ; constats ci-dessous
 
 ## Revue de phase 7 (OWASP Top 10, 2021)
@@ -81,4 +83,4 @@ Auditeur indépendant (sous-agent, code relu sans modification), puis correction
 - [x] **A05 : `Permissions-Policy`** fermée (caméra, micro, géolocalisation, paiement, USB)
 - [x] **A09 : RGPD et journaux** : purge planifiée (sessions expirées, IP à 12 mois — le déclencheur d'audit autorise seulement de mettre `ip` à NULL —, destinataires à 12 mois, photos à 1 an, clientes inactives anonymisées) — test `retention/service.test.js`
 - [ ] **Résiduel, assumé** : verrouillage du compte propriétaire par un tiers (verrou par compte : 5 échecs puis 1 à 60 min ; la limite par IP freine mais n'empêche pas ; déblocage en base) ; preuve de travail légère et anti-rejeu en mémoire (réinitialisé au redémarrage, une seule instance) ; limites de débit en mémoire ; journal d'audit non protégé contre `DELETE` / `TRUNCATE` par un compte SQL compromis ; l'équipe voit toutes les clientes (règle métier à confirmer) ; cookie CSRF non lié à la session (atténué par SameSite)
-- [ ] **Phase 8** : sauvegardes chiffrées + test de restauration, HTTPS de bout en bout
+- [ ] **Phase 8** : voir les cases ci-dessus (sauvegardes faites ; HTTPS et restauration réelle à valider sur la pile démarrée)

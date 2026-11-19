@@ -5,16 +5,17 @@
 
 ## État actuel
 
-| Phase                     | Statut                                                                          | Critère de fin                                        |
-| ------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 0 · Mise en place         | ✅ terminée (2026-11-19)                                                        | `npm run dev`, lint et tests passent                  |
-| 1 · Design system         | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
-| 2 · Pages publiques       | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
-| 3 · Base de données       | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
-| 4 · Réservation           | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
-| 5 · Notifications et avis | ✅ terminée (2026-11-19), Brevo à tester avec une vraie clé                     | Tests de planification des jobs                       |
-| 6 · Back-office           | ✅ terminée (2026-11-19), à essayer sur téléphone par la propriétaire           | Contrôle d'accès prouvé, e2e des parcours principaux  |
-| 7 · Durcissement          | ✅ terminée (2026-11-19) ; performance à re-mesurer sur une machine saine       | Checklists `SECURITY.md` et accessibilité             |
+| Phase                     | Statut                                                                                   | Critère de fin                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 0 · Mise en place         | ✅ terminée (2026-11-19)                                                                 | `npm run dev`, lint et tests passent                    |
+| 1 · Design system         | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire          | Styleguide validé (captures dans `docs/screenshots/`)   |
+| 2 · Pages publiques       | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire                    | Pages du §5, budgets §16 (Lighthouse mobile)            |
+| 3 · Base de données       | ✅ terminée (2026-11-19)                                                                 | Seeds JSON migrés en tables, `docs/DATABASE.md`         |
+| 4 · Réservation           | ✅ terminée (2026-11-19), règles de prestation longue à valider                          | Tests du moteur, e2e réservation                        |
+| 5 · Notifications et avis | ✅ terminée (2026-11-19), Brevo à tester avec une vraie clé                              | Tests de planification des jobs                         |
+| 6 · Back-office           | ✅ terminée (2026-11-19), à essayer sur téléphone par la propriétaire                    | Contrôle d'accès prouvé, e2e des parcours principaux    |
+| 7 · Durcissement          | ✅ terminée (2026-11-19) ; performance à re-mesurer sur une machine saine                | Checklists `SECURITY.md` et accessibilité               |
+| 8 · Déploiement           | 🟡 préparé et testé en local (2026-11-19), **rien déployé** ; captures du guide ajoutées | Pile prod testée en local, restauration répétée, guides |
 
 ## Phase 0 : fait
 
@@ -201,6 +202,41 @@ Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélior
 - **Accessibilité et performance** (Lighthouse, mobile, serveur en mode production, 6 pages : accueil, prestations, méthodes, réserver, contact, confidentialité) : **accessibilité 100, bonnes pratiques 100, SEO 100 partout**, CLS 0 à 0,001, JS initial de l'accueil **≈ 4 ko gzip** (GSAP chargé à la demande), transfert de l'accueil 283 ko. axe-core WCAG A/AA déjà couvert par les e2e (20 pages admin).
 - **Performance : à re-mesurer.** Scores mesurés ici : 98 (confidentialité), 89 (prestations), 77 (réserver) ; accueil, contact et méthodes autour de 60 (avant correctif : 33 à 65). Le temps de blocage (TBT) y est dominé par « Style & Layout », « Autre » et le ramasse-miettes, alors que le script ne pèse que 300 ms : la machine de test (4 Go de RAM, disque plein, benchmark Lighthouse 600) fausse la mesure. **Budget §16 (≥ 90) non confirmé** : refaire `lighthouse` sur une machine saine ou en ligne.
 - **Correctif de performance** : le grain papier n'utilise plus `mix-blend-mode` (recomposition d'un calque plein écran par section) ; accueil 33 → 60 et prestations 65 → 89 sur cette machine. Rendu quasi identique (grain très léger).
+
+## Phase 8 : préparé (aucun déploiement)
+
+**Livrables** (tous dans le dépôt ; rien n'a été envoyé sur un serveur ni mis en ligne) :
+
+- `Dockerfile` multi-stage (deps de prod → build Vite → runtime Node 22 Debian slim, utilisateur `node`, sans secret, `HEALTHCHECK`) et `.dockerignore`.
+- `docker-compose.prod.yml` : `caddy` (seul exposé : 80/443, HTTPS Let's Encrypt automatique, adresse fixe `172.30.10.2` = `TRUST_PROXY`), `app` (lecture seule, `cap_drop: ALL`, migrations au démarrage, volume des photos), `db` (PostgreSQL 17, **aucun port publié**, réseau `internal`), `backup` (sauvegarde nocturne chiffrée), `restore` (profil `tools`). Logs `json-file` pivotés (5 × 10 Mo). Valeurs lues dans `.env` (modèle `.env.production.example`), avec messages d'erreur clairs si l'une manque.
+- `deploy/Caddyfile` : redirection `www`, limite de corps 12 Mo, sonde active `/health`, journal d'accès **filtré** (IP, en-têtes, jetons `/rdv`, `/avis/laisser`, `/agenda` et paramètres supprimés).
+- `deploy/backup/` : `backup.sh` (pg_dump → contrôle du dump → chiffrement **age à clé publique** : la clé privée n'est jamais sur le serveur ; copies en clair uniquement en tmpfs ; rotation 14 j / 8 sem. / 12 mois ; copie hors serveur rclone et signal de supervision facultatifs), `loop.sh` (03:30 Paris, 3 essais), `restore.sh` (`verify` = base temporaire, ne touche pas à la production ; `live` = remplace la base, refuse si l'application tourne, sauvegarde de sécurité chiffrée d'abord).
+- `deploy/preflight.sh` : contrôle du `.env` (valeurs, longueurs, clé publique et non privée, DNS, textes légaux restants).
+- `scripts/init-production.js` (`npm run db:init`) : migrations + contenus de départ **sans avis d'exemple**, relançable sans rien écraser. `scripts/admin-recover.js` : déblocage de compte, 2FA perdue, tracé au journal d'audit (le SQL est dans `auth/repo.js`).
+- `/health` vérifie maintenant la base (503 sans détail si elle ne répond pas en 2 s) ; test ajouté.
+- `docs/DEPLOIEMENT.md` (pas à pas pour une personne non technique, avec la liste de ce qu'il faut côté propriétaire) et `docs/GUIDE_PROPRIETAIRE.md` (mode d'emploi de l'admin avec captures).
+
+**Vérifié** (en local, jamais sur un serveur) :
+
+- `docker compose config` valide ; images `app` et `backup` construites ; `scripts/init-production.js` exécuté dans le conteneur durci (non-root, lecture seule) sur une base neuve : 11 migrations + contenus, 0 avis.
+- Sauvegarde exécutée dans l'image `backup` (lecture seule, `cap_drop: ALL`) contre une vraie base : fichier chiffré (en-tête age) ; `restore verify` : effectifs corrects (16 prestations, 1 cliente, 11 migrations, photos) ; **mauvaise clé refusée** avec un message clair ; base temporaire supprimée.
+- Tests unitaires : `/health` en 503 sans fuite, `db:init` (base neuve sans avis, relance sans écrasement) ; lint, Prettier et typecheck propres.
+
+**Vérifié aussi, après libération du disque** :
+
+- Pile complète démarrée en local (`DOMAIN=localhost`, ports 18080/18443) : app « healthy », HTTPS via Caddy, `/health` à travers Caddy, redirection HTTP→HTTPS, HSTS et CSP présents.
+- `deploy/Caddyfile` validé par `caddy validate`. Le filtre de journal initial (`multi_regexp`) n'existe pas dans Caddy 2.9 : remplacé par une seule règle `regexp`. Constaté : ni IP, ni en-têtes, ni jeton (`/rdv/SECRET?x=1` journalisé `/rdv/`), ni paramètres.
+- Défaut corrigé : le conteneur `backup` pouvait prendre l'adresse fixe de Caddy (172.30.10.2) ; le réseau `web` a maintenant un `ip_range` qui l'exclut.
+- `restore.sh live` : refuse si l'application tourne, fait la sauvegarde de sécurité chiffrée, remplace la base (les données ajoutées après la sauvegarde disparaissent) et restaure les photos ; l'app redémarre « healthy ».
+- Rotation : les sauvegardes quotidiennes anciennes sont supprimées, celles du 1er du mois et des dimanches récents sont gardées. Healthcheck du service `backup` « healthy ».
+- `npm test` : 30 fichiers, 462 tests verts (dont `admin-recover` et `db:init`).
+
+**Reste non vérifié** :
+
+- `caddy:2-alpine` (dernière version) plante au démarrage (code 139) sur cette machine de développement ; `caddy:2.9-alpine` fonctionne. Probablement propre à cette machine virtuelle, mais à surveiller au premier démarrage sur le vrai serveur (sinon épingler `caddy:2.9-alpine`).
+- Certificat Let's Encrypt réel (nécessite un vrai domaine), copie rclone hors serveur, signal de supervision, planification nocturne (`loop.sh`), envoi Brevo réel.
+- Captures du guide : ajoutées (`ADMIN_SHOTS_ONLY=plus,reglages ADMIN_SHOTS=1 npx playwright test tests/e2e/admin-shots.spec.js` pour en refaire certaines). Données de démonstration uniquement.
+- Lighthouse sur machine saine (inchangé).
 
 ## Reste à faire (phase 8 et suivantes)
 
