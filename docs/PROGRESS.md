@@ -10,7 +10,8 @@
 | 0 · Mise en place   | ✅ terminée (2026-11-19)                                                        | `npm run dev`, lint et tests passent                  |
 | 1 · Design system   | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
 | 2 · Pages publiques | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
-| 3 · Base de données | ⏭️ prochaine                                                                    | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
+| 3 · Base de données | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
+| 4 · Réservation     | ⏭️ prochaine                                                                    | Tests du moteur, e2e réservation                      |
 
 ## Phase 0 : fait
 
@@ -77,9 +78,18 @@
 - **Point de vigilance** : le LCP de l'accueil est à la limite du budget (2,5 s). Lighthouse voit toujours le loader d'entrée (session neuve), qui retarde le hero de ~1 s. Les vraies photos (AVIF, `srcset`) devront être vérifiées à nouveau.
 - Corrections faites pour tenir les budgets : GSAP à la première interaction, bandeau défilant en pause hors écran, calques dédiés pour le loader, filigrane de l'emblème réservé aux arches (le SVG de 61 ko coûtait cher en rendu sur les vignettes), `text-wrap: pretty` limité aux textes longs, compression.
 
-## Reste à faire (phase 3 et suivantes)
+## Phase 3 : fait
 
-- Phase 3 : tables `services`, `methods`, `gallery_items`, `reviews`, `articles`, `faq_items` ; remplacer `json-store.js` par du SQL dans les `repo.js` ; `docs/DATABASE.md`.
+- **Schéma complet** (toutes phases), 7 nouvelles migrations commentées : catalogue (`categories`, `services`, `service_options`, `service_photos`, `methods`, `service_methods`, `faq_*`), comptes (`users`, `sessions`), planning (`staff`, `staff_services`, `opening_hours`, `closures`, `blocks`), `clients`, `appointments` + `appointment_options`, `reviews` + `review_tokens`, contenu (`tags`, `gallery_items`, `articles`, `content_blocks`), `notifications_log`, `audit_log` (ajout seul). Documenté dans `docs/DATABASE.md` (diagramme, conventions, conservation RGPD).
+- **Anti-double-réservation** : `EXCLUDE USING gist (staff_id =, tstzrange(starts_at, ends_at) &&)` sur les statuts qui occupent le planning ; l'annulation libère le créneau. Prouvé par des tests (chevauchement refusé `23P01`, créneaux contigus acceptés, autre praticienne, annulé). Même garde-fou sur les plages d'ouverture.
+- **Seeds JSON → base** (`db/seed-content.js`, SQL paramétré, idempotent, vérifié par test) : 5 catégories, 16 prestations, 13 options, 10 méthodes, 14 réalisations, 8 avis, 3 articles, 28 questions FAQ, réglages `site.*`, étapes de maturation (`content_blocks`), une praticienne par défaut. **Prix, durées, options, avis et visuels : `is_placeholder = true`.** `json-store.js` supprimé.
+- **Modules** alignés sur le §11 : `catalog` → `services`, `journal` → `content` (absorbe aussi les réglages et la FAQ de `site`), `gallery` et `reviews` conservés. Chaque repo reçoit le pool (`app.db`), les formes de données sont inchangées : **routes et templates n'ont pas bougé**, sauf l'ajout du pool.
+- **API de lecture JSON** validée par Zod : `/api/services[/:slug]`, `/api/gallery`, `/api/reviews`, `/api/articles`, `/api/content/:key`. `isPlaceholder` n'est jamais exposé.
+- **Pages publiques branchées** sur la base ; données communes (méga-menu, bandeau) relues au plus toutes les 30 s.
+- **Tests** : base dédiée `<base>_test` créée, migrée et seedée automatiquement (`vitest globalSetup`), fichiers exécutés en série. 84 tests unitaires et 45 e2e passent ; lint et typecheck propres.
+
+## Reste à faire (phase 4 et suivantes)
+
 - Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
 - Tunnel de réservation (§7), pages à jeton `/rdv/:token` et `/avis/laisser/:token`.
 - Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
@@ -87,6 +97,12 @@
 - CI (lint, tests, `npm audit`) à mettre en place.
 
 ## Décisions prises
+
+- **Phase 3, modules** : noms du §11 (`services`, `content`). Le SQL ne vit que dans les `repo.js` ; migrations et seeds sont les seules autres sources de SQL.
+- **Phase 3, statuts en anglais** en base (`pending`, `confirmed`, `completed`, `cancelled_by_client`, `cancelled_by_salon`, `no_show`), libellés français à l'affichage.
+- **Phase 3, prix en centimes** en base, en euros dans le code (conversion dans les repos).
+- **Phase 3, `appointments.ends_at`** inclut le tampon : c'est la fin d'occupation du planning.
+- **Phase 3, tests sur base dédiée** : `npm test` exige PostgreSQL (`npm run db:up`).
 
 - **Eta appelé directement** (`src/server/lib/view.js`), sans `@fastify/view` : moins de magie, même échappement automatique.
 - **PostgreSQL 17** (le cahier des charges demande 16 ou plus).
@@ -106,6 +122,10 @@
 - Le tout premier commit (outillage) a été fait avec `--no-verify`, avant que lint-staged n'ait de fichiers à traiter. Tous les commits suivants passent par le hook.
 
 ## Points d'attention
+
+- **Avis d'exemple en base** : ils sont publiés (`approved`) comme en phase 2. Avant la mise en ligne, les supprimer (`is_placeholder`) : tant qu'il n'y a pas de vrai avis, le §8 demande de masquer les blocs.
+- **Aucun horaire d'ouverture** n'est semé (inconnus) : le moteur de la phase 4 ne proposera aucun créneau tant qu'ils ne sont pas saisis.
+- Les e2e et `npm run dev` utilisent la base de dev : lancer `npm run db:up && npm run db:migrate && npm run db:seed` d'abord.
 
 - Le projet est dans **OneDrive** : `node_modules` et `dist/` sont synchronisés en continu, ce qui ralentit et peut verrouiller des fichiers. Il est conseillé de déplacer le dépôt hors de OneDrive, ou d'exclure ces dossiers de la synchronisation. La base, elle, est dans un volume Docker.
 - Le serveur de dev de Vite affiche le port HMR `PORT + 21000` (24000 pour le port 3000).

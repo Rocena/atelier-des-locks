@@ -1,13 +1,14 @@
 // @ts-check
-import { findPublishedArticles } from './repo.js';
+import { findContentBlock, findPublishedArticles } from './repo.js';
 import { sortArticles } from './service.js';
-import { slugParams } from '../catalog/schemas.js';
+import { contentKeyParams } from './schemas.js';
+import { slugParams } from '../services/schemas.js';
 import { site } from '../../lib/site.js';
 
 /** @param {import('fastify').FastifyInstance} app */
 export default async function journalRoutes(app) {
   app.get('/conseils', async (_request, reply) => {
-    const articles = sortArticles(await findPublishedArticles());
+    const articles = sortArticles(await findPublishedArticles(app.db));
     return reply.page('pages/conseils', 'editorial', {
       title: 'Conseils locks · Le journal de L’Atelier des Locks',
       description:
@@ -19,7 +20,7 @@ export default async function journalRoutes(app) {
   app.get('/conseils/:slug', async (request, reply) => {
     const parsed = slugParams.safeParse(request.params);
     if (!parsed.success) return reply.callNotFound();
-    const articles = sortArticles(await findPublishedArticles());
+    const articles = sortArticles(await findPublishedArticles(app.db));
     const article = articles.find((a) => a.slug === parsed.data.slug);
     if (!article) return reply.callNotFound();
     return reply.page('pages/article', 'editorial', {
@@ -46,4 +47,17 @@ export default async function journalRoutes(app) {
       ],
     });
   });
+
+  // API de lecture : un bloc de contenu éditable par clé.
+  app.get('/api/content/:key', async (request, reply) => {
+    const parsed = contentKeyParams.safeParse(request.params);
+    if (!parsed.success) return reply.code(404).send({ error: 'Not Found' });
+    const block = await findContentBlock(app.db, parsed.data.key);
+    if (!block) return reply.code(404).send({ error: 'Not Found' });
+    return { block };
+  });
+
+  app.get('/api/articles', async () => ({
+    articles: sortArticles(await findPublishedArticles(app.db)),
+  }));
 }

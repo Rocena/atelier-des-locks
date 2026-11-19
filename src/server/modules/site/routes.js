@@ -3,14 +3,13 @@
  * Pages publiques éditoriales : accueil, le salon, contact, FAQ, réservation (vitrine),
  * pages légales, sitemap.xml et robots.txt.
  */
-import { findFaq, findSettings } from './repo.js';
+import { findFaq, findSettings, findPublishedArticles } from '../content/repo.js';
 import { faqJsonLd, hairSalonJsonLd, sitemapXml } from './service.js';
-import { findCatalog, findMethods } from '../catalog/repo.js';
-import { groupByCategory } from '../catalog/service.js';
+import { findCatalog, findMethods } from '../services/repo.js';
+import { groupByCategory } from '../services/service.js';
 import { findGallery } from '../gallery/repo.js';
 import { findPublishedReviews } from '../reviews/repo.js';
 import { featuredReviews, summarizeReviews } from '../reviews/service.js';
-import { findPublishedArticles } from '../journal/repo.js';
 import { site } from '../../lib/site.js';
 
 /** Pages légales : chemin → template et titre. */
@@ -41,7 +40,13 @@ const LEGAL = /** @type {const} */ ([
 export default async function siteRoutes(app) {
   app.get('/', async (_request, reply) => {
     const [{ categories, services }, { methods }, { items }, reviews, settings] = await Promise.all(
-      [findCatalog(), findMethods(), findGallery(), findPublishedReviews(), findSettings()],
+      [
+        findCatalog(app.db),
+        findMethods(app.db),
+        findGallery(app.db),
+        findPublishedReviews(app.db),
+        findSettings(app.db),
+      ],
     );
     const summary = summarizeReviews(reviews);
     return reply.page('pages/home', 'home', {
@@ -59,7 +64,7 @@ export default async function siteRoutes(app) {
   });
 
   app.get('/le-salon', async (_request, reply) => {
-    const settings = await findSettings();
+    const settings = await findSettings(app.db);
     return reply.page('pages/le-salon', 'editorial', {
       title: 'Le salon · De Dakar à Toulouse, L’Atelier des Locks',
       description:
@@ -69,7 +74,7 @@ export default async function siteRoutes(app) {
   });
 
   app.get('/contact', async (_request, reply) => {
-    const reviews = await findPublishedReviews();
+    const reviews = await findPublishedReviews(app.db);
     return reply.page('pages/contact', 'editorial', {
       title: 'Contact et accès · L’Atelier des Locks, Toulouse',
       description:
@@ -79,7 +84,7 @@ export default async function siteRoutes(app) {
   });
 
   app.get('/faq', async (_request, reply) => {
-    const groups = await findFaq();
+    const groups = await findFaq(app.db);
     return reply.page('pages/faq', 'editorial', {
       title: 'Questions fréquentes · L’Atelier des Locks',
       description:
@@ -91,7 +96,7 @@ export default async function siteRoutes(app) {
 
   // Vitrine du tunnel de réservation : le module fonctionnel arrive dans une phase suivante.
   app.get('/reserver', async (_request, reply) => {
-    const { categories, services } = await findCatalog();
+    const { categories, services } = await findCatalog(app.db);
     return reply.page('pages/reserver', 'editorial', {
       title: 'Réserver un rendez-vous · L’Atelier des Locks',
       description: 'Réservez votre rendez-vous locks à Toulouse en quatre étapes.',
@@ -118,7 +123,10 @@ export default async function siteRoutes(app) {
   );
 
   app.get('/sitemap.xml', async (_request, reply) => {
-    const [{ services }, articles] = await Promise.all([findCatalog(), findPublishedArticles()]);
+    const [{ services }, articles] = await Promise.all([
+      findCatalog(app.db),
+      findPublishedArticles(app.db),
+    ]);
     const paths = [
       '/',
       '/prestations',

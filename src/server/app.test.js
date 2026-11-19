@@ -1,9 +1,9 @@
 // @ts-check
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from './app.js';
-import { loadConfig } from './config.js';
+import { testConfig } from './test-helpers.js';
 
-const config = loadConfig({ NODE_ENV: 'test', SESSION_SECRET: 'x'.repeat(48) });
+const config = testConfig();
 
 describe('application (mode test, sans Vite)', () => {
   /** @type {import('fastify').FastifyInstance} */
@@ -71,11 +71,7 @@ describe('application (mode test, sans Vite)', () => {
 describe('styleguide désactivé', () => {
   it('renvoie 404 quand STYLEGUIDE_ENABLED=false', async () => {
     const app = await buildApp({
-      config: loadConfig({
-        NODE_ENV: 'test',
-        SESSION_SECRET: 'x'.repeat(48),
-        STYLEGUIDE_ENABLED: 'false',
-      }),
+      config: testConfig({ STYLEGUIDE_ENABLED: 'false' }),
       logger: false,
     });
     const res = await app.inject({ method: 'GET', url: '/styleguide' });

@@ -1,5 +1,7 @@
 # Module `gallery`
 
 - **Rôle** : galerie des réalisations, filtrable par catégorie, méthode et taille (§5).
-- **Routes** : `GET /galerie` (filtres en paramètres d'URL validés par Zod ; filtrage instantané côté client).
-- **Données** : phase 2 → `db/seeds/gallery.json` (placeholders) ; phase 3 → table + import des photos (§12).
+- **Routes** : `GET /galerie` (filtres d'URL validés par Zod, filtrage instantané côté client) ; JSON : `GET /api/gallery`.
+- **Tables** : `gallery_items`, `tags` (taille), `gallery_item_tags`. `image_path` NULL = placeholder de marque.
+- **Métier** : `service.js` (filtres, facettes), fonctions pures testées.
+- **Photos** : aucune photo récupérée sur le web ; import des originales prévu (§12).

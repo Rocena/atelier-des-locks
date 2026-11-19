@@ -8,18 +8,19 @@ import helmet from '@fastify/helmet';
 import compress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
+import { createPool } from './db/pool.js';
 import { createAssetResolver } from './lib/assets.js';
 import { createRenderer } from './lib/view.js';
 import { site } from './lib/site.js';
 import { fmt } from './lib/format.js';
 import siteRoutes from './modules/site/routes.js';
-import catalogRoutes from './modules/catalog/routes.js';
+import servicesRoutes from './modules/services/routes.js';
 import galleryRoutes from './modules/gallery/routes.js';
 import reviewsRoutes from './modules/reviews/routes.js';
-import journalRoutes from './modules/journal/routes.js';
-import { findCatalog } from './modules/catalog/repo.js';
-import { buildNavigation } from './modules/catalog/service.js';
-import { findSettings } from './modules/site/repo.js';
+import contentRoutes from './modules/content/routes.js';
+import { findCatalog } from './modules/services/repo.js';
+import { buildNavigation } from './modules/services/service.js';
+import { findSettings } from './modules/content/repo.js';
 import styleguideRoutes from './modules/styleguide/routes.js';
 
 /**
@@ -27,6 +28,7 @@ import styleguideRoutes from './modules/styleguide/routes.js';
  * @property {import('./config.js').AppConfig} config
  * @property {import('vite').ViteDevServer} [vite]  serveur Vite en mode middleware (dev)
  * @property {boolean} [logger]
+ * @property {import('pg').Pool} [db]  pool PostgreSQL (créé depuis la config s'il est absent)
  */
 
 /**
@@ -51,7 +53,7 @@ function cspDirectives(dev) {
 }
 
 /** @param {BuildOptions} options */
-export async function buildApp({ config, vite, logger = true }) {
+export async function buildApp({ config, vite, logger = true, db }) {
   const dev = !config.isProd;
   const app = Fastify({
     logger: logger && {
@@ -96,12 +98,26 @@ export async function buildApp({ config, vite, logger = true }) {
 
   app.decorate('publicUrl', config.publicUrl);
 
+  // Pool PostgreSQL partagé par tous les modules (les repo.js reçoivent app.db). Fermé avec l'app.
+  const pool = db ?? createPool(config.databaseUrl);
+  app.decorate('db', pool);
+  if (!db) app.addHook('onClose', () => pool.end());
+
   const resolveAssets = createAssetResolver({ dev: !config.isProd });
-  // Données communes à toutes les pages (méga-menu, bandeau d'annonce).
-  // Phase 3 : relues en base à chaque requête (ou mises en cache avec invalidation admin).
-  const { categories, services } = await findCatalog();
-  const navigation = buildNavigation(categories, services);
-  const settings = await findSettings();
+  // Données communes à toutes les pages (méga-menu, bandeau d'annonce), relues en base au plus
+  // toutes les 30 s en production (1 s en dev) : une modification admin se voit sans redémarrage.
+  const SHARED_TTL_MS = config.isProd ? 30_000 : 1_000;
+  async function loadShared() {
+    const [{ categories, services }, settings] = await Promise.all([
+      findCatalog(pool),
+      findSettings(pool),
+    ]);
+    return { navigation: buildNavigation(categories, services), settings, loadedAt: Date.now() };
+  }
+  let shared = await loadShared();
+  app.addHook('onRequest', async () => {
+    if (Date.now() - shared.loadedAt > SHARED_TTL_MS) shared = await loadShared();
+  });
   const render = createRenderer({ cache: config.isProd });
 
   /**
@@ -119,11 +135,11 @@ export async function buildApp({ config, vite, logger = true }) {
       JSON.stringify(item).replaceAll('<', String.fromCharCode(92) + 'u003c'),
     );
     const html = render(template, {
-      settings,
+      settings: shared.settings,
       ...data,
       jsonLd,
       site,
-      navigation,
+      navigation: shared.navigation,
       fmt,
       pathname,
       canonical: config.publicUrl + (pathname === '/' ? '/' : pathname),
@@ -140,10 +156,10 @@ export async function buildApp({ config, vite, logger = true }) {
   app.get('/health', async () => ({ status: 'ok' }));
 
   await app.register(siteRoutes);
-  await app.register(catalogRoutes);
+  await app.register(servicesRoutes);
   await app.register(galleryRoutes);
   await app.register(reviewsRoutes);
-  await app.register(journalRoutes);
+  await app.register(contentRoutes);
   if (config.styleguideEnabled) await app.register(styleguideRoutes);
 
   app.setNotFoundHandler((request, reply) => {

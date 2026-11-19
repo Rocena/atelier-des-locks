@@ -1,6 +1,7 @@
 # Module `reviews`
 
-- **Rôle** : avis clientes publiés, note moyenne et répartition (§8).
-- **Routes** : `GET /avis`. À venir : `GET/POST /avis/laisser/:token` (phase avis).
-- **Données** : phase 2 → `db/seeds/reviews.json` (**avis d'exemple, à remplacer avant la mise en ligne**).
+- **Rôle** : lecture des avis publiés, note moyenne et répartition (§8).
+- **Routes** : `GET /avis` ; JSON : `GET /api/reviews`. À venir : `/avis/laisser/:token` (dépôt, modération).
+- **Tables** : `reviews` (lecture : `status = 'approved'`), `review_tokens` (phase avis).
 - **Métier** : `service.js` (moyenne, répartition, mise en avant), testé.
+- **Attention** : les 8 avis actuels sont des **exemples** (`is_placeholder`), à remplacer avant la mise en ligne.

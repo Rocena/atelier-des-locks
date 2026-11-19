@@ -1,5 +1,6 @@
 // @ts-check
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
+import { testPool } from '../../test-helpers.js';
 import { findCatalog, findMethods } from './repo.js';
 import {
   buildNavigation,
@@ -11,8 +12,10 @@ import {
   serviceJsonLd,
 } from './service.js';
 
-const { categories, services } = await findCatalog();
-const { methods } = await findMethods();
+const pool = testPool();
+const { categories, services } = await findCatalog(pool);
+const { methods } = await findMethods(pool);
+afterAll(() => pool.end());
 
 /** @param {string} slug */
 const get = (slug) =>

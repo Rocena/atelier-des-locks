@@ -1,13 +1,9 @@
 // @ts-check
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp } from '../../app.js';
-import { loadConfig } from '../../config.js';
+import { testConfig } from '../../test-helpers.js';
 
-const config = loadConfig({
-  NODE_ENV: 'test',
-  SESSION_SECRET: 'x'.repeat(48),
-  PUBLIC_URL: 'https://exemple.fr',
-});
+const config = testConfig({ PUBLIC_URL: 'https://exemple.fr' });
 
 /** Toutes les pages publiques de la phase 2 (§5, hors réservation fonctionnelle et pages à jeton). */
 const PAGES = [

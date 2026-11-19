@@ -11,13 +11,13 @@ import {
   relatedServices,
   serviceJsonLd,
 } from './service.js';
-import { slugParams } from './schemas.js';
+import { publicService, slugParams, servicesQuery } from './schemas.js';
 import { site } from '../../lib/site.js';
 
 /** @param {import('fastify').FastifyInstance} app */
 export default async function catalogRoutes(app) {
   app.get('/prestations', async (_request, reply) => {
-    const { categories, services } = await findCatalog();
+    const { categories, services } = await findCatalog(app.db);
     return reply.page('pages/prestations', 'services', {
       title: 'Prestations · L’Atelier des Locks, locticienne à Toulouse',
       description:
@@ -29,10 +29,10 @@ export default async function catalogRoutes(app) {
   app.get('/prestations/:slug', async (request, reply) => {
     const parsed = slugParams.safeParse(request.params);
     if (!parsed.success) return reply.callNotFound();
-    const { categories, services } = await findCatalog();
+    const { categories, services } = await findCatalog(app.db);
     const service = findActiveService(services, parsed.data.slug);
     if (!service) return reply.callNotFound();
-    const { methods } = await findMethods();
+    const { methods } = await findMethods(app.db);
     const category = categories.find((c) => c.slug === service.category) ?? null;
     return reply.page('pages/prestation', 'services', {
       title: `${service.name} à Toulouse · L’Atelier des Locks`,
@@ -53,7 +53,7 @@ export default async function catalogRoutes(app) {
   });
 
   app.get('/methodes', async (_request, reply) => {
-    const { methods, stages } = await findMethods();
+    const { methods, stages } = await findMethods(app.db);
     return reply.page('pages/methodes', 'methods', {
       title: 'Les méthodes de locks expliquées · L’Atelier des Locks, Toulouse',
       description:
@@ -65,12 +65,32 @@ export default async function catalogRoutes(app) {
   });
 
   app.get('/tarifs', async (_request, reply) => {
-    const { categories, services } = await findCatalog();
+    const { categories, services } = await findCatalog(app.db);
     return reply.page('pages/tarifs', 'services', {
       title: 'Tarifs · L’Atelier des Locks, locticienne à Toulouse',
       description:
         'Grille tarifaire complète : création de locks, resserrage, détox, coloration, coiffure et options. Prix et durées indicatifs.',
       ...groupByCategory(categories, services),
     });
+  });
+
+  // API de lecture publique (JSON). Jamais d'info interne : isPlaceholder reste côté admin (§6).
+  app.get('/api/services', async (request) => {
+    const { categorie } = servicesQuery.parse(request.query ?? {});
+    const { services } = await findCatalog(app.db);
+    return {
+      services: services
+        .filter((s) => s.active && (!categorie || s.category === categorie))
+        .map(publicService),
+    };
+  });
+
+  app.get('/api/services/:slug', async (request, reply) => {
+    const parsed = slugParams.safeParse(request.params);
+    if (!parsed.success) return reply.code(404).send({ error: 'Not Found' });
+    const { services } = await findCatalog(app.db);
+    const service = findActiveService(services, parsed.data.slug);
+    if (!service) return reply.code(404).send({ error: 'Not Found' });
+    return { service: publicService(service) };
   });
 }
