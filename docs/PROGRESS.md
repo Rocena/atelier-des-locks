@@ -5,13 +5,14 @@
 
 ## État actuel
 
-| Phase               | Statut                                                                          | Critère de fin                                        |
-| ------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| 0 · Mise en place   | ✅ terminée (2026-11-19)                                                        | `npm run dev`, lint et tests passent                  |
-| 1 · Design system   | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
-| 2 · Pages publiques | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
-| 3 · Base de données | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
-| 4 · Réservation     | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
+| Phase                     | Statut                                                                          | Critère de fin                                        |
+| ------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| 0 · Mise en place         | ✅ terminée (2026-11-19)                                                        | `npm run dev`, lint et tests passent                  |
+| 1 · Design system         | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
+| 2 · Pages publiques       | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
+| 3 · Base de données       | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
+| 4 · Réservation           | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
+| 5 · Notifications et avis | ✅ terminée (2026-11-19), Brevo à tester avec une vraie clé                     | Tests de planification des jobs                       |
 
 ## Phase 0 : fait
 
@@ -135,14 +136,33 @@
   - e2e : 21 tests dans `tests/e2e/booking.spec.js` (11 desktop, 10 mobile ; le parcours au clavier est testé sur desktop), sur mobile et desktop (parcours complet avec photo, déplacement et annulation, erreurs, créneau pris, états du calendrier, présélection, clavier, axe-core WCAG A/AA) ;
   - les réservations e2e (`@e2e.test.invalid`) sont nettoyées avant et après la suite (`tests/e2e/cleanup.js`).
 
-## Reste à faire (phase 5 et suivantes)
+## Phase 5 : fait
 
-- **Notifications** (§7.6, Brevo, pg-boss) : aujourd'hui, la création, le déplacement et l'annulation ne font que journaliser un événement (`appointment.created`…), sans donnée personnelle. L'email de confirmation avec le lien « Gérer mon RDV » est **indispensable avant la mise en production** : sans lui, la cliente ne garde le lien que si elle le note à l'étape 4.
+- **Notifications** (`modules/notifications/`) :
+  - interface `NotificationProvider` ; `console` (dev et tests, destinataires masqués) et `brevo` (API `/smtp/email` et `/transactionalSMS/sms`, erreurs 4xx définitives, 429 et 5xx rejouées) ;
+  - jobs **pg-boss** dans PostgreSQL (schéma `pgboss`, 6 essais à délai croissant), démarrés par `index.js` ; file en mémoire en test ;
+  - 7 files : confirmation, déplacement/annulation, alerte propriétaire, rappel J-2 (email, 10h), rappel J-1 (SMS, 18h), demande d'avis (terminé + 3 h), relance unique (+ 5 jours) ;
+  - planification **pure** (`plan.js`, heure de Paris, changements d'heure) et garde-fous rejoués à l'exécution : RDV annulé, déplacé ou avis déjà laissé → message écarté et journalisé `skipped` ;
+  - jamais de doublon : clé de dédoublonnage unique par canal (migration 0009), seul le canal en échec est retenté ;
+  - jobs **sans donnée personnelle** ; le jeton « Gérer mon RDV » (haché en base) n'y figure que **chiffré** (AES-256-GCM, clé dérivée de `SESSION_SECRET`) pour les rappels ;
+  - emails HTML en tableaux, responsive, aux couleurs de la marque (en-tête ébène, filet laiton, bouton terre cuite, polices de secours Bodoni 72 / Didot / Georgia et Helvetica / Segoe UI), version texte, logo en PNG (`npm run email-logo`), `.ics` joint à la confirmation et au déplacement ;
+  - SMS transcodés GSM, 160 caractères maximum, lien jamais tronqué, sans « STOP » ; expéditeur `SMS_SENDER` (11 caractères alphanumériques).
+- **Avis** (`modules/reviews/`) :
+  - lien `/avis/laisser/:token` (32 octets, SHA-256, 30 jours, usage unique, pages `no-store` / `noindex` / `no-referrer`) ;
+  - formulaire sans JavaScript : note en étoiles (boutons radio), texte, prénom + initiale, photo facultative (magic bytes, WebP via sharp, `UPLOAD_DIR/reviews/`), consentement obligatoire, CSRF, pot de miel, limitation de débit ;
+  - dépôt transactionnel : avis `pending` (« à modérer »), `verified`, jeton consommé ; deux envois simultanés ne créent qu'un avis ;
+  - publics : `/avis` (note moyenne, répartition, photo, réponse de la propriétaire, lien Google `GOOGLE_REVIEW_URL`), avis par prestation, blocs masqués tant qu'il n'y a aucun avis (accueil) ou « Les premiers avis arrivent bientôt » (`/avis`) ; photos servies par `/avis/photos/:id` **uniquement si l'avis est approuvé**.
+- **Branchement** : création, déplacement et annulation appellent `app.notifications.*` (qui ne lève jamais d'erreur : la réservation est déjà enregistrée). `appointmentCompleted` est prêt pour l'admin.
+- **Tests** : 289 tests unitaires (dont 29 de planification, 19 de messages et fournisseurs, 11 de cycle de vie avec base, 17 sur les avis) ; lint, typecheck et build propres. e2e non relancés.
+
+## Reste à faire (phase 6 et suivantes)
+
+- **Notifications en production** : créer le compte Brevo, valider l'expéditeur (SPF, DKIM), renseigner `NOTIFICATIONS_PROVIDER=brevo`, `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `OWNER_EMAIL`, `GOOGLE_REVIEW_URL`, puis envoyer un message réel. Le fournisseur Brevo n'a été testé qu'avec un faux `fetch`. Tester aussi les emails dans Gmail, Outlook et Apple Mail (§7.6).
+- **Admin (phase 6) à brancher** : bouton « terminé » → `app.notifications.appointmentCompleted` ; annulation par le salon → `appointmentCancelled({ by: 'salon' })` ; validation d'un RDV `pending` ; modération des avis (approuver, refuser, répondre, mettre en avant) ; écran du journal `notifications_log` ; textes d'emails éditables (aujourd'hui dans `messages.js`).
 - Admin (phase 6) : validation des RDV `pending`, consultation des photos (`UPLOAD_DIR/hair/`), blocages, fermetures, réglages `booking.*`.
 - Purge RGPD des photos de cheveux après le RDV (durée à fixer, cf. `docs/DATABASE.md`).
 
 - Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
-- Page à jeton `/avis/laisser/:token` (phase 5).
 - Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
 - Textes d'interface dans des fichiers de traduction (i18n, §18) : non fait en phase 2, les contenus métier sont déjà séparés des templates (seeds JSON).
 - CI (lint, tests, `npm audit`) à mettre en place.
@@ -183,6 +203,16 @@
 - **Phase 2, prix** : affichés tels quels côté public (`isPlaceholder` sert au badge « à confirmer » en admin, §6).
 - Le tout premier commit (outillage) a été fait avec `--no-verify`, avant que lint-staged n'ait de fichiers à traiter. Tous les commits suivants passent par le hook.
 
+## Décisions de la phase 5
+
+- **Rappels** : email J-2 à 10h, SMS J-1 à 18h (heure de Paris), non envoyés s'ils sont déjà passés à la réservation. Les RDV `pending` n'en reçoivent pas.
+- **Annuler ou déplacer** : pas d'annulation de jobs, mais des garde-fous à l'exécution (un job égaré ne produit jamais un message erroné).
+- **Alerte propriétaire** : aussi envoyée pour un déplacement ou une annulation (le §7.6 ne cite que le nouveau RDV).
+- **Relance d'avis** : un nouveau lien est émis, avec l'**échéance du premier** (pas de prolongation) ; une seule relance par RDV.
+- **Journal** : une ligne par message et par canal, destinataire inclus (purge à 12 mois, cf. DATABASE.md). La console n'affiche que des destinataires masqués.
+- **Limite connue** : la planification se fait après l'enregistrement du RDV, pas dans la même transaction. Si la base de jobs était indisponible à cet instant, les messages ne partiraient pas (l'erreur est journalisée).
+- **Un avis vérifié bloque la suppression de son RDV** (contrainte `reviews_verified_needs_appointment`) : la suppression passera par l'anonymisation de la cliente.
+
 ## Points d'attention
 
 - **Avis d'exemple en base** : ils sont publiés (`approved`) comme en phase 2. Avant la mise en ligne, les supprimer (`is_placeholder`) : tant qu'il n'y a pas de vrai avis, le §8 demande de masquer les blocs.
@@ -194,6 +224,8 @@
 - Le serveur de dev de Vite affiche le port HMR `PORT + 21000` (24000 pour le port 3000).
 
 ## Questions pour la propriétaire
+
+0. **Phase 5** : adresse email qui reçoit les alertes de RDV ? Lien de votre fiche Google pour les avis ? Textes des emails et SMS à relire (`modules/notifications/messages.js`) ? Heures de rappel (J-2 à 10h, veille à 18h) ?
 
 1. Prénom et nom de la fondatrice, adresse exacte, horaires, téléphone, WhatsApp, Instagram (marqués `TODO-PROPRIO` dans `src/server/lib/site.js`).
 2. Prix et durées réels de chaque prestation et option (les valeurs du styleguide sont des exemples).
