@@ -17,27 +17,34 @@ Navigateur ──HTTP──▶ Fastify (src/server/app.js)
 
 ## Dossiers
 
-| Dossier                 | Rôle                                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------------- |
-| `src/server/config.js`  | Seul point de lecture de l'environnement, validé par Zod                                    |
-| `src/server/app.js`     | Création de l'app, plugins de sécurité, rendu, enregistrement des modules                   |
-| `src/server/lib/`       | Utilitaires partagés : `assets.js` (Vite), `view.js` (Eta), `site.js` (infos du salon)      |
-| `src/server/modules/`   | Un dossier par domaine (`site`, `styleguide` ; à venir : `services`, `booking`, `reviews`…) |
-| `src/server/db/`        | `pool.js`, `migrate.js`, `seed.js`, `migrations/*.sql`, `seeds/*.sql`                       |
-| `src/views/`            | Templates Eta : `layouts/`, `partials/` (composants), `pages/`                              |
-| `src/client/entries.js` | Liste des entrées Vite (une page = un CSS + un JS)                                          |
-| `src/client/styles/`    | `tokens.css`, `base.css`, `layout.css`, `components/*.css`, `pages/*.css`                   |
-| `src/client/scripts/`   | `common.js` + `components/*.js` + `pages/*.js`                                              |
-| `public/`               | Fichiers servis tels quels (logos en noms ASCII, favicon)                                   |
-| `tests/e2e/`            | Playwright (desktop 1440, mobile 390)                                                       |
+| Dossier                 | Rôle                                                                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `src/server/config.js`  | Seul point de lecture de l'environnement, validé par Zod                                                                 |
+| `src/server/app.js`     | Création de l'app, plugins de sécurité, rendu, enregistrement des modules                                                |
+| `src/server/lib/`       | Utilitaires partagés : `assets.js` (Vite), `view.js` (Eta), `site.js` (infos du salon)                                   |
+| `src/server/modules/`   | Un dossier par domaine : `site`, `catalog`, `gallery`, `reviews`, `journal`, `styleguide` (à venir : `booking`, `admin`) |
+| `src/server/db/`        | `pool.js`, `migrate.js`, `seed.js`, `migrations/*.sql`, `seeds/*.sql` ; phase 2 : `seeds/*.json` lus par `json-store.js` |
+| `src/views/`            | Templates Eta : `layouts/`, `partials/` (composants), `pages/`                                                           |
+| `src/client/entries.js` | Liste des entrées Vite (une page = un CSS + un JS)                                                                       |
+| `src/client/styles/`    | `tokens.css`, `base.css`, `layout.css`, `components/*.css`, `pages/*.css`                                                |
+| `src/client/scripts/`   | `common.js` + `components/*.js` + `pages/*.js`                                                                           |
+| `public/`               | Fichiers servis tels quels (logos en noms ASCII, favicon)                                                                |
+| `tests/e2e/`            | Playwright (desktop 1440, mobile 390)                                                                                    |
 
 ## Front-end
 
 - **Couches CSS** (`main.css`) : `reset, tokens, base, layout, components, utilities, pages`.
 - **Tokens** : primitives OKLCH (palette BRAND.md) → tokens sémantiques (`--surface`, `--text`, `--accent-text`…) redéfinis pour `[data-theme='dark']` et `[data-surface='ebene']`. Les composants n'utilisent que les tokens sémantiques.
 - **Thème** : script inline (avec nonce) qui pose `data-theme` avant le rendu ; sans JS, `prefers-color-scheme`.
-- **JS** : modules ES sans dépendance. GSAP, ScrollTrigger et Lenis arrivent en phase 2, chargés à la demande.
+- **JS** : modules ES. `common.js` (thème, header, menus, barre Réserver, révélations, curseur, bandeau défilant) sur toutes les pages, ~4 ko gzip.
+- **Mouvement** : `scripts/motion/smooth.js` (Lenis) et `scripts/motion/gsap.js` (GSAP, ScrollTrigger, SplitText) sont importés dynamiquement à la **première interaction**, jamais en mouvement réduit (`withMotion()` dans `common.js`). Le hero, le loader et les View Transitions sont en CSS pur.
 - **Polices** : Fontsource (Bodoni Moda opsz + italique, Manrope), auto-hébergées, préchargées en production.
+
+## Données (phase 2)
+
+- Contenus seed en JSON (`src/server/db/seeds/*.json`), lus par `db/json-store.js` depuis les seuls `repo.js`. Phase 3 : SQL paramétré dans ces mêmes repos, sans toucher aux routes ni aux templates.
+- Convention de contenu : `*mot*` devient le mot en italique terre cuite (`fmt.accent()`, échappement préalable).
+- `reply.page()` injecte dans chaque page : `site`, `settings` (bandeau), `navigation` (méga-menu), `fmt`, `canonical`, `jsonLd` (sérialisé et neutralisé).
 
 ## Base de données
 

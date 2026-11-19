@@ -9,7 +9,8 @@
 | ------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | 0 · Mise en place   | ✅ terminée (2026-11-19)                                                        | `npm run dev`, lint et tests passent                  |
 | 1 · Design system   | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
-| 2 · Pages publiques | ⏭️ prochaine                                                                    |                                                       |
+| 2 · Pages publiques | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
+| 3 · Base de données | ⏭️ prochaine                                                                    | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
 
 ## Phase 0 : fait
 
@@ -40,11 +41,49 @@
   - lien d'évitement visible ;
   - libellé du bouton de thème écrasé par un `aria-label`.
 
-## Reste à faire (phase 2 et suivantes)
+## Phase 2 : fait
 
-- Phase 2 : toutes les pages du §5 avec contenus seed. GSAP + ScrollTrigger + SplitText + Lenis (chargés à la demande), View Transitions, méga-menu desktop, barre « Réserver » collante sur mobile, bandeau d'annonce, fil d'Ariane, loader d'entrée, boutons magnétiques et curseur sur desktop. Textes dans des fichiers de traduction (i18n, §18). Lighthouse.
-- Image Open Graph de marque, `sitemap.xml`, `robots.txt`, JSON-LD `HairSalon`.
-- `docs/DATABASE.md` à créer en phase 3 avec le schéma.
+- **Pages** (§5) : accueil, `/le-salon`, `/prestations`, `/prestations/:slug` (16 prestations), `/methodes`, `/galerie`, `/tarifs`, `/avis`, `/conseils` (+ 3 articles), `/faq`, `/contact`, `/reserver` (vitrine de la 1re étape, le tunnel arrive plus tard), `/mentions-legales`, `/confidentialite`, `/cgv-politique-rdv`, 404. Plus `sitemap.xml` et `robots.txt`.
+- **Données seed JSON** dans `src/server/db/seeds/*.json` (prestations et catégories, méthodes, galerie, avis, articles, FAQ, réglages). Lues **uniquement** par les `repo.js` via `db/json-store.js` : en phase 3, seuls les repos changent.
+- **Modules** : `catalog` (prestations, méthodes, tarifs), `gallery`, `reviews`, `journal`, `site` (accueil, pages éditoriales, légal, SEO). Métier en fonctions pures testées (regroupement, suggestions, méga-menu, filtres de galerie, moyenne des avis, JSON-LD, sitemap).
+- **Accueil** exactement selon le déroulé du §5 (10 sections), avec les **7 signatures** du §15 :
+  1. fil de loc piloté par ScrollTrigger (manifeste, parcours) ;
+  2. titres révélés ligne par ligne (SplitText, masque) ; le titre du hero est révélé en CSS pur (LCP) ;
+  3. arches révélées en `clip-path` + léger parallax ;
+  4. carrousel des méthodes épinglé et piloté par le scroll (≥ 1024 px ; glissable au doigt en dessous ; panneau amené à l'écran au focus clavier) ;
+  5. View Transitions entre documents (fondu + glissement du titre `.page-title`) ;
+  6. boutons magnétiques et curseur discret (pointeur fin uniquement, curseur natif conservé) ;
+  7. loader d'entrée en CSS pur (≤ 1,2 s, une fois par session) : soleil qui se lève, puis l'emblème.
+- **Chargement à la demande** : Lenis (5,5 ko gzip) et GSAP + ScrollTrigger + SplitText (48 ko gzip) ne se chargent qu'à la **première interaction** (scroll, pointeur, clavier). JS initial de l'accueil : ~4 ko gzip.
+- **Navigation à la raissadora** : bandeau d'annonce (éditable, masquable, mémorisé par id), header sticky rétractable, méga-menu « Prestations » (survol avec délai d'intention, clavier, Échap), tiroir mobile avec sous-catégories et liens secondaires, fil d'Ariane (microdonnées `BreadcrumbList`) sur les pages profondes, barre « Réserver » collante en bas sur mobile et tablette.
+- **`prefers-reduced-motion`** : pas de loader, pas de Lenis, pas de GSAP, fils affichés entiers, bandeau défilant figé, pas de View Transitions.
+- **SEO** : title/description/canonical uniques, Open Graph avec `public/og-image.png` (`npm run og-image`), JSON-LD `HairSalon` (accueil, contact), `Service` (prestations), `Article`, `FAQPage`.
+- **Compression** brotli/gzip des réponses (`@fastify/compress`).
+- **Tests** : 61 tests unitaires (dont toutes les pages en 200, titres uniques, 404, sitemap, JSON-LD sûr, compression, mention Sisterlocks™) ; 45 tests e2e (chaque page sans erreur console ni défilement horizontal à 390 et 1440, méga-menu au clavier, barre Réserver, filtres et lightbox de la galerie, mouvement réduit).
+- **Vérification visuelle** à 390, 768 et 1440 px, clair et sombre : captures dans `docs/screenshots/` (`npm run screenshots -- <url>`).
+
+### Lighthouse mobile (build de production, médiane de 3 passages)
+
+| Page                    | Perf    | A11y | Bonnes pratiques | SEO | LCP         | CLS     |
+| ----------------------- | ------- | ---- | ---------------- | --- | ----------- | ------- |
+| Accueil                 | 90 – 98 | 100  | 100              | 100 | 2,3 – 2,5 s | 0       |
+| Prestations             | 99      | 100  | 100              | 100 | 1,0 s       | 0       |
+| Prestation (détail)     | 94      | 100  | 100              | 100 | 1,1 s       | 0       |
+| Méthodes                | 100     | 100  | 100              | 100 | 1,2 s       | 0       |
+| Galerie, avis, le salon | 99      | 100  | 100              | 100 | ≤ 1,0 s     | 0       |
+| Conseils, FAQ, contact… | 99–100  | 100  | 100              | 100 | ≤ 1,0 s     | ≤ 0,004 |
+
+- La machine de développement est bruyante (OneDrive) : un passage isolé peut varier de ±20 points. D'où la médiane.
+- **Point de vigilance** : le LCP de l'accueil est à la limite du budget (2,5 s). Lighthouse voit toujours le loader d'entrée (session neuve), qui retarde le hero de ~1 s. Les vraies photos (AVIF, `srcset`) devront être vérifiées à nouveau.
+- Corrections faites pour tenir les budgets : GSAP à la première interaction, bandeau défilant en pause hors écran, calques dédiés pour le loader, filigrane de l'emblème réservé aux arches (le SVG de 61 ko coûtait cher en rendu sur les vignettes), `text-wrap: pretty` limité aux textes longs, compression.
+
+## Reste à faire (phase 3 et suivantes)
+
+- Phase 3 : tables `services`, `methods`, `gallery_items`, `reviews`, `articles`, `faq_items` ; remplacer `json-store.js` par du SQL dans les `repo.js` ; `docs/DATABASE.md`.
+- Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
+- Tunnel de réservation (§7), pages à jeton `/rdv/:token` et `/avis/laisser/:token`.
+- Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
+- Textes d'interface dans des fichiers de traduction (i18n, §18) : non fait en phase 2, les contenus métier sont déjà séparés des templates (seeds JSON).
 - CI (lint, tests, `npm audit`) à mettre en place.
 
 ## Décisions prises
@@ -58,6 +97,12 @@
 - **Logos** : les fichiers `brand/emblème*.svg` ont des noms abîmés à la décompression (`embl├¿me…`). Ils sont copiés sans accent dans `public/brand/` (`embleme.svg`…) ; `brand/` n'est pas modifié.
 - **Sections** : `overflow-x: clip` sur `.section`, pour que les décors (soleil, fil) puissent déborder sans créer de défilement horizontal.
 - **Captures** : seules les vues « au-dessus de la ligne de flottaison » sont commitées ; les pleines pages se régénèrent avec `npm run screenshots`.
+- **Phase 2, données** : seeds JSON lus par les `repo.js` (async, comme le futur `pg`), données communes (méga-menu, réglages) chargées une fois au démarrage.
+- **Phase 2, textes riches** : convention `*mot*` → `<em>` (mot italique terre cuite), via `fmt.accent()` qui échappe le texte **avant** la conversion.
+- **Phase 2, JSON-LD** : sérialisé côté serveur avec `<` neutralisé, injecté dans un `<script type="application/ld+json">` avec nonce.
+- **Phase 2, plan** : pas d'iframe de carte (CSP, traceurs) ; plan stylisé décoratif + lien OpenStreetMap.
+- **Phase 2, entrées Vite** : `home`, `services` (prestations, détail, tarifs), `methods`, `gallery`, `editorial` (autres pages), `styleguide`.
+- **Phase 2, prix** : affichés tels quels côté public (`isPlaceholder` sert au badge « à confirmer » en admin, §6).
 - Le tout premier commit (outillage) a été fait avec `--no-verify`, avant que lint-staged n'ait de fichiers à traiter. Tous les commits suivants passent par le hook.
 
 ## Points d'attention
@@ -75,3 +120,7 @@
 6. Composition exacte de la détox ; certification Sisterlocks™ ; formations proposées ?
 7. Photos originales (réalisations, portrait, salon), idéalement une vidéo de 10 s pour le hero, à déposer dans `content/photos-a-importer/`.
 8. Nom de domaine souhaité, compte Brevo, hébergement.
+9. **Avis** : les 8 avis du site sont des **exemples** (`reviews.json`). Pouvez-vous fournir de vrais avis (Google, messages de clientes, avec leur accord) ? Ils doivent remplacer les exemples avant la mise en ligne.
+10. Relire les textes : histoire Dakar → Toulouse, guide des méthodes, articles, FAQ, pages légales (SIRET, hébergeur), composition du bain détox.
+11. Nombre de clientes accompagnées et années d'expérience (bandeau de l'accueil : « 400 » et « 8 ans » sont provisoires).
+12. Compte Instagram et sélection de 6 à 9 photos pour la grille de l'accueil.

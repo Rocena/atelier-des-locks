@@ -14,7 +14,7 @@ CSS moderne + JS vanilla (ES modules, JSDoc + `// @ts-check`), PostgreSQL (SQL �
 
 - `npm run dev` : serveur + Vite (http://127.0.0.1:3000, `/styleguide` en dev)
 - `npm test` · `npm run test:e2e` · `npm run lint` · `npm run typecheck` · `npm run check:contrast`
-- `npm run db:up` · `npm run db:migrate` · `npm run db:seed` · `npm run build` · `npm run screenshots`
+- `npm run db:up` · `npm run db:migrate` · `npm run db:seed` · `npm run build` · `npm run screenshots -- <url>` · `npm run og-image`
 
 ## Conventions (§11)
 
