@@ -17,19 +17,19 @@ Navigateur ──HTTP──▶ Fastify (src/server/app.js)
 
 ## Dossiers
 
-| Dossier                 | Rôle                                                                                                                      |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `src/server/config.js`  | Seul point de lecture de l'environnement, validé par Zod                                                                  |
-| `src/server/app.js`     | Création de l'app, plugins de sécurité, rendu, enregistrement des modules                                                 |
-| `src/server/lib/`       | Utilitaires partagés : `assets.js` (Vite), `view.js` (Eta), `site.js` (infos du salon)                                    |
-| `src/server/modules/`   | Un dossier par domaine : `site`, `services`, `gallery`, `reviews`, `content`, `booking`, `styleguide` (à venir : `admin`) |
-| `src/server/db/`        | `pool.js`, `migrate.js`, `seed.js`, `seed-content.js`, `migrations/*.sql`, `seeds/*` (SQL et JSON de départ)              |
-| `src/views/`            | Templates Eta : `layouts/`, `partials/` (composants), `pages/`                                                            |
-| `src/client/entries.js` | Liste des entrées Vite (une page = un CSS + un JS)                                                                        |
-| `src/client/styles/`    | `tokens.css`, `base.css`, `layout.css`, `components/*.css`, `pages/*.css`                                                 |
-| `src/client/scripts/`   | `common.js` + `components/*.js` + `pages/*.js`                                                                            |
-| `public/`               | Fichiers servis tels quels (logos en noms ASCII, favicon)                                                                 |
-| `tests/e2e/`            | Playwright (desktop 1440, mobile 390)                                                                                     |
+| Dossier                 | Rôle                                                                                                                                                                                                                                          |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/server/config.js`  | Seul point de lecture de l'environnement, validé par Zod                                                                                                                                                                                      |
+| `src/server/app.js`     | Création de l'app, plugins de sécurité, rendu, enregistrement des modules                                                                                                                                                                     |
+| `src/server/lib/`       | Utilitaires partagés : `assets.js` (Vite), `view.js` (Eta), `site.js` (infos du salon)                                                                                                                                                        |
+| `src/server/modules/`   | Un dossier par domaine : `site`, `services`, `gallery`, `reviews`, `content`, `booking`, `notifications`, `styleguide`, et le back-office : `admin` (coque, garde, navigation), `auth`, `agenda`, `clients`, `dashboard`, `settings`, `audit` |
+| `src/server/db/`        | `pool.js`, `migrate.js`, `seed.js`, `seed-content.js`, `migrations/*.sql`, `seeds/*` (SQL et JSON de départ)                                                                                                                                  |
+| `src/views/`            | Templates Eta : `layouts/`, `partials/` (composants), `pages/`                                                                                                                                                                                |
+| `src/client/entries.js` | Liste des entrées Vite (une page = un CSS + un JS)                                                                                                                                                                                            |
+| `src/client/styles/`    | `tokens.css`, `base.css`, `layout.css`, `components/*.css`, `pages/*.css`                                                                                                                                                                     |
+| `src/client/scripts/`   | `common.js` + `components/*.js` + `pages/*.js`                                                                                                                                                                                                |
+| `public/`               | Fichiers servis tels quels (logos en noms ASCII, favicon)                                                                                                                                                                                     |
+| `tests/e2e/`            | Playwright (desktop 1440, mobile 390)                                                                                                                                                                                                         |
 
 ## Front-end
 
