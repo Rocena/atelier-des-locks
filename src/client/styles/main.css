@@ -17,4 +17,7 @@
 @import './components/arch.css';
 @import './components/loc-thread.css';
 @import './components/textures.css';
+@import './components/navigation.css';
+@import './components/page.css';
+@import './components/motion.css';
 @import './utilities.css';

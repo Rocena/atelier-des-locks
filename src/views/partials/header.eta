@@ -1,3 +1,7 @@
+<%
+  /* Lien actif : la page elle-même, ou une page enfant (/prestations/… → Prestations). */
+  var isCurrent = function (href) { return it.pathname === href || it.pathname.indexOf(href + '/') === 0; };
+%>
 <header class="site-header" data-site-header>
   <div class="site-header__inner">
     <a class="site-header__brand" href="/" aria-label="L’Atelier des Locks, accueil">
@@ -8,7 +12,45 @@
     <nav class="site-nav" aria-label="Navigation principale">
       <ul class="site-nav__list" role="list">
 <% it.site.nav.forEach(function (item) { %>
-        <li><a class="site-nav__link" href="<%= item.href %>"<% if (it.path === item.href) { %> aria-current="page"<% } %>><%= item.label %></a></li>
+<% if (item.mega) { %>
+        <li class="site-nav__item site-nav__item--mega" data-mega>
+          <a class="site-nav__link" href="<%= item.href %>"<% if (isCurrent(item.href)) { %> aria-current="page"<% } %>><%= item.label %></a>
+          <button class="site-nav__toggle" type="button" data-mega-toggle aria-expanded="false" aria-controls="mega-prestations">
+            <span class="visually-hidden">Afficher le détail des prestations</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" /></svg>
+          </button>
+          <div class="mega" id="mega-prestations" data-mega-panel hidden>
+            <div class="mega__inner">
+              <div class="mega__grid">
+<% it.navigation.categories.forEach(function (cat, i) { %>
+                <div class="mega__col">
+                  <a class="mega__title" href="<%= cat.href %>">
+                    <span class="mega__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span>
+                    <%= cat.name %>
+                  </a>
+                  <ul class="mega__links" role="list">
+<% cat.services.forEach(function (s) { %>
+                    <li><a class="mega__link" href="<%= s.href %>"><%= s.name %></a></li>
+<% }) %>
+                  </ul>
+                </div>
+<% }) %>
+              </div>
+              <aside class="mega__aside" data-surface="ebene">
+                <p class="eyebrow">Vous hésitez ?</p>
+                <p class="mega__pitch">Commencez par une <em>consultation</em> : trente minutes pour choisir la bonne méthode.</p>
+                <a class="btn btn--primary btn--sm" href="/prestations/consultation-diagnostic">Voir la consultation</a>
+                <ul class="mega__more" role="list">
+                  <li><a class="mega__link" href="/methodes">Le guide des méthodes</a></li>
+                  <li><a class="mega__link" href="/tarifs">Tous les tarifs</a></li>
+                </ul>
+              </aside>
+            </div>
+          </div>
+        </li>
+<% } else { %>
+        <li class="site-nav__item"><a class="site-nav__link" href="<%= item.href %>"<% if (isCurrent(item.href)) { %> aria-current="page"<% } %>><%= item.label %></a></li>
+<% } %>
 <% }) %>
       </ul>
     </nav>
@@ -23,7 +65,7 @@
           <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
         </svg>
       </button>
-      <a class="btn btn--primary btn--sm site-header__cta" href="/reserver">Réserver</a>
+      <a class="btn btn--primary btn--sm site-header__cta" href="/reserver" data-magnetic>Réserver</a>
       <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-mobile">
         <span class="menu-toggle__label">Menu</span>
         <span class="menu-toggle__bars" aria-hidden="true"><span></span><span></span></span>
@@ -38,13 +80,25 @@
       <ol class="mobile-menu__list" role="list">
 <% it.site.nav.forEach(function (item, i) { %>
         <li class="mobile-menu__item">
-          <a class="mobile-menu__link" href="<%= item.href %>">
+          <a class="mobile-menu__link" href="<%= item.href %>"<% if (isCurrent(item.href)) { %> aria-current="page"<% } %>>
             <span class="mobile-menu__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span>
             <%= item.label %>
           </a>
+<% if (item.mega) { %>
+          <ul class="mobile-menu__sub" role="list">
+<% it.navigation.categories.forEach(function (cat) { %>
+            <li><a class="mobile-menu__sublink" href="<%= cat.href %>"><%= cat.name %></a></li>
+<% }) %>
+          </ul>
+<% } %>
         </li>
 <% }) %>
       </ol>
+      <ul class="mobile-menu__secondary" role="list">
+<% it.site.secondaryNav.forEach(function (item) { %>
+        <li><a class="mobile-menu__sublink" href="<%= item.href %>"><%= item.label %></a></li>
+<% }) %>
+      </ul>
     </nav>
     <div class="mobile-menu__footer">
       <a class="btn btn--primary btn--block" href="/reserver">Réserver un rendez-vous</a>

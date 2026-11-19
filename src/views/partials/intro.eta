@@ -1,0 +1,8 @@
+<%/* Loader d'entrée (≤ 1,2 s, une fois par session) : le soleil se lève, puis la silhouette apparaît.
+     Affiché seulement si le script du <head> a posé .has-intro (jamais en mouvement réduit). CSS pur. */%>
+<div class="intro" aria-hidden="true">
+  <div class="intro__stage">
+    <span class="intro__sun"></span>
+    <img class="intro__mark" src="/brand/embleme.svg" alt="" width="600" height="507" fetchpriority="low" />
+  </div>
+</div>

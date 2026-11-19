@@ -1,0 +1,276 @@
+/* Signatures de mouvement transverses (§15) :
+   - loader d'entrée (≤ 1,2 s, une fois par session, CSS pur) ;
+   - transitions de page (View Transitions API entre documents : fondu + glissement du titre) ;
+   - curseur discret (desktop, pointeur fin) ;
+   - titres révélés ligne par ligne ([data-split], GSAP SplitText chargé à la demande) ;
+   - bandeau défilant (marquee).
+   Tout est neutralisé en mouvement réduit. */
+@layer components {
+  /* ---- Loader : le soleil se lève, la silhouette apparaît ---- */
+  .intro {
+    display: none;
+  }
+  .has-intro .intro {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-skip) - 1);
+    display: grid;
+    place-items: center;
+    background-color: var(--color-karite);
+    pointer-events: none;
+    animation: intro-out 300ms var(--ease-in) 900ms forwards;
+    will-change: opacity;
+  }
+  [data-theme='dark'].has-intro .intro {
+    background-color: var(--color-ebene);
+  }
+  .intro__stage {
+    position: relative;
+    width: min(13rem, 46vw);
+    aspect-ratio: 600 / 507;
+    overflow: hidden;
+  }
+  /* Disque calé sur le soleil de l'emblème (cx 47,4 %, cy 47,5 %, r 35,6 % de la largeur) */
+  .intro__sun {
+    position: absolute;
+    left: 11.8%;
+    top: 5.4%;
+    width: 71.2%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: var(--color-terre);
+    transform: translateY(110%);
+    animation: intro-sun 560ms var(--ease-out) 60ms forwards;
+    will-change: transform;
+  }
+  .intro__mark {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: intro-mark 320ms var(--ease-out) 520ms forwards;
+    /* Calque dédié : l'emblème (SVG détaillé) est rastérisé une fois, puis seulement fondu */
+    will-change: opacity;
+  }
+  @keyframes intro-sun {
+    to {
+      transform: none;
+    }
+  }
+  @keyframes intro-mark {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes intro-out {
+    to {
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .has-intro .intro {
+      display: none;
+    }
+  }
+
+  /* ---- Transitions de page (navigation entre documents) ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    @view-transition {
+      navigation: auto;
+    }
+    ::view-transition-old(root) {
+      animation: vt-fade-out var(--duration-exit) var(--ease-in) both;
+    }
+    ::view-transition-new(root) {
+      animation: vt-fade-in var(--duration-panel) var(--ease-out) both;
+    }
+    /* Le grand titre de chaque page glisse en place */
+    .page-title {
+      view-transition-name: page-title;
+    }
+    ::view-transition-old(page-title) {
+      animation: vt-title-out var(--duration-exit) var(--ease-in) both;
+    }
+    ::view-transition-new(page-title) {
+      animation: vt-title-in 420ms var(--ease-out) both;
+    }
+    /* Le header ne bouge pas d'une page à l'autre */
+    .site-header {
+      view-transition-name: site-header;
+    }
+    ::view-transition-group(site-header) {
+      animation: none;
+    }
+  }
+  @keyframes vt-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes vt-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes vt-title-out {
+    to {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes vt-title-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+  }
+
+  /* ---- Curseur discret (desktop) : un anneau qui suit et s'ouvre sur les liens ---- */
+  .cursor {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .cursor[data-active='true'] {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: var(--z-skip);
+      display: block;
+      width: 2.25rem;
+      height: 2.25rem;
+      margin: -1.125rem 0 0 -1.125rem;
+      border: var(--border-hairline) solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      transition:
+        opacity var(--duration-base) var(--ease-standard),
+        scale var(--duration-base) var(--ease-out),
+        background-color var(--duration-base) var(--ease-standard);
+    }
+    .cursor[data-visible='true'] {
+      opacity: 0.8;
+    }
+    .cursor[data-hover='true'] {
+      scale: 1.6;
+      background-color: color-mix(in oklch, var(--accent) 10%, transparent);
+    }
+  }
+
+  /* ---- Cartes et blocs qui apparaissent au scroll ([data-reveal='card'], reveal.js) ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    .js [data-reveal='card'] {
+      opacity: 0;
+      transform: translateY(16px);
+      transition:
+        opacity 600ms var(--ease-out),
+        transform 700ms var(--ease-out);
+      transition-delay: calc(var(--reveal-i, 0) * 70ms);
+    }
+    .js [data-reveal='card'].is-revealed {
+      opacity: 1;
+      transform: none;
+    }
+    .js [data-reveal='card']:nth-child(3n + 2) {
+      --reveal-i: 1;
+    }
+    .js [data-reveal='card']:nth-child(3n + 3) {
+      --reveal-i: 2;
+    }
+  }
+
+  /* ---- Titres révélés ligne par ligne ---- */
+  /* Avant le découpage, le titre reste visible (pas de flash si GSAP tarde ou échoue). */
+  .split-line {
+    display: block;
+    overflow: clip;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  /* ---- Bandeau de réassurance défilant ---- */
+  .marquee {
+    --marquee-duration: 48s;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    border-block: var(--border-hairline) solid var(--line);
+    background-color: var(--surface);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  .marquee__track {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--space-7);
+    padding: var(--space-5) var(--space-7) var(--space-5) 0;
+    animation: marquee var(--marquee-duration) linear infinite;
+    will-change: transform; /* calque dédié : l'animation reste sur le compositeur */
+  }
+  /* Avec JS : l'animation ne tourne que lorsque le bandeau est visible (marquee.js) */
+  .js .marquee:not([data-playing='true']) .marquee__track,
+  .marquee:hover .marquee__track {
+    animation-play-state: paused;
+  }
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-7);
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-display);
+  }
+  .marquee__item em {
+    color: var(--accent-display);
+    font-weight: var(--weight-regular);
+  }
+  .marquee__item::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--brass);
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  /* Lenis (défilement doux, desktop) : règles minimales recommandées par la bibliothèque. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+    .marquee__track[aria-hidden='true'] {
+      display: none;
+    }
+    .marquee {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .marquee__track {
+      flex-wrap: wrap;
+      justify-content: center;
+      padding-inline: var(--space-5);
+    }
+  }
+}

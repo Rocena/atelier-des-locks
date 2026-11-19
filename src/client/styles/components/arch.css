@@ -85,7 +85,26 @@
       linear-gradient(160deg, var(--placeholder-a), var(--placeholder-b));
     color: var(--text-muted);
   }
-  .placeholder::before {
+  /* Petit soleil en coin (CSS pur, coût de rendu nul) sur toutes les vignettes */
+  .placeholder::after {
+    content: '';
+    position: absolute;
+    top: 14%;
+    right: 12%;
+    width: 22%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.12;
+  }
+  /* L'emblème en filigrane, seulement dans les arches (SVG détaillé : coûteux à rastériser,
+     on le réserve aux grands visuels) */
+  .arch__frame > .placeholder:not(.placeholder--plain)::after {
+    display: none;
+  }
+  /* --plain : sans filigrane (visuel au-dessus de la ligne de flottaison : pas d'image tardive
+     qui deviendrait l'élément LCP) */
+  .arch__frame > .placeholder:not(.placeholder--plain)::before {
     content: '';
     position: absolute;
     inset: 12% -10% auto auto;
@@ -94,8 +113,8 @@
     background: url('/brand/embleme-monochrome.svg') center / contain no-repeat;
     opacity: 0.08;
   }
-  [data-theme='dark'] .placeholder::before,
-  [data-surface='ebene'] .placeholder::before {
+  [data-theme='dark'] .arch__frame > .placeholder:not(.placeholder--plain)::before,
+  [data-surface='ebene'] .arch__frame > .placeholder:not(.placeholder--plain)::before {
     filter: invert(1);
     opacity: 0.06;
   }

@@ -1,8 +1,8 @@
 // @ts-check
 /**
  * Révélations à l'apparition ([data-reveal]) et fil de loc piloté par le scroll ([data-animate]).
- * Phase 2 : GSAP ScrollTrigger prendra le relais pour les séquences complexes ;
- * ce module reste la base légère (IntersectionObserver, sans dépendance).
+ * Base légère (IntersectionObserver, sans dépendance). Les fils marqués data-animate="gsap"
+ * sont pilotés par ScrollTrigger (scripts/motion/gsap.js).
  */
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -30,7 +30,7 @@ export function initReveal() {
 /** Le fil se dessine à mesure que son SVG traverse la fenêtre. */
 export function initLocThreads() {
   const threads = /** @type {NodeListOf<SVGSVGElement>} */ (
-    document.querySelectorAll('.loc-thread[data-animate]')
+    document.querySelectorAll('.loc-thread[data-animate]:not([data-animate="gsap"])')
   );
   if (!threads.length || reducedMotion()) return;
 

@@ -1,0 +1,313 @@
+/* Navigation « à la raissadora » : bandeau d'annonce, méga-menu Prestations (desktop),
+   fil d'Ariane, barre « Réserver » collante (mobile). Comportements : scripts/components/navigation.js */
+@layer components {
+  /* ---- Bandeau d'annonce (éditable en admin, masquable) ---- */
+  .announce {
+    position: relative;
+    z-index: calc(var(--z-header) + 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 2.5rem;
+    padding: var(--space-2) var(--space-8) var(--space-2) var(--space-gutter);
+    background-color: var(--color-ebene);
+    color: var(--color-karite);
+    font-size: var(--text-label);
+    letter-spacing: 0.04em;
+    text-align: center;
+  }
+  [data-theme='dark'] .announce {
+    background-color: var(--color-cacao);
+  }
+  .announce__text {
+    max-width: none;
+  }
+  .announce__link {
+    margin-left: var(--space-2);
+    color: var(--color-terre-300);
+    text-underline-offset: 0.2em;
+    white-space: nowrap;
+  }
+  .announce__link:hover {
+    color: var(--color-karite);
+  }
+  .announce__close {
+    position: absolute;
+    right: var(--space-2);
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: var(--tap-target);
+    height: var(--tap-target);
+    border-radius: 50%;
+    color: inherit;
+    transform: translateY(-50%);
+  }
+  .announce__close .icon {
+    width: 1rem;
+    height: 1rem;
+  }
+  .announce__close:hover {
+    background-color: color-mix(in oklch, var(--color-karite) 12%, transparent);
+  }
+  .announce-closed .announce {
+    display: none;
+  }
+
+  /* ---- Méga-menu ---- */
+  .site-nav__item {
+    display: flex;
+    align-items: center;
+  }
+  .site-nav__toggle {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: var(--tap-target);
+    margin-left: calc(var(--space-1) * -1);
+    color: var(--text-muted);
+    border-radius: var(--radius-xs);
+  }
+  .site-nav__toggle .icon {
+    width: 1rem;
+    height: 1rem;
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .site-nav__toggle[aria-expanded='true'] .icon {
+    transform: rotate(180deg);
+  }
+
+  .mega {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--surface);
+    border-top: var(--border-hairline) solid var(--line);
+    border-bottom: var(--border-hairline) solid var(--line);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity var(--duration-exit) var(--ease-in),
+      transform var(--duration-exit) var(--ease-in);
+  }
+  .mega[data-open='true'] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--duration-base) var(--ease-out),
+      transform var(--duration-panel) var(--ease-out);
+  }
+  .mega__inner {
+    display: grid;
+    grid-template-columns: 1fr 18rem;
+    gap: var(--space-7);
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding: var(--space-7) var(--space-gutter);
+  }
+  .mega__grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+  .mega__col {
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+  }
+  .mega__title {
+    display: grid;
+    gap: var(--space-1);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--border-hairline) solid var(--brass);
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: var(--weight-medium);
+    line-height: 1.15;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .mega__title:hover {
+    color: var(--accent-text);
+    font-style: italic;
+  }
+  .mega__index {
+    font-family: var(--font-text);
+    font-size: var(--text-label);
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-style: normal;
+  }
+  .mega__links,
+  .mega__more {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .mega__link {
+    display: inline-block;
+    padding-block: var(--space-1);
+    font-size: var(--step--1);
+    line-height: 1.4;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-standard);
+  }
+  .mega__link:hover {
+    color: var(--accent-text);
+  }
+  .mega__aside {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border-radius: var(--radius-arch);
+    border-bottom-left-radius: var(--radius-sm);
+    border-bottom-right-radius: var(--radius-sm);
+    padding-top: var(--space-9);
+    background-color: var(--surface);
+    color: var(--text);
+  }
+  .mega__aside .eyebrow {
+    color: var(--brass);
+  }
+  .mega__pitch {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    line-height: 1.3;
+  }
+  .mega__pitch em {
+    color: var(--accent-display);
+  }
+  .mega__aside .mega__link {
+    color: var(--text-muted);
+  }
+
+  /* ---- Tiroir mobile : sous-liens (catégories) et liens secondaires ---- */
+  .mobile-menu__sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    margin: 0 0 var(--space-3) calc(var(--space-4) + 1.4rem);
+  }
+  .mobile-menu__secondary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-5);
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: var(--border-hairline) solid
+      color-mix(in oklch, var(--color-laiton) 50%, transparent);
+  }
+  .mobile-menu__sublink {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    font-size: var(--step--1);
+    color: var(--color-lin-300);
+    text-decoration: none;
+  }
+  .mobile-menu__sublink:hover,
+  .mobile-menu__sublink:focus-visible {
+    color: var(--color-terre-300);
+  }
+  .mobile-menu__link[aria-current='page'] {
+    font-style: italic;
+    color: var(--color-terre-400);
+  }
+
+  /* ---- Fil d'Ariane ---- */
+  .breadcrumb {
+    padding-top: var(--space-5);
+    font-size: var(--text-label);
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .breadcrumb__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+  }
+  .breadcrumb__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  .breadcrumb__item + .breadcrumb__item::before {
+    content: '';
+    width: 1rem;
+    height: 1px;
+    background: var(--brass);
+  }
+  .breadcrumb__link {
+    display: inline-block;
+    padding-block: var(--space-2);
+    color: inherit;
+    text-decoration: none;
+  }
+  .breadcrumb__link:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+  }
+  .breadcrumb [aria-current='page'] {
+    color: var(--text);
+  }
+
+  /* ---- Barre « Réserver » collante (mobile et tablette) ---- */
+  .book-bar {
+    position: fixed;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    z-index: calc(var(--z-header) - 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-raised);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(calc(100% + var(--space-6)));
+    transition: transform var(--duration-panel) var(--ease-out);
+  }
+  .book-bar[data-visible='true'] {
+    transform: none;
+  }
+  html[data-menu-open='true'] .book-bar {
+    transform: translateY(calc(100% + var(--space-6)));
+  }
+  .book-bar__text {
+    display: grid;
+    font-size: var(--step--1);
+    line-height: 1.3;
+    font-weight: var(--weight-medium);
+  }
+  .book-bar__eyebrow {
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .book-bar__cta {
+    flex: none;
+  }
+  @media (min-width: 64rem) {
+    .book-bar {
+      display: none;
+    }
+  }
+  /* Le footer garde de la place pour la barre */
+  @media (max-width: 63.99rem) {
+    .site-footer {
+      padding-bottom: calc(var(--space-10) + env(safe-area-inset-bottom, 0px));
+    }
+  }
+}

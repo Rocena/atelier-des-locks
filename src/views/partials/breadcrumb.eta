@@ -1,0 +1,15 @@
+<nav class="breadcrumb container" aria-label="Fil d’Ariane">
+  <ol class="breadcrumb__list" role="list" itemscope itemtype="https://schema.org/BreadcrumbList">
+<% it.breadcrumb.forEach(function (crumb, i) { var last = i === it.breadcrumb.length - 1; %>
+    <li class="breadcrumb__item" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<% if (last) { %>
+      <span itemprop="name" aria-current="page"><%= crumb.label %></span>
+      <link itemprop="item" href="<%= it.publicUrl + crumb.href %>" />
+<% } else { %>
+      <a class="breadcrumb__link" itemprop="item" href="<%= crumb.href %>"><span itemprop="name"><%= crumb.label %></span></a>
+<% } %>
+      <meta itemprop="position" content="<%= i + 1 %>" />
+    </li>
+<% }) %>
+  </ol>
+</nav>

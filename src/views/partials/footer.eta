@@ -4,6 +4,7 @@
     <div class="site-footer__brand">
       <img src="/brand/logo-vertical-sombre.svg" alt="L’Atelier des Locks" width="200" height="155" loading="lazy" />
       <p class="site-footer__pitch">Création, entretien et soin des locks, avec patience et savoir-faire.</p>
+      <a class="btn btn--primary site-footer__cta" href="/reserver" data-magnetic>Réserver un rendez-vous</a>
     </div>
 
     <div class="site-footer__col">
@@ -13,6 +14,16 @@
         <%= it.site.address.street %><br />
         <%= it.site.address.postalCode %> <%= it.site.address.city %>
       </address>
+      <ul class="site-footer__links" role="list">
+        <li><a class="link link--quiet" href="/contact">Plan et accès</a></li>
+<% if (it.site.whatsapp) { %>
+        <li><a class="link link--quiet" href="<%= it.site.whatsapp %>" rel="noopener">WhatsApp</a></li>
+<% } %>
+<% if (it.site.instagram) { %>
+        <li><a class="link link--quiet" href="<%= it.site.instagram %>" rel="noopener">Instagram</a></li>
+<% } %>
+        <!-- TODO-PROPRIO : liens WhatsApp et Instagram (src/server/lib/site.js) -->
+      </ul>
     </div>
 
     <div class="site-footer__col">
@@ -28,10 +39,9 @@
     <div class="site-footer__col">
       <h2 class="eyebrow">Explorer</h2>
       <ul class="site-footer__links" role="list">
-        <li><a class="link link--quiet" href="/prestations">Prestations</a></li>
-        <li><a class="link link--quiet" href="/tarifs">Tarifs</a></li>
-        <li><a class="link link--quiet" href="/faq">Questions fréquentes</a></li>
-        <li><a class="link link--quiet" href="/contact">Contact</a></li>
+<% it.site.nav.concat(it.site.secondaryNav).forEach(function (item) { %>
+        <li><a class="link link--quiet" href="<%= item.href %>"><%= item.label %></a></li>
+<% }) %>
       </ul>
     </div>
   </div>

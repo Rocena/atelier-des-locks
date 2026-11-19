@@ -126,9 +126,9 @@
     letter-spacing: -0.01em;
   }
 
-  p,
-  li,
-  dd {
+  /* « pretty » coûte en mise en page : réservé aux textes longs */
+  .prose p,
+  .lead {
     text-wrap: pretty;
   }
   p {

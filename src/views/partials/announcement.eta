@@ -1,0 +1,14 @@
+<% var a = it.settings && it.settings.announcement; %>
+<% if (a && a.enabled) { %>
+<div class="announce" data-announce-bar>
+  <p class="announce__text">
+    <%= a.text %>
+<% if (a.href) { %>
+    <a class="announce__link" href="<%= a.href %>"><%= a.linkLabel %></a>
+<% } %>
+  </p>
+  <button class="announce__close" type="button" data-announce-close aria-label="Masquer l’annonce">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  </button>
+</div>
+<% } %>
