@@ -1,0 +1,20 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a; %>
+<p><a class="link" href="/admin/contenus">← Contenus</a></p>
+<div class="a-head">
+  <div><h1>Articles du journal</h1></div>
+  <a class="btn btn--primary btn--small" href="/admin/contenus/articles/nouveau"><span class="btn__label">Nouvel article</span></a>
+</div>
+<% if (it.articles.length === 0) { %>
+<p class="a-empty">Aucun article. Les conseils que vous publiez apparaissent sur la page Conseils.</p>
+<% } else { %>
+<ul class="a-list" role="list">
+<% it.articles.forEach(function (art) { %>
+  <li><a class="a-row" href="/admin/contenus/articles/<%= art.id %>">
+    <span></span>
+    <span class="a-row__main"><span class="a-row__title"><%= art.title %></span><span class="a-row__meta"><%= art.publishedOn ? a.shortDayLabel(art.publishedOn) : 'Sans date' %></span></span>
+    <span class="a-status a-status--<%= art.status === 'published' ? 'success' : 'warning' %>"><%= art.status === 'published' ? 'Publié' : 'Brouillon' %></span>
+  </a></li>
+<% }) %>
+</ul>
+<% } %>

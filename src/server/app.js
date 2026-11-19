@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { createPool } from './db/pool.js';
 import { createAssetResolver } from './lib/assets.js';
 import { createRenderer } from './lib/view.js';
-import { site } from './lib/site.js';
+import { site, withContact } from './lib/site.js';
 import { fmt } from './lib/format.js';
 import siteRoutes from './modules/site/routes.js';
 import servicesRoutes from './modules/services/routes.js';
@@ -28,6 +28,9 @@ import { buildNavigation } from './modules/services/service.js';
 import { findSettings } from './modules/content/repo.js';
 import styleguideRoutes from './modules/styleguide/routes.js';
 import bookingRoutes from './modules/booking/routes.js';
+import adminShell from './modules/admin/index.js';
+import { sessionCookieName } from './modules/admin/guard.js';
+import { galleryMediaRoutes } from './modules/gallery/admin-routes.js';
 import { MAX_PHOTO_BYTES } from './modules/booking/upload.js';
 import { createNotifier } from './modules/notifications/service.js';
 import { createProvider } from './modules/notifications/providers.js';
@@ -204,7 +207,7 @@ export async function buildApp({ config, vite, logger = true, db, now, queue, pr
       settings: shared.settings,
       ...data,
       jsonLd,
-      site,
+      site: withContact(site, shared.settings.contact),
       navigation: shared.navigation,
       fmt,
       pathname,
@@ -228,6 +231,17 @@ export async function buildApp({ config, vite, logger = true, db, now, queue, pr
   await app.register(reviewsRoutes, { config, now });
   await app.register(contentRoutes);
   await app.register(bookingRoutes, { config, now });
+  await app.register(galleryMediaRoutes, { config });
+  // Inventaire des routes de l'admin et nom du cookie : visibles de tout le serveur (tests d'accès).
+  app.decorate('adminRoutes', []);
+  app.decorate('adminCookie', sessionCookieName(config.isProd));
+  // Back-office (§9) : contrôle d'accès par rôle sur chaque route, cf. modules/admin/guard.js.
+  await app.register(adminShell, {
+    prefix: '/admin',
+    config,
+    now,
+    views: { render, assets: resolveAssets },
+  });
   if (config.styleguideEnabled) await app.register(styleguideRoutes);
 
   app.setNotFoundHandler((request, reply) => {

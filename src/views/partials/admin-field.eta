@@ -1,0 +1,33 @@
+<%
+  /* Champ de formulaire de l'admin. Paramètres : name, label, type (text par défaut, textarea,
+     select, email, tel, number, date, time, password), value, values, errors, hint, required,
+     options [{ value, label }], rows, autocomplete, inputmode, min, max, step, maxlength, attrs. */
+  var id = (it.idPrefix || 'f') + '-' + it.name;
+  var error = it.errors && it.errors[it.name];
+  var submitted = it.values && it.values[it.name] !== undefined ? it.values[it.name] : undefined;
+  var value = submitted !== undefined ? submitted : (it.value === undefined || it.value === null ? '' : it.value);
+  var describedBy = [];
+  if (it.hint) describedBy.push(id + '-hint');
+  if (error) describedBy.push(id + '-error');
+  var type = it.type || 'text';
+%>
+<div class="field<%= error ? ' field--invalid' : '' %>">
+  <label class="field__label" for="<%= id %>"><%= it.label %><% if (it.required === false) { %> <span class="field__optional">(facultatif)</span><% } %></label>
+<% if (type === 'textarea') { %>
+  <textarea class="field__control" id="<%= id %>" name="<%= it.name %>" rows="<%= it.rows || 4 %>"<% if (it.maxlength) { %> maxlength="<%= it.maxlength %>"<% } %><% if (it.required !== false) { %> required<% } %><% if (error) { %> aria-invalid="true"<% } %><% if (describedBy.length) { %> aria-describedby="<%= describedBy.join(' ') %>"<% } %>><%= value %></textarea>
+<% } else if (type === 'select') { %>
+  <select class="field__control" id="<%= id %>" name="<%= it.name %>"<% if (it.required !== false) { %> required<% } %><% if (error) { %> aria-invalid="true"<% } %><% if (describedBy.length) { %> aria-describedby="<%= describedBy.join(' ') %>"<% } %>>
+<% (it.options || []).forEach(function (o) { %>
+    <option value="<%= o.value %>"<% if (String(o.value) === String(value)) { %> selected<% } %>><%= o.label %></option>
+<% }) %>
+  </select>
+<% } else { %>
+  <input class="field__control" id="<%= id %>" name="<%= it.name %>" type="<%= type %>" value="<%= type === 'password' ? '' : value %>"<% if (it.autocomplete) { %> autocomplete="<%= it.autocomplete %>"<% } %><% if (it.inputmode) { %> inputmode="<%= it.inputmode %>"<% } %><% if (it.min !== undefined) { %> min="<%= it.min %>"<% } %><% if (it.max !== undefined) { %> max="<%= it.max %>"<% } %><% if (it.step !== undefined) { %> step="<%= it.step %>"<% } %><% if (it.maxlength) { %> maxlength="<%= it.maxlength %>"<% } %><% if (it.pattern) { %> pattern="<%= it.pattern %>"<% } %><% if (it.required !== false) { %> required<% } %><% if (error) { %> aria-invalid="true"<% } %><% if (describedBy.length) { %> aria-describedby="<%= describedBy.join(' ') %>"<% } %> />
+<% } %>
+<% if (it.hint) { %>
+  <p class="field__hint" id="<%= id %>-hint"><%= it.hint %></p>
+<% } %>
+<% if (error) { %>
+  <p class="field__message" id="<%= id %>-error" role="alert"><%= error %></p>
+<% } %>
+</div>

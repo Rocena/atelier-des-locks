@@ -1,0 +1,36 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a;
+   var statuses = [['', 'Tous'], ['sent', 'Envoyés'], ['failed', 'Échecs'], ['skipped', 'Ignorés'], ['queued', 'En attente']];
+   var labels = { sent: 'Envoyé', failed: 'Échec', skipped: 'Ignoré', queued: 'En attente' };
+   var tones = { sent: 'success', failed: 'error', skipped: 'warning', queued: 'warning' };
+   var templates = { booking_confirmation: 'Confirmation', reminder_d2: 'Rappel J-2', reminder_d1: 'Rappel veille', rescheduled: 'Déplacement', cancelled: 'Annulation', owner_alert: 'Alerte salon', review_request: 'Demande d’avis', review_reminder: 'Relance d’avis' }; %>
+<div class="a-head"><div><h1>Messages envoyés</h1><p class="a-head__lead">Emails et SMS partis vers les clientes. Les adresses et numéros sont masqués.</p></div></div>
+<nav class="a-segment" aria-label="Filtrer par état">
+<% statuses.forEach(function (s) { %>
+  <a href="/admin/notifications?statut=<%= s[0] %>"<% if (it.statut === s[0]) { %> aria-current="page"<% } %>><%= s[1] %></a>
+<% }) %>
+</nav>
+<% if (it.rows.length === 0) { %>
+<p class="a-empty a-section">Aucun message.</p>
+<% } else { %>
+<div class="a-table-wrap a-section">
+  <table class="a-table">
+    <thead><tr><th scope="col">Prévu</th><th scope="col">Message</th><th scope="col">Canal</th><th scope="col">Destinataire</th><th scope="col">État</th></tr></thead>
+    <tbody>
+<% it.rows.forEach(function (r) { %>
+      <tr>
+        <td data-label="Prévu"><%= a.dateTimeLabel(r.scheduledAt) %></td>
+        <td data-label="Message"><% if (r.appointmentId) { %><a class="link" href="/admin/agenda/rdv/<%= r.appointmentId %>"><%= templates[r.template] || r.template %></a><% } else { %><%= templates[r.template] || r.template %><% } %><% if (r.clientLabel) { %> · <%= r.clientLabel %><% } %></td>
+        <td data-label="Canal"><%= r.channel === 'email' ? 'Email' : 'SMS' %></td>
+        <td data-label="Destinataire"><%= r.recipient ? a.maskRecipient(r.recipient) : '—' %></td>
+        <td data-label="État"><span class="a-status a-status--<%= tones[r.status] %>"><%= labels[r.status] %></span><% if (r.error) { %><br /><span class="a-row__meta"><%= r.error.slice(0, 120) %></span><% } %></td>
+      </tr>
+<% }) %>
+    </tbody>
+  </table>
+</div>
+<div class="a-pager">
+<% if (it.page > 1) { %><a class="btn btn--secondary btn--small" href="/admin/notifications?statut=<%= it.statut %>&amp;page=<%= it.page - 1 %>"><span class="btn__label">Plus récents</span></a><% } else { %><span></span><% } %>
+<% if (it.hasNext) { %><a class="btn btn--secondary btn--small" href="/admin/notifications?statut=<%= it.statut %>&amp;page=<%= it.page + 1 %>"><span class="btn__label">Plus anciens</span></a><% } %>
+</div>
+<% } %>

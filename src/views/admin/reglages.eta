@@ -1,0 +1,22 @@
+<% layout('../layouts/admin', it) %>
+<% var i = it.infra; %>
+<div class="a-head"><div><h1>Réglages</h1></div></div>
+<ul class="a-list" role="list">
+  <li><a class="a-row" href="/admin/reglages/reservation"><span></span><span class="a-row__main"><span class="a-row__title">Réservation</span><span class="a-row__meta">Délais, annulation, validation manuelle, politique de rendez-vous</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/reglages/horaires"><span></span><span class="a-row__main"><span class="a-row__title">Horaires d’ouverture</span><span class="a-row__meta">Les créneaux proposés en ligne en découlent</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/reglages/fermetures"><span></span><span class="a-row__main"><span class="a-row__title">Congés et fermetures</span><span class="a-row__meta">Jours fermés, horaires exceptionnels</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/reglages/coordonnees"><span></span><span class="a-row__main"><span class="a-row__title">Coordonnées et réseaux</span><span class="a-row__meta">Adresse, téléphone, WhatsApp, Instagram, horaires affichés</span></span><span></span></a></li>
+</ul>
+
+<section class="a-section">
+  <h2>Réglages techniques (lecture seule)</h2>
+  <p class="text-muted">Ces réglages dépendent du serveur : ils se modifient dans la configuration de l’hébergement, puis un redémarrage.</p>
+  <dl class="a-dl a-card">
+    <dt>Réservation</dt><dd><%= i.provider %></dd>
+    <dt>Lien Fresha</dt><dd><%= i.fresha %></dd>
+    <dt>Lien avis Google</dt><dd><%= i.google %></dd>
+    <dt>Envoi des messages</dt><dd><%= i.notifications %></dd>
+    <dt>Alertes de rendez-vous à</dt><dd><%= i.ownerEmail %></dd>
+  </dl>
+  <p class="text-muted">Les textes des emails et des SMS sont écrits dans l’application ; ils ne se modifient pas encore depuis cet espace.</p>
+</section>

@@ -1,0 +1,4 @@
+<% layout('../layouts/admin', it) %>
+<div class="a-head"><h1>Page introuvable</h1></div>
+<p>Cette page n’existe pas ou plus.</p>
+<p><a class="btn btn--primary" href="/admin"><span class="btn__label">Retour à l’accueil</span></a></p>

@@ -6,7 +6,11 @@
 <li class="tile tile--<%= it.item.ratio %>" data-gallery-item data-category="<%= it.item.category %>" data-method="<%= it.item.method || '' %>" data-size="<%= it.item.size %>"<% if (it.hidden) { %> hidden<% } %>>
   <button class="tile__button" type="button" data-lightbox-item data-title="<%= it.item.title %>" data-meta="<%= it.meta %>" data-ratio="<%= ratios[it.item.ratio] %>">
     <span class="tile__media" data-lightbox-media>
+<% if (it.item.image) { %>
+      <img src="/media/galerie/<%= it.item.image.replace(/.webp$/, '-600.webp') %>" srcset="/media/galerie/<%= it.item.image.replace(/.webp$/, '-600.webp') %> 600w, /media/galerie/<%= it.item.image %> 1600w" sizes="(min-width: 64em) 25vw, 50vw" alt="<%= it.item.alt %>" loading="lazy" decoding="async" width="600" height="750" />
+<% } else { %>
       <span class="placeholder"><span class="placeholder__label">Photo à venir</span></span>
+<% } %>
     </span>
     <span class="tile__caption">
       <span class="tile__title"><%= it.item.title %></span>

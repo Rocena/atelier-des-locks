@@ -1,0 +1,46 @@
+<% layout('../layouts/admin', it) %>
+<% var c = it.client, a = it.a; %>
+<p><a class="link" href="/admin/clientes">← Clientes</a></p>
+<div class="a-head">
+  <div><h1><%= c.firstName %> <%= c.lastName %></h1>
+    <p class="a-head__lead">Cliente depuis le <%= a.dateTimeLabel(c.createdAt).split(',')[0] %><% if (c.newsletter) { %> · inscrite à la newsletter<% } %></p></div>
+  <a class="btn btn--primary btn--small" href="/admin/agenda/rdv/nouveau"><span class="btn__label">Nouveau rendez-vous</span></a>
+</div>
+
+<div class="a-grid a-grid--2">
+  <section class="a-card">
+    <h2>Coordonnées et notes</h2>
+    <form class="a-form" method="post" action="/admin/clientes/<%= c.id %>" novalidate>
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <div class="a-form__row">
+        <%~ include('../partials/admin-field', { name: 'firstName', label: 'Prénom', value: c.firstName, values: it.values, errors: it.errors }) %>
+        <%~ include('../partials/admin-field', { name: 'lastName', label: 'Nom', value: c.lastName, values: it.values, errors: it.errors }) %>
+      </div>
+      <%~ include('../partials/admin-field', { name: 'phone', label: 'Téléphone', type: 'tel', inputmode: 'tel', required: false, value: c.phone || '', values: it.values, errors: it.errors }) %>
+      <p class="a-row__meta">Email : <%= c.email || 'non renseigné' %></p>
+      <%~ include('../partials/admin-check', { name: 'smsReminders', label: 'Rappels par SMS', checked: c.smsReminders }) %>
+      <%~ include('../partials/admin-field', { name: 'notes', label: 'Notes (type de cheveux, méthode, produits…)', type: 'textarea', rows: 6, maxlength: 4000, required: false, value: c.notes || '', values: it.values, errors: it.errors }) %>
+      <div><button class="btn btn--primary btn--small" type="submit"><span class="btn__label">Enregistrer la fiche</span></button></div>
+    </form>
+  </section>
+  <section class="a-card">
+    <h2>Historique (<%= it.history.length %>)</h2>
+<% if (it.history.length === 0) { %>
+    <p class="text-muted">Aucun rendez-vous.</p>
+<% } else { %>
+    <ul class="a-list" role="list">
+<% it.history.forEach(function (appt) { %>
+      <li><%~ include('../partials/admin-appt-row', { appt: appt, a: a, showDate: true, date: appt.startsAt.toISOString().slice(0, 10) }) %></li>
+<% }) %>
+    </ul>
+<% } %>
+  </section>
+</div>
+
+<% if (it.isOwner) { %>
+<section class="a-section">
+  <h2>Données personnelles (RGPD)</h2>
+  <p class="text-muted">À la demande de la cliente, ses données peuvent être effacées. Les statistiques sont conservées, sans nom ni coordonnées.</p>
+  <p><a class="btn btn--danger btn--small" href="/admin/clientes/<%= c.id %>/supprimer"><span class="btn__label">Supprimer cette cliente</span></a></p>
+</section>
+<% } %>

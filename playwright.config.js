@@ -6,8 +6,8 @@ const PORT = 3100;
 export default defineConfig({
   testDir: 'tests/e2e',
   // Les réservations e2e (emails « @e2e.test.invalid ») sont supprimées avant et après la suite.
-  globalSetup: './tests/e2e/cleanup.js',
-  globalTeardown: './tests/e2e/cleanup.js',
+  globalSetup: ['./tests/e2e/cleanup.js', './tests/e2e/admin-setup.js'],
+  globalTeardown: ['./tests/e2e/cleanup.js', './tests/e2e/admin-teardown.js'],
   fullyParallel: true,
   // En local, un seul worker par défaut : plusieurs Chromium + Vite + PostgreSQL (Docker) en
   // parallèle saturent une machine modeste, et les requêtes de l'API restent sans réponse.
@@ -37,6 +37,7 @@ export default defineConfig({
       SESSION_SECRET: 'e2e-'.padEnd(48, 'x'),
       // Les tests réservent plusieurs fois depuis la même adresse.
       BOOKING_RATE_LIMIT: '1000',
+      ADMIN_LOGIN_RATE_LIMIT: '1000',
       UPLOAD_DIR: 'storage/e2e-uploads',
     },
     timeout: 60_000,

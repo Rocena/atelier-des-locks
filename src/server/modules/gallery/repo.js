@@ -11,6 +11,8 @@
  * @property {string} size
  * @property {'portrait'|'landscape'|'square'} ratio
  * @property {boolean} featured
+ * @property {string|null} image   nom du fichier (uuid.webp) sous /media/galerie/, ou null (placeholder)
+ * @property {string} alt
  * @typedef {{ slug: string, label: string }} Size
  */
 
@@ -22,7 +24,9 @@ export async function findGallery(db) {
   const [items, sizes] = await Promise.all([
     db.query(
       `SELECT g.slug AS id, g.title, c.slug AS category, m.slug AS method, t.slug AS size,
-              g.ratio, g.featured
+              g.ratio, g.featured, g.alt_text AS alt,
+              CASE WHEN g.image_path IS NULL THEN NULL
+                   ELSE substring(g.image_path from '[^/]+$') END AS image
          FROM gallery_items g
          LEFT JOIN categories c ON c.id = g.category_id
          LEFT JOIN methods m ON m.id = g.method_id

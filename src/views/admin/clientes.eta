@@ -1,0 +1,37 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a, r = it.result; %>
+<div class="a-head">
+  <div><h1>Clientes</h1></div>
+<% if (it.isOwner) { %>
+  <a class="btn btn--secondary btn--small" href="/admin/clientes/export.csv"><span class="btn__label">Exporter en CSV</span></a>
+<% } %>
+</div>
+
+<form class="a-toolbar" method="get" action="/admin/clientes" role="search">
+  <div class="field">
+    <label class="field__label" for="q">Chercher une cliente</label>
+    <input class="field__control" id="q" name="q" type="search" value="<%= it.q %>" placeholder="Nom, email ou téléphone" autocomplete="off" />
+  </div>
+  <button class="btn btn--secondary" type="submit"><span class="btn__label">Chercher</span></button>
+</form>
+
+<% if (r.rows.length === 0) { %>
+<div class="a-empty"><p><%= it.q ? 'Aucune cliente ne correspond à « ' + it.q + ' ».' : 'Les clientes apparaissent ici dès leur première réservation.' %></p></div>
+<% } else { %>
+<ul class="a-list" role="list">
+<% r.rows.forEach(function (c) { %>
+  <li><a class="a-row" href="/admin/clientes/<%= c.id %>">
+    <span></span>
+    <span class="a-row__main">
+      <span class="a-row__title"><%= c.firstName %> <%= c.lastName %></span>
+      <span class="a-row__meta"><%= c.phone || c.email || 'Sans coordonnées' %></span>
+    </span>
+    <span class="a-row__meta"><%= c.visits %> <%= c.visits > 1 ? 'visites' : 'visite' %></span>
+  </a></li>
+<% }) %>
+</ul>
+<div class="a-pager">
+<% if (it.page > 1) { %><a class="btn btn--secondary btn--small" href="/admin/clientes?q=<%= encodeURIComponent(it.q) %>&amp;page=<%= it.page - 1 %>"><span class="btn__label">Précédentes</span></a><% } else { %><span></span><% } %>
+<% if (r.hasNext) { %><a class="btn btn--secondary btn--small" href="/admin/clientes?q=<%= encodeURIComponent(it.q) %>&amp;page=<%= it.page + 1 %>"><span class="btn__label">Suivantes</span></a><% } %>
+</div>
+<% } %>

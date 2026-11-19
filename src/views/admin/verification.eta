@@ -1,0 +1,22 @@
+<% layout('../layouts/admin', it) %>
+<% var recovery = it.values && it.values.kind === 'recovery'; %>
+<h1 class="h3">Vérification en deux étapes</h1>
+<% if (it.errors._form) { %>
+<p class="a-alert" role="alert"><%= it.errors._form %></p>
+<% } %>
+<form class="a-form" method="post" action="/admin/verification" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+<% if (recovery) { %>
+  <input type="hidden" name="kind" value="recovery" />
+  <%~ include('../partials/admin-field', { name: 'code', label: 'Code de secours', autocomplete: 'off', hint: 'Un des codes remis à l’activation. Chaque code ne sert qu’une fois.', values: {}, errors: it.errors }) %>
+<% } else { %>
+  <input type="hidden" name="kind" value="totp" />
+  <%~ include('../partials/admin-field', { name: 'code', label: 'Code à 6 chiffres', autocomplete: 'one-time-code', inputmode: 'numeric', hint: 'Ouvrez votre application d’authentification : le code change toutes les 30 secondes.', values: {}, errors: it.errors }) %>
+<% } %>
+  <button class="btn btn--primary" type="submit"><span class="btn__label">Valider</span></button>
+</form>
+<% if (recovery) { %>
+<p><a class="link" href="/admin/verification">Utiliser le code de l’application</a></p>
+<% } else { %>
+<p><a class="link" href="/admin/verification?secours=1">J’ai perdu mon téléphone : utiliser un code de secours</a></p>
+<% } %>

@@ -1,0 +1,24 @@
+<% layout('../layouts/admin', it) %>
+<p><a class="link" href="/admin/reglages">← Réglages</a></p>
+<div class="a-head"><div><h1>Horaires d’ouverture</h1><p class="a-head__lead">Laissez un jour vide s’il est fermé. Deux plages par jour au maximum (matin, après-midi).</p></div></div>
+<% if (it.errors._form) { %><p class="a-alert" role="alert"><%= it.errors._form %></p><% } %>
+<form class="a-form a-form--narrow" method="post" action="/admin/reglages/horaires" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+<% it.weekdays.forEach(function (d) { var n = d[0]; %>
+  <fieldset class="a-card a-form">
+    <legend><%= d[1] %></legend>
+    <div class="a-form__row">
+      <%~ include('../partials/admin-field', { name: 'd' + n + 'a', idPrefix: 'h', label: 'Ouvre', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'd' + n + 'b', idPrefix: 'h', label: 'Ferme', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+    </div>
+    <div class="a-form__row">
+      <%~ include('../partials/admin-field', { name: 'd' + n + 'c', idPrefix: 'h', label: 'Rouvre (après-midi)', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'd' + n + 'd', idPrefix: 'h', label: 'Ferme', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+    </div>
+  </fieldset>
+<% }) %>
+  <div class="a-sticky-actions a-sticky-actions--bar">
+    <button class="btn btn--primary" type="submit"><span class="btn__label">Enregistrer les horaires</span></button>
+    <a class="btn btn--ghost" href="/admin/reglages"><span class="btn__label">Annuler</span></a>
+  </div>
+</form>

@@ -1,0 +1,13 @@
+<%
+  /* Ligne de rendez-vous. Paramètres : appt, a (formatage), showDate (afficher le jour). */
+  var appt = it.appt, a = it.a;
+  var tone = a.STATUS_TONE[appt.status] || 'success';
+%>
+<a class="a-row" href="/admin/agenda/rdv/<%= appt.id %>">
+  <span class="a-row__time"><% if (it.showDate) { %><%= a.shortDayLabel(it.date) %><br /><% } %><%= a.timeLabel(appt.startsAt) %></span>
+  <span class="a-row__main">
+    <span class="a-row__title"><%= appt.firstName %> <%= appt.lastName %> · <%= appt.serviceName %></span>
+    <span class="a-row__meta"><%= a.minutesLabel(appt.durationMinutes) %><% if (appt.price !== null) { %> · <%= appt.priceFrom ? 'dès ' : '' %><%= a.money(appt.price) %><% } %><% if (appt.options.length) { %> · <%= appt.options.join(', ') %><% } %><% if (appt.source === 'admin') { %> · saisi par le salon<% } %></span>
+  </span>
+  <span class="a-status a-status--<%= tone %>"><%= a.STATUS_LABELS[appt.status] %></span>
+</a>

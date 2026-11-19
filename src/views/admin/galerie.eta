@@ -1,0 +1,72 @@
+<% layout('../layouts/admin', it) %>
+<% var items = it.items, c = it.choices;
+   function opts(list, placeholder) { return [{ value: '', label: placeholder }].concat(list.map(function (x) { return { value: x.id, label: x.name }; })); } %>
+<div class="a-head">
+  <div><h1>Galerie</h1><p class="a-head__lead">Les photos s’affichent sur la page Galerie et, si elles sont mises en avant, sur l’accueil.</p></div>
+</div>
+
+<section class="a-card" data-uploader data-url="/admin/galerie/photos">
+  <h2>Ajouter des photos</h2>
+  <noscript><p class="a-alert a-alert--warning">L’envoi de photos a besoin de JavaScript.</p></noscript>
+  <div class="a-drop" data-dropzone>
+    <p>Glissez vos photos ici, ou choisissez-les dans votre téléphone.</p>
+    <label class="btn btn--primary btn--small"><span class="btn__label">Choisir des photos</span>
+      <input class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp" multiple data-file-input />
+    </label>
+    <p class="text-muted">JPEG, PNG ou WebP, 8 Mo maximum chacune. Vous recadrez avant l’envoi.</p>
+  </div>
+  <div class="a-grid" data-queue></div>
+
+  <template data-item-template>
+    <form class="a-card a-form" data-item novalidate>
+      <div class="a-crop">
+        <canvas width="480" height="600" data-canvas aria-label="Aperçu du recadrage : faites glisser la photo pour la cadrer" role="img"></canvas>
+        <div class="a-actions" role="group" aria-label="Format du cadre">
+          <button class="btn btn--secondary btn--small" type="button" data-ratio="4:5" aria-pressed="true"><span class="btn__label">Portrait</span></button>
+          <button class="btn btn--secondary btn--small" type="button" data-ratio="1:1" aria-pressed="false"><span class="btn__label">Carré</span></button>
+          <button class="btn btn--secondary btn--small" type="button" data-ratio="4:3" aria-pressed="false"><span class="btn__label">Paysage</span></button>
+        </div>
+        <label class="field__label">Zoom <input type="range" min="1" max="3" step="0.01" value="1" data-zoom /></label>
+      </div>
+      <%~ include('../partials/admin-field', { name: 'title', label: 'Titre', idPrefix: 'tpl', maxlength: 120, values: {}, errors: {} }) %>
+      <%~ include('../partials/admin-field', { name: 'categoryId', label: 'Prestation', idPrefix: 'tpl', type: 'select', required: false, options: opts(c.categories, 'Aucune'), values: {}, errors: {} }) %>
+      <%~ include('../partials/admin-field', { name: 'methodId', label: 'Méthode', idPrefix: 'tpl', type: 'select', required: false, options: opts(c.methods, 'Aucune'), values: {}, errors: {} }) %>
+      <%~ include('../partials/admin-field', { name: 'sizeTagId', label: 'Taille des locks', idPrefix: 'tpl', type: 'select', required: false, options: opts(c.sizes, 'Non précisée'), values: {}, errors: {} }) %>
+      <%~ include('../partials/admin-field', { name: 'alt', label: 'Texte alternatif (obligatoire)', idPrefix: 'tpl', type: 'textarea', rows: 2, maxlength: 300, hint: 'Décrivez la photo pour les personnes qui ne la voient pas. Une suggestion est proposée.', values: {}, errors: {} }) %>
+      <label class="check"><input type="checkbox" name="featured" value="1" /><span>Mettre en avant sur l’accueil</span></label>
+      <p class="field__message" role="alert" data-error hidden></p>
+      <div class="a-actions">
+        <button class="btn btn--primary btn--small" type="submit"><span class="btn__label">Envoyer cette photo</span></button>
+        <button class="btn btn--ghost btn--small" type="button" data-remove><span class="btn__label">Retirer</span></button>
+      </div>
+    </form>
+  </template>
+</section>
+
+<section class="a-section">
+  <h2>Réalisations (<%= items.length %>)</h2>
+<% if (items.length === 0) { %>
+  <p class="a-empty">Aucune réalisation. Ajoutez votre première photo ci-dessus.</p>
+<% } else { %>
+  <ul class="a-gallery" role="list" data-sortable data-reorder-url="/admin/galerie/ordre">
+<% items.forEach(function (g) { %>
+    <li class="a-gallery__item" data-id="<%= g.id %>">
+<% if (g.image) { %>
+      <img src="/media/galerie/<%= g.image.replace(/\.webp$/, '-600.webp') %>" alt="<%= g.alt %>" width="150" height="188" loading="lazy" />
+<% } else { %>
+      <div class="a-drop"><span>Photo à venir</span></div>
+<% } %>
+      <a class="link" href="/admin/galerie/<%= g.id %>"><strong><%= g.title %></strong></a>
+      <span class="a-row__meta"><%= [g.category, g.method, g.size].filter(Boolean).join(' · ') || 'Sans étiquette' %></span>
+      <span class="a-row__meta"><%= g.active ? '' : 'Masquée · ' %><%= g.featured ? 'À l’accueil' : '' %></span>
+      <span class="a-reorder">
+        <span class="a-handle" data-handle aria-hidden="true">⋮⋮</span>
+<% ['up', 'down'].forEach(function (dir) { %>
+        <form method="post" action="/admin/galerie/<%= g.id %>/deplacer"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><input type="hidden" name="direction" value="<%= dir %>" /><button class="btn btn--secondary btn--small btn--icon" type="submit" aria-label="<%= dir === 'up' ? 'Avancer' : 'Reculer' %> <%= g.title %>"><span class="btn__label"><%= dir === 'up' ? '←' : '→' %></span></button></form>
+<% }) %>
+      </span>
+    </li>
+<% }) %>
+  </ul>
+<% } %>
+</section>

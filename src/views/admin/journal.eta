@@ -1,0 +1,38 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a; %>
+<div class="a-head"><div><h1>Journal d’activité</h1><p class="a-head__lead">Qui a fait quoi, et quand. Jamais de mot de passe ni de code.</p></div></div>
+<form class="a-toolbar" method="get" action="/admin/journal">
+  <div class="field">
+    <label class="field__label" for="zone">Rubrique</label>
+    <select class="field__control" id="zone" name="zone">
+      <option value="">Toutes</option>
+<% it.areas.forEach(function (z) { %>
+      <option value="<%= z %>"<% if (z === it.zone) { %> selected<% } %>><%= z %></option>
+<% }) %>
+    </select>
+  </div>
+  <button class="btn btn--secondary" type="submit"><span class="btn__label">Filtrer</span></button>
+</form>
+<% if (it.rows.length === 0) { %>
+<p class="a-empty">Rien à afficher.</p>
+<% } else { %>
+<div class="a-table-wrap">
+  <table class="a-table">
+    <thead><tr><th scope="col">Quand</th><th scope="col">Qui</th><th scope="col">Action</th><th scope="col">Détail</th></tr></thead>
+    <tbody>
+<% it.rows.forEach(function (r) { %>
+      <tr>
+        <td data-label="Quand"><%= a.dateTimeLabel(r.createdAt) %></td>
+        <td data-label="Qui"><%= r.userName || 'Système' %></td>
+        <td data-label="Action"><%= r.label %></td>
+        <td data-label="Détail"><%= [r.entityType, r.entityId].filter(Boolean).join(' ') %><% var d = Object.keys(r.details || {}).map(function (k) { return k + ' : ' + r.details[k]; }).join(', '); if (d) { %> · <%= d %><% } %></td>
+      </tr>
+<% }) %>
+    </tbody>
+  </table>
+</div>
+<div class="a-pager">
+<% if (it.page > 1) { %><a class="btn btn--secondary btn--small" href="/admin/journal?zone=<%= it.zone %>&amp;page=<%= it.page - 1 %>"><span class="btn__label">Plus récent</span></a><% } else { %><span></span><% } %>
+<% if (it.hasNext) { %><a class="btn btn--secondary btn--small" href="/admin/journal?zone=<%= it.zone %>&amp;page=<%= it.page + 1 %>"><span class="btn__label">Plus ancien</span></a><% } %>
+</div>
+<% } %>

@@ -1,0 +1,17 @@
+<%
+  /* Rend une liste de champs décrits par le serveur (voir modules/admin/forms.js).
+     Paramètres : fields, values, errors. Un champ { row: [...] } place ses champs côte à côte. */
+%>
+<% it.fields.forEach(function (f) { %>
+<% if (f.row) { %>
+  <div class="a-form__row">
+<% f.row.forEach(function (g) { %>
+    <%~ include('./admin-field-any', { f: g, values: it.values, errors: it.errors }) %>
+<% }) %>
+  </div>
+<% } else if (f.legend) { %>
+  <p class="field__label"><%= f.legend %></p>
+<% } else { %>
+  <%~ include('./admin-field-any', { f: f, values: it.values, errors: it.errors }) %>
+<% } %>
+<% }) %>

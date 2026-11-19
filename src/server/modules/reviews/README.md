@@ -6,3 +6,5 @@
 - **Métier** : `service.js` (moyenne, jeton, dépôt transactionnel), `schemas.js` (Zod). Le lien est envoyé par `notifications`.
 - **À venir (phase 6)** : modération en admin (approuver, refuser, répondre, mettre en avant).
 - **Attention** : les 8 avis actuels sont des **exemples** (`is_placeholder`), à supprimer avant la mise en ligne.
+
+**Admin (phase 6)** : `admin-routes.js` modération (publier, refuser), réponse publique, mise en avant ; jamais de publication sans consentement.

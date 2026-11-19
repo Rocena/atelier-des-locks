@@ -19,6 +19,7 @@
  * @property {{ firstName: string, displayName: string, role: string }} founder
  * @property {{ clients: number, yearsOfPractice: number, isPlaceholder: boolean }} stats
  * @property {{ handle: string, url: string, tiles: string[] }} instagram
+ * @property {{ street?: string, postalCode?: string, city?: string, phone?: string, whatsapp?: string, instagram?: string, hours?: { days: string, time: string }[] }} [contact]
  *
  * @typedef {{ slug: string, title: string, items: { q: string, a: string }[] }} FaqGroup
  */

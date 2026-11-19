@@ -1,0 +1,35 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a; %>
+<p><a class="link" href="/admin/agenda?date=<%= it.values.date %>">← Agenda</a></p>
+<div class="a-head"><div><h1>Bloquer un créneau</h1><p class="a-head__lead">Pause, rendez-vous personnel, matériel à récupérer : ces heures ne seront plus proposées en ligne.</p></div></div>
+<% if (it.errors._form) { %><p class="a-alert" role="alert"><%= it.errors._form %></p><% } %>
+<form class="a-form a-form--narrow" method="post" action="/admin/agenda/blocages" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <%~ include('../partials/admin-field', { name: 'date', label: 'Jour', type: 'date', min: it.today, values: it.values, errors: it.errors }) %>
+  <div class="a-form__row">
+    <%~ include('../partials/admin-field', { name: 'startTime', label: 'De', type: 'time', step: 900, values: it.values, errors: it.errors }) %>
+    <%~ include('../partials/admin-field', { name: 'endTime', label: 'À', type: 'time', step: 900, values: it.values, errors: it.errors }) %>
+  </div>
+  <%~ include('../partials/admin-field', { name: 'reason', label: 'Motif', required: false, maxlength: 200, values: it.values, errors: it.errors }) %>
+  <button class="btn btn--primary" type="submit"><span class="btn__label">Bloquer ce créneau</span></button>
+</form>
+
+<section class="a-section">
+  <h2>Blocages à venir</h2>
+<% if (it.blocks.length === 0) { %>
+  <p class="a-empty">Aucun blocage à venir.</p>
+<% } else { %>
+  <ul class="a-list" role="list">
+<% it.blocks.forEach(function (b) { %>
+    <li class="a-row">
+      <span class="a-row__time"><%= a.shortDayLabel(b.date) %></span>
+      <span class="a-row__main"><span class="a-row__title"><%= a.hhmm(b.startsAt) %> – <%= a.hhmm(b.endsAt) %></span><span class="a-row__meta"><%= b.reason || 'Sans motif' %></span></span>
+      <form method="post" action="/admin/agenda/blocages/<%= b.id %>/supprimer">
+        <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+        <button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Retirer</span></button>
+      </form>
+    </li>
+<% }) %>
+  </ul>
+<% } %>
+</section>

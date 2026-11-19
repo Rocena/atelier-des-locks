@@ -17,3 +17,6 @@ storage/
 # Captures pleine page : régénérables (npm run screenshots), seules les vues « top » sont suivies
 docs/screenshots/*.png
 !docs/screenshots/*-top.png
+
+# Sessions de test e2e de l'admin (jetons éphémères)
+tests/e2e/.auth/

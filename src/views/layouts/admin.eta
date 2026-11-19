@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title><%= it.title %> · Espace pro · L’Atelier des Locks</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="csrf-token" content="<%= it.csrf %>" />
+    <meta name="theme-color" content="#F4ECE2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1C1310" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<% it.assets.fonts.forEach(function (href) { %>
+    <link rel="preload" href="<%= href %>" as="font" type="font/woff2" crossorigin />
+<% }) %>
+<% it.assets.styles.forEach(function (href) { %>
+    <link rel="stylesheet" href="<%= href %>" />
+<% }) %>
+<% it.assets.scripts.forEach(function (src) { %>
+    <script type="module" src="<%= src %>"></script>
+<% }) %>
+  </head>
+<% if (it.bare) { %>
+  <body class="a-bare">
+    <main id="contenu" tabindex="-1" class="a-bare__card">
+      <div class="a-bare__logo">
+        <img src="/brand/embleme.svg" alt="" width="40" height="40" />
+        <span>L’Atelier des Locks<small>Espace pro</small></span>
+      </div>
+<%~ it.body %>
+    </main>
+  </body>
+<% } else { %>
+  <body class="a-body">
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <header class="a-top">
+      <a class="a-brand" href="/admin">
+        <img src="/brand/embleme.svg" alt="" width="28" height="28" />
+        <span>Atelier des Locks<small>Espace pro</small></span>
+      </a>
+      <div class="a-top__user">
+        <span class="a-top__name"><%= it.user.displayName %></span>
+        <form method="post" action="/admin/deconnexion">
+          <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+          <button class="btn btn--ghost btn--small" type="submit"><span class="btn__label">Se déconnecter</span></button>
+        </form>
+      </div>
+    </header>
+    <nav class="a-side" aria-label="Rubriques">
+      <ul class="a-nav" role="list">
+<% it.nav.forEach(function (item) { %>
+        <li><a href="<%= item.href %>"<% if (item.current) { %> aria-current="page"<% } %>>
+          <%~ include('../partials/admin-icon', { name: item.icon }) %>
+          <span><%= item.label %></span></a></li>
+<% }) %>
+      </ul>
+    </nav>
+    <nav class="a-tabs" aria-label="Navigation principale">
+<% var tabs = it.nav.filter(function (n) { return n.tab; }); %>
+<% tabs.forEach(function (item) { %>
+      <a href="<%= item.href %>"<% if (item.current) { %> aria-current="page"<% } %>>
+        <%~ include('../partials/admin-icon', { name: item.icon }) %>
+        <span><%= item.label %></span>
+      </a>
+<% }) %>
+      <a href="/admin/plus"<% if (it.section === 'plus' || (it.pathname === '/admin/plus')) { %> aria-current="page"<% } %>>
+        <%~ include('../partials/admin-icon', { name: 'menu' }) %>
+        <span>Plus</span>
+      </a>
+    </nav>
+    <main id="contenu" tabindex="-1" class="a-main">
+<% if (it.flash) { %>
+      <p class="a-flash" role="status"><%= it.flash %></p>
+<% } %>
+<%~ it.body %>
+    </main>
+  </body>
+<% } %>
+</html>

@@ -1,0 +1,8 @@
+@import '../main.css';
+@import '../components/admin-shell.css';
+@import '../components/admin-ui.css';
+@import '../components/admin-agenda.css';
+
+/* Back-office : même identité que le site, en plus sobre.
+   Pas de fil de loc, pas de grain, pas d'animation d'entrée : un outil d'atelier, lisible
+   d'une main entre deux clientes. Tout vient des tokens du site. */

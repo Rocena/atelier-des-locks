@@ -1,0 +1,10 @@
+<% layout('../layouts/admin', it) %>
+<div class="a-head"><div><h1>Contenus</h1></div></div>
+<ul class="a-list" role="list">
+  <li><a class="a-row" href="/admin/contenus/bandeau"><span></span><span class="a-row__main"><span class="a-row__title">Bandeau d’annonce</span><span class="a-row__meta">Le message en haut de toutes les pages</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/contenus/presentation"><span></span><span class="a-row__main"><span class="a-row__title">Chiffres et présentation</span><span class="a-row__meta">Clientes accompagnées, années de pratique, fondatrice</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/contenus/faq"><span></span><span class="a-row__main"><span class="a-row__title">Questions fréquentes</span><span class="a-row__meta"><%= it.faqCount %> questions</span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/contenus/articles"><span></span><span class="a-row__main"><span class="a-row__title">Articles du journal</span><span class="a-row__meta"><%= it.articles.length %> article<%= it.articles.length > 1 ? 's' : '' %></span></span><span></span></a></li>
+  <li><a class="a-row" href="/admin/contenus/etapes"><span></span><span class="a-row__main"><span class="a-row__title">Étapes de la vie d’une loc</span><span class="a-row__meta">Page Méthodes</span></span><span></span></a></li>
+</ul>
+<p class="text-muted a-section">L’histoire du salon et les textes d’accueil sont écrits dans l’application : pour les modifier, contactez la personne qui s’occupe du site.</p>

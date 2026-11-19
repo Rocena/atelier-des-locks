@@ -1,0 +1,40 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a; var impact = it.query && it.query.impact; %>
+<p><a class="link" href="/admin/reglages">← Réglages</a></p>
+<div class="a-head"><div><h1>Congés et fermetures</h1><p class="a-head__lead">Les jours fermés ne sont plus proposés en ligne. Les rendez-vous déjà posés ne sont pas annulés automatiquement.</p></div></div>
+<% if (it.impact) { %><p class="a-alert a-alert--warning" role="status"><%= it.impact %> rendez-vous déjà posé<%= it.impact > 1 ? 's' : '' %> sur cette période : déplacez-les ou annulez-les depuis l’agenda.</p><% } %>
+
+<form class="a-form a-form--narrow" method="post" action="/admin/reglages/fermetures" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <%~ include('../partials/admin-field', { name: 'kind', label: 'Type', type: 'select', options: [{ value: 'closed', label: 'Fermé toute la journée' }, { value: 'special_hours', label: 'Horaires exceptionnels' }], values: it.values, errors: it.errors }) %>
+  <div class="a-form__row">
+    <%~ include('../partials/admin-field', { name: 'startsOn', label: 'Du', type: 'date', values: it.values, errors: it.errors }) %>
+    <%~ include('../partials/admin-field', { name: 'endsOn', label: 'Au (inclus)', type: 'date', required: false, hint: 'Vide pour un seul jour.', values: it.values, errors: it.errors }) %>
+  </div>
+  <div class="a-form__row">
+    <%~ include('../partials/admin-field', { name: 'opens', label: 'Ouvre (horaires exceptionnels)', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+    <%~ include('../partials/admin-field', { name: 'closes', label: 'Ferme', type: 'time', required: false, values: it.values, errors: it.errors }) %>
+  </div>
+  <%~ include('../partials/admin-field', { name: 'reason', label: 'Motif', required: false, maxlength: 200, values: it.values, errors: it.errors }) %>
+  <button class="btn btn--primary" type="submit"><span class="btn__label">Ajouter</span></button>
+</form>
+
+<section class="a-section">
+  <h2>À venir</h2>
+<% if (it.closures.length === 0) { %>
+  <p class="a-empty">Aucune fermeture prévue.</p>
+<% } else { %>
+  <ul class="a-list" role="list">
+<% it.closures.forEach(function (c) { %>
+    <li class="a-row">
+      <span class="a-row__time"><%= a.shortDayLabel(c.startsOn) %></span>
+      <span class="a-row__main">
+        <span class="a-row__title"><%= c.kind === 'closed' ? 'Fermé' : 'Ouvert de ' + c.opens + ' à ' + c.closes %><%= c.endsOn !== c.startsOn ? ' jusqu’au ' + a.shortDayLabel(c.endsOn) : '' %></span>
+        <span class="a-row__meta"><%= c.reason || 'Sans motif' %></span>
+      </span>
+      <form method="post" action="/admin/reglages/fermetures/<%= c.id %>/supprimer"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Retirer</span></button></form>
+    </li>
+<% }) %>
+  </ul>
+<% } %>
+</section>

@@ -1,0 +1,119 @@
+<% layout('../layouts/admin', it) %>
+<%
+  var ap = it.appointment, a = it.a;
+  var tone = a.STATUS_TONE[ap.status] || 'success';
+  var labels = { confirmed: 'Confirmer', completed: 'Marquer terminé', no_show: 'Absente', pending: 'Remettre à valider' };
+%>
+<p><a class="link" href="/admin/agenda?vue=jour&amp;date=<%= it.startDate %>">← Agenda</a></p>
+<% if (it.error) { %><p class="a-alert" role="alert"><%= it.error %></p><% } %>
+<div class="a-head">
+  <div>
+    <h1><%= ap.firstName %> <%= ap.lastName %></h1>
+    <p class="a-head__lead"><%= ap.serviceName %><% if (ap.options.length) { %> · <%= ap.options.join(', ') %><% } %></p>
+  </div>
+  <span class="a-status a-status--<%= tone %>"><%= a.STATUS_LABELS[ap.status] %></span>
+</div>
+
+<div class="a-grid a-grid--2">
+  <section class="a-card">
+    <h2>Rendez-vous</h2>
+    <dl class="a-dl">
+      <dt>Quand</dt><dd><%= a.dayLabel(it.startDate) %>, <%= a.timeLabel(ap.startsAt) %></dd>
+      <dt>Durée</dt><dd><%= a.minutesLabel(ap.durationMinutes) %><% if (ap.bufferMinutes) { %> (+ <%= ap.bufferMinutes %> min de rangement)<% } %></dd>
+      <dt>Prix</dt><dd><%= ap.price === null ? 'Sur devis' : (ap.priceFrom ? 'À partir de ' : '') + a.money(ap.price) %></dd>
+      <dt>Praticienne</dt><dd><%= ap.staffName %></dd>
+      <dt>Origine</dt><dd><%= ap.source === 'admin' ? 'Saisi par le salon' : 'Réservation en ligne' %></dd>
+    </dl>
+  </section>
+  <section class="a-card">
+    <h2>Cliente</h2>
+    <dl class="a-dl">
+      <dt>Nom</dt><dd><a class="link" href="/admin/clientes/<%= ap.clientId %>"><%= ap.firstName %> <%= ap.lastName %></a></dd>
+<% if (ap.phone) { %>
+      <dt>Téléphone</dt><dd><a class="link" href="tel:<%= ap.phone %>"><%= ap.phone %></a><% if (it.waNumber) { %> · <a class="link" href="https://wa.me/<%= it.waNumber %>" rel="noopener noreferrer" target="_blank">WhatsApp</a><% } %></dd>
+<% } %>
+<% if (ap.email) { %>
+      <dt>Email</dt><dd><a class="link" href="mailto:<%= ap.email %>"><%= ap.email %></a></dd>
+<% } %>
+<% if (ap.hairState) { %>
+      <dt>Cheveux</dt><dd><%= ap.hairState %></dd>
+<% } %>
+    </dl>
+<% if (ap.clientNotes) { %>
+    <p class="a-notes"><strong>Message de la cliente :</strong> <%= ap.clientNotes %></p>
+<% } %>
+<% if (ap.hasPhoto) { %>
+    <p><a href="/admin/agenda/rdv/<%= ap.id %>/photo" target="_blank" rel="noopener"><img class="a-thumb" src="/admin/agenda/rdv/<%= ap.id %>/photo" alt="Photo des cheveux envoyée par la cliente" width="72" height="72" /></a></p>
+<% } %>
+  </section>
+</div>
+
+<% if (it.transitions.length) { %>
+<section class="a-section">
+  <h2>Statut</h2>
+  <div class="a-actions">
+<% it.transitions.filter(function (s) { return s !== 'cancelled_by_salon'; }).forEach(function (s) { %>
+    <form method="post" action="/admin/agenda/rdv/<%= ap.id %>/statut">
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <input type="hidden" name="status" value="<%= s %>" />
+      <button class="btn <%= s === 'confirmed' || s === 'completed' ? 'btn--primary' : 'btn--secondary' %> btn--small" type="submit"><span class="btn__label"><%= labels[s] %></span></button>
+    </form>
+<% }) %>
+  </div>
+<% if (it.transitions.indexOf('cancelled_by_salon') !== -1) { %>
+  <details class="a-section">
+    <summary class="link">Annuler ce rendez-vous</summary>
+    <form class="a-form a-form--narrow" method="post" action="/admin/agenda/rdv/<%= ap.id %>/statut">
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <input type="hidden" name="status" value="cancelled_by_salon" />
+      <%~ include('../partials/admin-field', { name: 'reason', label: 'Motif (gardé en interne)', required: false, values: {}, errors: {} }) %>
+      <%~ include('../partials/admin-check', { name: 'notify', label: 'Prévenir la cliente par email et SMS', checked: true }) %>
+      <button class="btn btn--danger btn--small" type="submit"><span class="btn__label">Annuler le rendez-vous</span></button>
+    </form>
+  </details>
+<% } %>
+</section>
+<% } %>
+
+<% if (it.movable) { %>
+<section class="a-section">
+  <h2>Déplacer</h2>
+<% if (!it.wantsMove) { %>
+  <p><a class="btn btn--secondary btn--small" href="/admin/agenda/rdv/<%= ap.id %>?deplacer=1#deplacer"><span class="btn__label">Choisir un autre créneau</span></a></p>
+<% } else { %>
+  <div id="deplacer">
+    <form class="a-form a-form--narrow" method="get" action="/admin/agenda/rdv/<%= ap.id %>">
+      <input type="hidden" name="deplacer" value="1" />
+      <%~ include('../partials/admin-field', { name: 'date', label: 'Jour', type: 'date', value: it.moveDate, min: it.minDate, values: {}, errors: {} }) %>
+      <button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Voir les créneaux libres</span></button>
+    </form>
+<% if (it.slots.length === 0) { %>
+    <p class="a-empty">Aucun créneau libre ce jour-là. Essayez un autre jour.</p>
+<% } else { %>
+    <form class="a-form" method="post" action="/admin/agenda/rdv/<%= ap.id %>/deplacer">
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <fieldset>
+        <legend>Créneaux libres le <%= a.dayLabel(it.moveDate) %></legend>
+        <div class="a-slots">
+<% it.slots.forEach(function (s, i) { %>
+          <label><input type="radio" name="startsAt" value="<%= s.startsAt %>"<% if (i === 0) { %> required<% } %> /><span><%= a.hhmm(s.startsAt) %></span></label>
+<% }) %>
+        </div>
+      </fieldset>
+      <%~ include('../partials/admin-check', { name: 'notify', label: 'Prévenir la cliente par email et SMS', checked: true }) %>
+      <div class="a-sticky-actions"><button class="btn btn--primary" type="submit"><span class="btn__label">Déplacer le rendez-vous</span></button></div>
+    </form>
+<% } %>
+  </div>
+<% } %>
+</section>
+<% } %>
+
+<section class="a-section">
+  <h2>Notes internes</h2>
+  <form class="a-form" method="post" action="/admin/agenda/rdv/<%= ap.id %>/notes">
+    <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+    <%~ include('../partials/admin-field', { name: 'notes', label: 'Notes (type de cheveux, méthode, produits…)', type: 'textarea', rows: 5, maxlength: 4000, required: false, value: ap.internalNotes || '', values: {}, errors: {} }) %>
+    <div><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Enregistrer les notes</span></button></div>
+  </form>
+</section>

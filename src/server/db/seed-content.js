@@ -174,9 +174,9 @@ async function seedGallery(db) {
   }
   for (const [position, item] of items.entries()) {
     const { rows } = await db.query(
-      `INSERT INTO gallery_items (slug, title, category_id, method_id, ratio, featured, position,
-         is_placeholder)
-       VALUES ($1, $2, (SELECT id FROM categories WHERE slug = $3),
+      `INSERT INTO gallery_items (slug, title, alt_text, category_id, method_id, ratio, featured,
+         position, is_placeholder)
+       VALUES ($1, $2, $2, (SELECT id FROM categories WHERE slug = $3),
          (SELECT id FROM methods WHERE slug = $4), $5, $6, $7, true)
        ON CONFLICT (slug) DO UPDATE SET title = $2, category_id = EXCLUDED.category_id,
          method_id = EXCLUDED.method_id, ratio = $5, featured = $6, position = $7

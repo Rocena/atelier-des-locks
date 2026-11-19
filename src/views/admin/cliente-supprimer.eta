@@ -1,0 +1,20 @@
+<% layout('../layouts/admin', it) %>
+<% var c = it.client; %>
+<p><a class="link" href="/admin/clientes/<%= c.id %>">← Retour à la fiche</a></p>
+<div class="a-head"><div><h1>Supprimer <%= c.firstName %> <%= c.lastName %> ?</h1></div></div>
+<div class="a-alert">
+  <p><strong>Cette action est définitive.</strong> Seront effacés : nom, email, téléphone, notes, photos de cheveux, messages de la cliente et destinataires du journal des envois. Son prénom disparaît aussi de ses avis.</p>
+  <p>Gardés, sans lien avec une personne : les dates, prestations et montants des rendez-vous passés.</p>
+<% if (it.upcoming > 0) { %>
+  <p><strong><%= it.upcoming %> rendez-vous à venir seront annulés</strong>, sans message envoyé : prévenez-la vous-même si besoin.</p>
+<% } %>
+</div>
+<form class="a-form a-form--narrow" method="post" action="/admin/clientes/<%= c.id %>/supprimer" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <label class="check"><input type="checkbox" name="confirm" value="1" /><span>Je confirme la suppression des données de cette cliente.</span></label>
+<% if (it.errors.confirm) { %><p class="field__message" role="alert"><%= it.errors.confirm %></p><% } %>
+  <div class="a-sticky-actions">
+    <button class="btn btn--danger" type="submit"><span class="btn__label">Supprimer définitivement</span></button>
+    <a class="btn btn--ghost" href="/admin/clientes/<%= c.id %>"><span class="btn__label">Garder la fiche</span></a>
+  </div>
+</form>

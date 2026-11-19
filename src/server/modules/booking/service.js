@@ -13,7 +13,7 @@ import * as repo from './repo.js';
 
 const DAY = 86_400_000;
 /** Le lien « Gérer mon RDV » reste valable 30 jours après la fin du RDV. */
-const MANAGE_LINK_DAYS_AFTER = 30;
+export const MANAGE_LINK_DAYS_AFTER = 30;
 /** Période maximale demandée en une fois par le calendrier public. */
 export const MAX_SLOTS_RANGE_DAYS = 42;
 
@@ -43,7 +43,7 @@ export const PREPARATION_TIPS = [
  * @param {string} slug
  * @param {number[]} optionIds
  */
-function resolveService(services, slug, optionIds) {
+export function resolveService(services, slug, optionIds) {
   const service = services.find((s) => s.slug === slug);
   if (!service) throw new BookingError('not_found');
   if (!service.bookableOnline || service.onQuote) throw new BookingError('not_bookable');
@@ -59,7 +59,7 @@ function resolveService(services, slug, optionIds) {
  * @param {{ staffIds: number[], from: string, to: string, occupationMinutes: number, settings: repo.BookingSettings, now: Date, excludeAppointmentId?: string }} q
  * @returns {Promise<import('./availability.js').AvailabilityInput>}
  */
-async function availabilityInput(db, q) {
+export async function availabilityInput(db, q) {
   const tz = q.settings.timeZone;
   const planning = await repo.findPlanning(db, {
     staffIds: q.staffIds,
@@ -138,7 +138,7 @@ export async function getSlots(db, q) {
 }
 
 /** @param {unknown} error */
-const isOverlap = (error) =>
+export const isOverlap = (error) =>
   typeof error === 'object' && error !== null && /** @type {any} */ (error).code === '23P01';
 
 /**

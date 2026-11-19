@@ -1,0 +1,15 @@
+<% layout('../layouts/admin', it) %>
+<p><a class="link" href="<%= it.backHref %>">← <%= it.backLabel || 'Retour' %></a></p>
+<div class="a-head"><div><h1><%= it.heading || it.title %></h1><% if (it.lead) { %><p class="a-head__lead"><%= it.lead %></p><% } %></div></div>
+<% if (it.errors._form) { %><p class="a-alert" role="alert"><%= it.errors._form %></p><% } %>
+<form class="a-form a-form--narrow" method="post" action="<%= it.action %>" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <%~ include('../partials/admin-fields', { fields: it.fields, values: it.values, errors: it.errors }) %>
+  <div class="a-sticky-actions a-sticky-actions--bar">
+    <button class="btn btn--primary" type="submit"><span class="btn__label"><%= it.submitLabel || 'Enregistrer' %></span></button>
+    <a class="btn btn--ghost" href="<%= it.backHref %>"><span class="btn__label">Annuler</span></a>
+  </div>
+</form>
+<% if (it.afterTemplate) { %>
+<%~ include(it.afterTemplate, it) %>
+<% } %>

@@ -1,0 +1,24 @@
+<% layout('../layouts/admin', it) %>
+<p><a class="link" href="/admin/contenus">← Contenus</a></p>
+<div class="a-head">
+  <div><h1>Questions fréquentes</h1></div>
+  <a class="btn btn--primary btn--small" href="/admin/contenus/faq/nouvelle"><span class="btn__label">Nouvelle question</span></a>
+</div>
+<% it.groups.forEach(function (g) { %>
+<section class="a-section">
+  <h2><%= g.title %></h2>
+<% if (g.items.length === 0) { %>
+  <p class="a-empty">Aucune question dans ce thème.</p>
+<% } else { %>
+  <ul class="a-list" role="list">
+<% g.items.forEach(function (q) { %>
+    <li class="a-row">
+      <span></span>
+      <a class="a-row__main link" href="/admin/contenus/faq/<%= q.id %>"><span class="a-row__title"><%= q.question %></span></a>
+      <form method="post" action="/admin/contenus/faq/<%= q.id %>/supprimer"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><button class="btn btn--ghost btn--small" type="submit" aria-label="Supprimer la question : <%= q.question %>"><span class="btn__label">Supprimer</span></button></form>
+    </li>
+<% }) %>
+  </ul>
+<% } %>
+</section>
+<% }) %>

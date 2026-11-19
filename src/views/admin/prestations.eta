@@ -1,0 +1,71 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a; %>
+<div class="a-head">
+  <div><h1>Prestations et tarifs</h1><p class="a-head__lead">Glissez une ligne par sa poignée pour changer l’ordre, ou utilisez les flèches.</p></div>
+  <div class="a-actions">
+    <a class="btn btn--primary btn--small" href="/admin/prestations/nouvelle"><span class="btn__label">Nouvelle prestation</span></a>
+    <a class="btn btn--secondary btn--small" href="/admin/prestations/categories/nouvelle"><span class="btn__label">Nouvelle catégorie</span></a>
+  </div>
+</div>
+
+<% var groups = it.categories.map(function (c) { return { category: c, services: it.services.filter(function (s) { return s.categoryId === c.id; }) }; });
+   var loose = it.services.filter(function (s) { return s.categoryId === null; });
+   if (loose.length) groups.push({ category: null, services: loose }); %>
+
+<% if (it.categories.length > 1) { %>
+<section class="a-section">
+  <h2>Ordre des catégories</h2>
+  <ul class="a-list" role="list" data-sortable data-reorder-url="/admin/prestations/ordre/categories">
+<% it.categories.forEach(function (c) { %>
+    <li class="a-row" data-id="<%= c.id %>">
+      <span class="a-handle" data-handle aria-hidden="true">⋮⋮</span>
+      <span class="a-row__main"><a class="a-row__title link" href="/admin/prestations/categories/<%= c.id %>"><%= c.name %></a><span class="a-row__meta"><%= c.active ? 'Affichée' : 'Masquée' %></span></span>
+      <span class="a-reorder">
+<% ['up', 'down'].forEach(function (dir) { %>
+        <form method="post" action="/admin/prestations/categories/<%= c.id %>/deplacer"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><input type="hidden" name="direction" value="<%= dir %>" /><button class="btn btn--secondary btn--small btn--icon" type="submit" aria-label="<%= dir === 'up' ? 'Monter' : 'Descendre' %> la catégorie <%= c.name %>"><span class="btn__label"><%= dir === 'up' ? '↑' : '↓' %></span></button></form>
+<% }) %>
+      </span>
+    </li>
+<% }) %>
+  </ul>
+</section>
+<% } %>
+
+<% groups.forEach(function (g) { %>
+<section class="a-section">
+  <h2><%= g.category ? g.category.name : 'Sans catégorie' %><% if (g.category && !g.category.active) { %> (masquée)<% } %></h2>
+<% if (g.services.length === 0) { %>
+  <p class="a-empty">Aucune prestation dans cette catégorie.</p>
+<% } else { %>
+  <ul class="a-list" role="list" data-sortable data-reorder-url="/admin/prestations/ordre/services">
+<% g.services.forEach(function (s) { %>
+    <li class="a-row" data-id="<%= s.id %>">
+      <span class="a-handle" data-handle aria-hidden="true">⋮⋮</span>
+      <span class="a-row__main">
+        <a class="a-row__title link" href="/admin/prestations/<%= s.id %>"><%= s.name %></a>
+        <span class="a-status a-status--<%= s.active ? 'success' : 'warning' %>"><%= s.active ? 'Affichée sur le site' : 'Masquée' %></span>
+        <span class="a-row__meta"><%= a.minutesLabel(s.durationMin) %><% if (s.durationMax !== s.durationMin) { %> à <%= a.minutesLabel(s.durationMax) %><% } %> · <%= s.onQuote ? 'sur devis' : (s.priceFrom ? 'dès ' : '') + a.money(s.price) %><% if (s.optionCount) { %> · <%= s.optionCount %> option<%= s.optionCount > 1 ? 's' : '' %><% } %><% if (!s.bookableOnline) { %> · non réservable en ligne<% } %></span>
+<% if (s.isPlaceholder) { %><span class="a-placeholder-flag">Prix et durées à confirmer</span><% } %>
+      </span>
+      <span class="a-reorder">
+        <form method="post" action="/admin/prestations/<%= s.id %>/actif"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><input type="hidden" name="active" value="<%= s.active ? '0' : '1' %>" /><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label"><%= s.active ? 'Masquer' : 'Afficher' %><span class="visually-hidden"> <%= s.name %> sur le site</span></span></button></form>
+<% ['up', 'down'].forEach(function (dir) { %>
+        <form method="post" action="/admin/prestations/<%= s.id %>/deplacer"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><input type="hidden" name="direction" value="<%= dir %>" /><button class="btn btn--secondary btn--small btn--icon" type="submit" aria-label="<%= dir === 'up' ? 'Monter' : 'Descendre' %> <%= s.name %>"><span class="btn__label"><%= dir === 'up' ? '↑' : '↓' %></span></button></form>
+<% }) %>
+      </span>
+    </li>
+<% }) %>
+  </ul>
+<% } %>
+</section>
+<% }) %>
+
+<section class="a-section">
+  <h2>Méthodes</h2>
+  <ul class="a-list" role="list">
+<% it.methods.forEach(function (m) { %>
+    <li><a class="a-row" href="/admin/prestations/methodes/<%= m.id %>"><span></span><span class="a-row__main"><span class="a-row__title"><%= m.name %></span><span class="a-row__meta"><%= m.family === 'installation' ? 'Installation' : (m.family === 'maintenance' ? 'Entretien' : 'Installation et entretien') %></span></span><span></span></a></li>
+<% }) %>
+  </ul>
+  <p><a class="btn btn--secondary btn--small" href="/admin/prestations/methodes/nouvelle"><span class="btn__label">Nouvelle méthode</span></a></p>
+</section>

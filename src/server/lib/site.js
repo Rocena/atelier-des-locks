@@ -41,3 +41,25 @@ export const site = {
     { href: '/faq', label: 'Questions fréquentes' },
   ],
 };
+
+/**
+ * Coordonnées modifiées depuis l'admin (réglage « site.contact »), fusionnées sur les valeurs
+ * par défaut. Sans réglage, le site garde ses valeurs d'origine.
+ * @param {typeof site} base
+ * @param {{ street?: string, postalCode?: string, city?: string, phone?: string, whatsapp?: string, instagram?: string, hours?: { days: string, time: string }[] }|undefined} contact
+ */
+export function withContact(base, contact) {
+  if (!contact) return base;
+  return {
+    ...base,
+    address: {
+      street: contact.street || base.address.street,
+      postalCode: contact.postalCode || base.address.postalCode,
+      city: contact.city || base.address.city,
+    },
+    phone: contact.phone ?? base.phone,
+    whatsapp: contact.whatsapp ?? base.whatsapp,
+    instagram: contact.instagram ?? base.instagram,
+    hours: contact.hours?.length ? contact.hours : base.hours,
+  };
+}

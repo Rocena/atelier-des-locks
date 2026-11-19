@@ -1,0 +1,40 @@
+<% layout('../layouts/admin', it) %>
+<% var item = it.item, c = it.choices;
+   function opts(list, placeholder) { return [{ value: '', label: placeholder }].concat(list.map(function (x) { return { value: x.id, label: x.name }; })); }
+   var values = it.values && Object.keys(it.values).length ? it.values : { title: item.title, alt: item.alt, categoryId: item.categoryId === null ? '' : String(item.categoryId), methodId: item.methodId === null ? '' : String(item.methodId), sizeTagId: item.sizeTagId === null ? '' : String(item.sizeTagId), featured: item.featured ? '1' : undefined, active: item.active ? '1' : undefined };
+   var file = item.imagePath ? item.imagePath.split('/').pop() : null; %>
+<p><a class="link" href="/admin/galerie">← Galerie</a></p>
+<div class="a-head"><div><h1><%= item.title %></h1></div></div>
+<div class="a-grid a-grid--2">
+  <section class="a-card">
+<% if (file) { %>
+    <img src="/media/galerie/<%= file.replace(/\.webp$/, '-600.webp') %>" alt="<%= item.alt %>" width="480" height="600" />
+<% } else { %>
+    <div class="a-drop"><span>Photo à venir : aucune image envoyée.</span></div>
+<% } %>
+    <form class="a-form" method="post" action="/admin/galerie/<%= item.id %>/photo?_csrf=<%= encodeURIComponent(it.csrf) %>" enctype="multipart/form-data">
+      <div class="field"><label class="field__label" for="photo">Remplacer la photo</label>
+        <input class="field__control" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required /></div>
+      <div><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Envoyer la nouvelle photo</span></button></div>
+    </form>
+  </section>
+  <section class="a-card">
+    <form class="a-form" method="post" action="/admin/galerie/<%= item.id %>" novalidate>
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <%~ include('../partials/admin-field', { name: 'title', label: 'Titre', maxlength: 120, values: values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'categoryId', label: 'Prestation', type: 'select', required: false, options: opts(c.categories, 'Aucune'), values: values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'methodId', label: 'Méthode', type: 'select', required: false, options: opts(c.methods, 'Aucune'), values: values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'sizeTagId', label: 'Taille des locks', type: 'select', required: false, options: opts(c.sizes, 'Non précisée'), values: values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'alt', label: 'Texte alternatif (obligatoire)', type: 'textarea', rows: 3, maxlength: 300, hint: it.suggestion ? 'Suggestion : ' + it.suggestion : 'Décrivez la photo en une phrase.', values: values, errors: it.errors }) %>
+      <%~ include('../partials/admin-check', { name: 'featured', label: 'Mise en avant sur l’accueil', checked: values.featured === '1' }) %>
+      <%~ include('../partials/admin-check', { name: 'active', label: 'Visible sur le site', checked: values.active === '1' }) %>
+      <div class="a-sticky-actions a-sticky-actions--bar"><button class="btn btn--primary" type="submit"><span class="btn__label">Enregistrer</span></button></div>
+    </form>
+<% if (it.isOwner) { %>
+    <form class="a-form" method="post" action="/admin/galerie/<%= item.id %>/supprimer">
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <button class="btn btn--danger btn--small" type="submit"><span class="btn__label">Supprimer cette photo</span></button>
+    </form>
+<% } %>
+  </section>
+</div>

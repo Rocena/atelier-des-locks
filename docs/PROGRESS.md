@@ -13,6 +13,7 @@
 | 3 · Base de données       | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
 | 4 · Réservation           | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
 | 5 · Notifications et avis | ✅ terminée (2026-11-19), Brevo à tester avec une vraie clé                     | Tests de planification des jobs                       |
+| 6 · Back-office           | ✅ terminée (2026-11-19), à essayer sur téléphone par la propriétaire           | Contrôle d'accès prouvé, e2e des parcours principaux  |
 
 ## Phase 0 : fait
 
@@ -155,12 +156,50 @@
 - **Branchement** : création, déplacement et annulation appellent `app.notifications.*` (qui ne lève jamais d'erreur : la réservation est déjà enregistrée). `appointmentCompleted` est prêt pour l'admin.
 - **Tests** : 289 tests unitaires (dont 29 de planification, 19 de messages et fournisseurs, 11 de cycle de vie avec base, 17 sur les avis) ; lint, typecheck et build propres. e2e non relancés.
 
-## Reste à faire (phase 6 et suivantes)
+## Phase 6 : fait
+
+Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélioration, **mobile d'abord** (barre d'onglets en bas, listes tactiles, aucune page qui défile à l'horizontale à 390 px), même identité que le site en plus sobre. Décisions : `docs/decisions/0002-admin-auth-and-access.md`.
+
+### Authentification et accès (§13)
+
+- **Connexion** : mot de passe (**argon2id**) → code **TOTP** (RFC 6238, testé avec les vecteurs de la RFC) ou **code de secours** (10 codes hachés, à usage unique). 2FA **obligatoire** : à la première connexion, QR code + clé de saisie, puis codes de secours affichés une seule fois.
+- **Sessions en base** : jeton de 32 octets (empreinte SHA-256), cookie HttpOnly, SameSite=Strict, Secure et préfixe `__Host-` en production. Identifiant **renouvelé** après le mot de passe puis après la 2FA. 30 min d'inactivité, 12 h au plus. Changer de mot de passe ferme les autres sessions.
+- **Verrouillage progressif** : 5 échecs, puis 1, 5, 15 et 60 min (mots de passe et codes comptés ensemble). Réponse identique pour compte inconnu, mauvais mot de passe et compte verrouillé. Limitation de débit (`ADMIN_LOGIN_RATE_LIMIT`).
+- **Rôles** : `owner` et `staff`, déclarés **route par route** ; une route sans rôle est refusée. Équipe : tableau de bord (sans chiffre d'affaires), agenda, clientes (lecture et notes), galerie, avis. Propriétaire en plus : prestations et tarifs, contenus, réglages, journaux, export CSV, suppression RGPD, suppression de photo.
+- **Premier compte** : `npm run admin:create` (questions à l'écran, mot de passe masqué ; `-- --role staff` pour l'équipe).
+- **Journal d'audit** en ajout seul (déclencheur SQL), sans mot de passe ni code (filtre testé).
+
+### Écrans
+
+- **Aujourd'hui** : rendez-vous du jour, de la semaine, « à valider », avis à modérer, taux d'absence, CA estimé du mois (propriétaire).
+- **Agenda** : jour, semaine, liste. Frise horaire avec zones fermées, tampons, ligne « maintenant ». **Glisser-déposer à la souris** (pas de 15 min, confirmation, case « prévenir la cliente », message d'erreur si le créneau est pris). Au doigt : fiche du RDV → « Choisir un autre créneau » (créneaux libres, sans délai minimum ni horizon). RDV **saisi par le salon** (hors horaires possible, jamais de chevauchement), statuts (terminé → demande d'avis, annulé → message), notes internes, photo des cheveux (derrière l'authentification), blocages.
+- **Clientes** : recherche (nom, email, téléphone), fiche (historique, notes), **export CSV** (Excel français, sans injection de formules, accès journalisé), **suppression RGPD** par anonymisation (confirmation en deux temps).
+- **Prestations et tarifs** : catégories, prestations (prix, durées, tampon, devis, visibilité, description en sections), options, méthodes ; **ordre par glisser-déposer** et boutons ↑ ↓ ; badge « à confirmer » tant que prix et durées ne sont pas validés.
+- **Galerie** : envoi **multiple** (glisser-déposer ou choix), **recadrage** (portrait, carré, paysage, zoom), étiquettes (prestation, méthode, taille), **texte alternatif obligatoire** avec suggestion, ordre, mise en avant ; ré-encodage serveur (1600 et 600 px, EXIF supprimé). Les photos s'affichent sur la page Galerie et l'accueil (`/media/galerie/<uuid>.webp`).
+- **Avis** : publier, refuser, réponse publique, mise en avant ; jamais de publication sans consentement.
+- **Contenus** : bandeau d'annonce, chiffres et fondatrice, FAQ, articles du journal, étapes de la vie d'une loc.
+- **Réglages** : réservation (délais, annulation, validation manuelle, politique), horaires, congés et fermetures (avertissement si des RDV existent), coordonnées et réseaux (appliquées au site). Réglages techniques en lecture seule.
+- **Messages envoyés** (journal des notifications, destinataires masqués, filtre par état) et **Journal d'activité** (filtre par rubrique).
+
+### Tests
+
+- **Contrôle d'accès** (`admin/access.test.js`) : la liste des routes est **lue dans l'application** ; non connecté → 401 sur chacune, session sans 2FA → 401, session expirée / trop vieille / compte désactivé → 401, équipe sur route propriétaire → 403, équipe et propriétaire sur leurs routes → ni 401 ni 403 ni 500, écriture sans jeton CSRF → 403, une route sans rôle fait échouer le test.
+- **Unitaires et intégration** : **UNIT** tests dans **FILES** fichiers (auth, TOTP, verrouillage, sessions, rotation, codes de secours, agenda sur base réelle, parcours HTTP, fonctions pures, CSV, RGPD, galerie, réglages, contenus, journaux, script de création de compte).
+- **e2e** (`tests/e2e/admin.spec.js`, mobile et desktop) : connexion avec 2FA et première connexion (QR, codes de secours), RDV manuel, déplacement par créneaux libres et par glisser-déposer, annulation d'un glisser, blocage, clientes (recherche, CSV, suppression RGPD), modération d'un avis, prestation (création, prix, masquage), envoi d'une photo recadrée, droits de l'équipe, **axe-core WCAG A/AA sur 20 pages**, aucun défilement horizontal, zones tactiles ≥ 44 px, aucune erreur de console (donc aucune violation de la CSP).
+- Revue visuelle (design-craft §10) à 390 et 1440 px : captures `docs/screenshots/admin-*-top.png` (`ADMIN_SHOTS=1 npx playwright test tests/e2e/admin-shots.spec.js`).
+- Défauts trouvés par les tests et corrigés : horizon de réservation appliqué au déplacement par le salon ; barre de dates et filtres qui débordaient à 390 px ; boutons dont l'étiquette visible n'était pas dans le nom accessible ; prestation sans praticienne associée impossible à réserver par le salon ; erreurs affichées en JSON brut sur les formulaires classiques ; recherche par téléphone en format national.
+
+## Reste à faire (phase 7 et suivantes)
 
 - **Notifications en production** : créer le compte Brevo, valider l'expéditeur (SPF, DKIM), renseigner `NOTIFICATIONS_PROVIDER=brevo`, `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `OWNER_EMAIL`, `GOOGLE_REVIEW_URL`, puis envoyer un message réel. Le fournisseur Brevo n'a été testé qu'avec un faux `fetch`. Tester aussi les emails dans Gmail, Outlook et Apple Mail (§7.6).
-- **Admin (phase 6) à brancher** : bouton « terminé » → `app.notifications.appointmentCompleted` ; annulation par le salon → `appointmentCancelled({ by: 'salon' })` ; validation d'un RDV `pending` ; modération des avis (approuver, refuser, répondre, mettre en avant) ; écran du journal `notifications_log` ; textes d'emails éditables (aujourd'hui dans `messages.js`).
-- Admin (phase 6) : validation des RDV `pending`, consultation des photos (`UPLOAD_DIR/hair/`), blocages, fermetures, réglages `booking.*`.
-- Purge RGPD des photos de cheveux après le RDV (durée à fixer, cf. `docs/DATABASE.md`).
+- **Phase 6 : suites** :
+  - **« RDV validé »** : valider un rendez-vous `pending` ne prévient pas encore la cliente (pas de modèle de message dédié ; la confirmation « demande reçue » est déjà partie). À écrire avec la propriétaire.
+  - **Textes des emails et SMS éditables** (`messages.js`) : lecture seule pour l'instant ; l'édition doit garder les garde-fous (160 caractères GSM, lien jamais tronqué).
+  - **Textes de l'accueil et de « Le salon »** : toujours dans les gabarits (le bandeau, les chiffres, la FAQ, les articles et les étapes sont éditables). Les passer en blocs de contenu est une évolution.
+  - **Réglages d'infrastructure** (`BOOKING_PROVIDER`, lien Fresha, lien avis Google, fournisseur d'envoi) : restent dans l'environnement du serveur.
+  - **Horaires par praticienne** : l'écran applique la même grille à toutes les praticiennes actives (une seule aujourd'hui).
+  - **Gestion des comptes** (créer une employée, désactiver, réinitialiser la 2FA) : aujourd'hui par script (`npm run admin:create`) et en base.
+- Purge RGPD **automatique** des photos de cheveux après le RDV et anonymisation des clientes inactives après 3 ans (durées à fixer, cf. `docs/DATABASE.md`) : la suppression à la demande existe (phase 6), pas la purge planifiée.
 
 - Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
 - Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
@@ -213,6 +252,20 @@
 - **Limite connue** : la planification se fait après l'enregistrement du RDV, pas dans la même transaction. Si la base de jobs était indisponible à cet instant, les messages ne partiraient pas (l'erreur est journalisée).
 - **Un avis vérifié bloque la suppression de son RDV** (contrainte `reviews_verified_needs_appointment`) : la suppression passera par l'anonymisation de la cliente.
 
+## Décisions de la phase 6
+
+- **Rendu serveur + formulaires classiques**, JavaScript en amélioration : tout marche sans glisser-déposer (flèches ↑ ↓, créneaux libres). Pas de SPA.
+- **Sessions en base**, pas de JWT ; **TOTP écrit sur node:crypto** (testé avec les vecteurs de la RFC) ; `@node-rs/argon2` (binaires précompilés) et `qrcode` sont les deux dépendances ajoutées.
+- **Refus par défaut** : une route /admin sans rôle déclaré est interdite, et un test le prouve.
+- **Suppression RGPD = anonymisation** : l'historique (dates, prestations, montants) reste sans lien avec une personne ; les RDV à venir sont annulés **sans message** (la cliente n'existe plus).
+- **Cliente sans email** (RDV par téléphone) : email de remplacement sur `sans-email.invalid` (RFC 2606), ignoré par les notifications (les SMS partent), jamais affiché ni exporté.
+- **Déplacement par l'admin** : le lien « Gérer mon RDV » est renouvelé (la base ne garde que l'empreinte) et le nouveau lien part dans l'email.
+- **Le salon n'est pas soumis aux règles de la réservation en ligne** : pas de délai minimum, pas d'horizon, hors horaires possible. Il reste soumis au planning : jamais de chevauchement (contrainte PostgreSQL) ni sur un blocage.
+- **Horaires** : un enregistrement vide est refusé (il fermerait tout) ; les congés n'annulent jamais de RDV automatiquement.
+- **Statuts** : transitions autorisées en tableau (`TRANSITIONS`), « terminé » et « absence » seulement après le début du RDV ; un RDV annulé peut être rouvert si le créneau est libre.
+- **Photos de galerie** : une requête par photo (recadrées dans le navigateur), orientation déduite des dimensions réelles, noms UUID, diffusion publique limitée à ce motif.
+- **e2e** : sessions pré-créées en base (`tests/e2e/.auth/`, ignoré par git) pour ne pas rejouer mot de passe et code à chaque test ; la connexion par formulaire a ses propres tests.
+
 ## Points d'attention
 
 - **Avis d'exemple en base** : ils sont publiés (`approved`) comme en phase 2. Avant la mise en ligne, les supprimer (`is_placeholder`) : tant qu'il n'y a pas de vrai avis, le §8 demande de masquer les blocs.
@@ -220,24 +273,28 @@
 - Les e2e et `npm run dev` utilisent la base de dev : lancer `npm run db:up && npm run db:migrate && npm run db:seed` d'abord.
 
 - **e2e sur cette machine (4 Go de RAM)** : Playwright tourne avec **un seul worker** en local (`E2E_WORKERS` pour en mettre plus). Avec plusieurs Chromium, Vite et PostgreSQL (Docker) en parallèle, la mémoire libre tombait à ~50 Mo : requêtes de l'API sans réponse pendant une minute, puis workers qui plantent (`0xC0000142`). Si besoin, lancer les specs séparément (`npx playwright test tests/e2e/booking.spec.js --project=desktop`). Dernier passage : 66 verts, 4 ignorés (desktop uniquement).
+- **Premier compte propriétaire** : `npm run admin:create`, puis ouvrir `/admin` et configurer l'application d'authentification (**noter les codes de secours**). Sans eux, perdre le téléphone oblige à réinitialiser la 2FA en base.
+- Les e2e de l'admin créent des comptes et des données dans la **base de développement** (domaine `@admin-e2e.test.invalid`, préfixe « E2E »), supprimés avant et après la suite.
 - Le projet est dans **OneDrive** : `node_modules` et `dist/` sont synchronisés en continu, ce qui ralentit et peut verrouiller des fichiers. Il est conseillé de déplacer le dépôt hors de OneDrive, ou d'exclure ces dossiers de la synchronisation. La base, elle, est dans un volume Docker.
 - Le serveur de dev de Vite affiche le port HMR `PORT + 21000` (24000 pour le port 3000).
 
 ## Questions pour la propriétaire
 
-0. **Phase 5** : adresse email qui reçoit les alertes de RDV ? Lien de votre fiche Google pour les avis ? Textes des emails et SMS à relire (`modules/notifications/messages.js`) ? Heures de rappel (J-2 à 10h, veille à 18h) ?
+0. **Phase 6** : l'équipe (employées) doit-elle voir les montants des rendez-vous ? Qui crée les comptes ? Les droits proposés (équipe : agenda, clientes, galerie, avis ; propriétaire : tout le reste) conviennent-ils ? Faut-il un message « votre rendez-vous est validé » quand vous validez une demande ? Souhaitez-vous modifier vous-même les textes des emails et SMS ?
 
-1. Prénom et nom de la fondatrice, adresse exacte, horaires, téléphone, WhatsApp, Instagram (marqués `TODO-PROPRIO` dans `src/server/lib/site.js`).
-2. Prix et durées réels de chaque prestation et option (les valeurs du styleguide sont des exemples).
-3. Validez-vous la direction visuelle du styleguide (captures dans `docs/screenshots/`), en particulier le fil de loc et la trame bogolan ?
-4. Pouvez-vous fournir des fichiers d'emblème aux noms intacts (les accents ont été perdus à la décompression) ?
-5. Validation manuelle des RDV ou confirmation automatique (automatique pour l'instant, réglage `booking.manual_validation`) ? Délai d'annulation (48 h par défaut) ? Texte de la politique de RDV (`booking.policy_text`) ?
-6. **Prestations longues** : travaillez-vous pendant la pause de midi pour une création (6 à 8 h) ? Le site l'autorise à partir de 4 h. Faut-il un délai minimum plus long (24 h aujourd'hui) ou des créneaux seulement le matin pour ces prestations ?
-7. Conseils de préparation affichés à la confirmation (`PREPARATION_TIPS` dans `booking/service.js`) : à relire.
-8. Composition exacte de la détox ; certification Sisterlocks™ ; formations proposées ?
-9. Photos originales (réalisations, portrait, salon), idéalement une vidéo de 10 s pour le hero, à déposer dans `content/photos-a-importer/`.
-10. Nom de domaine souhaité, compte Brevo, hébergement.
-11. **Avis** : les 8 avis du site sont des **exemples** (`reviews.json`). Pouvez-vous fournir de vrais avis (Google, messages de clientes, avec leur accord) ? Ils doivent remplacer les exemples avant la mise en ligne.
-12. Relire les textes : histoire Dakar → Toulouse, guide des méthodes, articles, FAQ, pages légales (SIRET, hébergeur), composition du bain détox.
-13. Nombre de clientes accompagnées et années d'expérience (bandeau de l'accueil : « 400 » et « 8 ans » sont provisoires).
-14. Compte Instagram et sélection de 6 à 9 photos pour la grille de l'accueil.
+1. **Phase 5** : adresse email qui reçoit les alertes de RDV ? Lien de votre fiche Google pour les avis ? Textes des emails et SMS à relire (`modules/notifications/messages.js`) ? Heures de rappel (J-2 à 10h, veille à 18h) ?
+
+2. Prénom et nom de la fondatrice, adresse exacte, horaires, téléphone, WhatsApp, Instagram (marqués `TODO-PROPRIO` dans `src/server/lib/site.js`).
+3. Prix et durées réels de chaque prestation et option (les valeurs du styleguide sont des exemples).
+4. Validez-vous la direction visuelle du styleguide (captures dans `docs/screenshots/`), en particulier le fil de loc et la trame bogolan ?
+5. Pouvez-vous fournir des fichiers d'emblème aux noms intacts (les accents ont été perdus à la décompression) ?
+6. Validation manuelle des RDV ou confirmation automatique (automatique pour l'instant, réglage `booking.manual_validation`) ? Délai d'annulation (48 h par défaut) ? Texte de la politique de RDV (`booking.policy_text`) ?
+7. **Prestations longues** : travaillez-vous pendant la pause de midi pour une création (6 à 8 h) ? Le site l'autorise à partir de 4 h. Faut-il un délai minimum plus long (24 h aujourd'hui) ou des créneaux seulement le matin pour ces prestations ?
+8. Conseils de préparation affichés à la confirmation (`PREPARATION_TIPS` dans `booking/service.js`) : à relire.
+9. Composition exacte de la détox ; certification Sisterlocks™ ; formations proposées ?
+10. Photos originales (réalisations, portrait, salon), idéalement une vidéo de 10 s pour le hero, à déposer dans `content/photos-a-importer/`.
+11. Nom de domaine souhaité, compte Brevo, hébergement.
+12. **Avis** : les 8 avis du site sont des **exemples** (`reviews.json`). Pouvez-vous fournir de vrais avis (Google, messages de clientes, avec leur accord) ? Ils doivent remplacer les exemples avant la mise en ligne.
+13. Relire les textes : histoire Dakar → Toulouse, guide des méthodes, articles, FAQ, pages légales (SIRET, hébergeur), composition du bain détox.
+14. Nombre de clientes accompagnées et années d'expérience (bandeau de l'accueil : « 400 » et « 8 ans » sont provisoires).
+15. Compte Instagram et sélection de 6 à 9 photos pour la grille de l'accueil.

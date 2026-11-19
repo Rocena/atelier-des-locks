@@ -1,0 +1,64 @@
+<% layout('../layouts/admin', it) %>
+<%
+  var d = it.dashboard, a = it.a, s = d.stats;
+  var firstName = it.user.displayName.split(' ')[0];
+%>
+<div class="a-head">
+  <div>
+    <h1>Bonjour <%= firstName %></h1>
+    <p class="a-head__lead"><%= a.dayLabel(d.today) %></p>
+  </div>
+  <a class="btn btn--primary btn--small" href="/admin/agenda/rdv/nouveau"><span class="btn__label">Nouveau rendez-vous</span></a>
+</div>
+
+<div class="a-stats">
+  <a class="a-stat" href="/admin/agenda?vue=jour">
+    <span class="a-stat__value"><%= d.todays.length %></span>
+    <span class="a-stat__label">rendez-vous aujourd’hui</span>
+  </a>
+  <a class="a-stat" href="/admin/agenda?vue=semaine">
+    <span class="a-stat__value"><%= s.weekCount %></span>
+    <span class="a-stat__label">cette semaine</span>
+  </a>
+  <a class="a-stat" href="/admin/avis">
+    <span class="a-stat__value"><%= s.reviewsPending %></span>
+    <span class="a-stat__label"><%= s.reviewsPending > 1 ? 'avis à modérer' : 'avis à modérer' %></span>
+  </a>
+  <div class="a-stat">
+    <span class="a-stat__value"><%= s.noShowRate === null ? '—' : s.noShowRate + ' %' %></span>
+    <span class="a-stat__label">d’absences (90 derniers jours)</span>
+  </div>
+<% if (it.isOwner) { %>
+  <div class="a-stat">
+    <span class="a-stat__value"><%= a.money(s.monthRevenue) %></span>
+    <span class="a-stat__label">chiffre d’affaires estimé du mois<% if (s.monthUnpriced) { %> (hors <%= s.monthUnpriced %> sur devis)<% } %></span>
+  </div>
+<% } %>
+</div>
+
+<section class="a-section">
+  <h2>Aujourd’hui</h2>
+<% if (d.todays.length === 0) { %>
+  <div class="a-empty">
+    <p>Aucun rendez-vous aujourd’hui.</p>
+    <p><a class="btn btn--secondary btn--small" href="/admin/agenda/rdv/nouveau"><span class="btn__label">Ajouter un rendez-vous</span></a></p>
+  </div>
+<% } else { %>
+  <ul class="a-list" role="list">
+<% d.todays.forEach(function (appt) { %>
+    <li><%~ include('../partials/admin-appt-row', { appt: appt, a: a }) %></li>
+<% }) %>
+  </ul>
+<% } %>
+</section>
+
+<% if (d.toValidate.length) { %>
+<section class="a-section">
+  <h2>À valider (<%= s.toValidate %>)</h2>
+  <ul class="a-list" role="list">
+<% d.toValidate.forEach(function (appt) { %>
+    <li><%~ include('../partials/admin-appt-row', { appt: appt, a: a, showDate: true, date: appt.localDate }) %></li>
+<% }) %>
+  </ul>
+</section>
+<% } %>

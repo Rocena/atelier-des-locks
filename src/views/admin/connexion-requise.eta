@@ -1,0 +1,4 @@
+<% layout('../layouts/admin', it) %>
+<h1 class="h3">Connexion requise</h1>
+<p>Votre session a expiré, ou vous n’êtes pas connectée.</p>
+<p><a class="btn btn--primary" href="/admin/connexion"><span class="btn__label">Se connecter</span></a></p>

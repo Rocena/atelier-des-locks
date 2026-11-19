@@ -34,6 +34,8 @@ const envSchema = z
     UPLOAD_DIR: z.string().min(1).default('storage/uploads'),
     // Réservations acceptées par adresse IP et par fenêtre de 10 minutes.
     BOOKING_RATE_LIMIT: z.coerce.number().int().min(1).max(10000).default(5),
+    // Tentatives de connexion à l'admin acceptées par adresse IP et par fenêtre de 10 minutes.
+    ADMIN_LOGIN_RATE_LIMIT: z.coerce.number().int().min(1).max(10000).default(10),
     STYLEGUIDE_ENABLED: booleanString.optional(),
     // Notifications (§7.6) : « console » écrit les messages dans le terminal (dev, tests),
     // « brevo » les envoie vraiment (emails et SMS transactionnels).
@@ -84,6 +86,7 @@ const envSchema = z
  * @property {{ provider: 'internal'|'fresha_link', freshaUrl: string, icalFeedToken: string, uploadDir: string, rateLimit: number }} booking
  * @property {{ provider: 'console'|'brevo', brevoApiKey: string, senderEmail: string, senderName: string, smsSender: string, ownerEmail: string }} notifications
  * @property {{ googleUrl: string }} reviews
+ * @property {{ loginRateLimit: number }} admin
  * @property {boolean} styleguideEnabled
  */
 
@@ -126,6 +129,7 @@ export function loadConfig(source = process.env) {
       ownerEmail: env.OWNER_EMAIL,
     },
     reviews: { googleUrl: env.GOOGLE_REVIEW_URL },
+    admin: { loginRateLimit: env.ADMIN_LOGIN_RATE_LIMIT },
     styleguideEnabled: env.STYLEGUIDE_ENABLED ?? !isProd,
   };
 }

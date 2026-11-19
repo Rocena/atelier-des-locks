@@ -1,0 +1,119 @@
+<% layout('../layouts/admin', it) %>
+<%
+  var ag = it.agenda, a = it.a;
+  var views = [['jour', 'Jour'], ['semaine', 'Semaine'], ['liste', 'Liste']];
+  var title = ag.view === 'jour' ? a.dayLabel(ag.date) : ag.view === 'semaine' ? 'Semaine du ' + a.shortDayLabel(ag.columns[0].date) : 'À partir du ' + a.shortDayLabel(ag.date);
+%>
+<div class="a-head">
+  <div><h1>Agenda</h1></div>
+  <div class="a-actions">
+    <a class="btn btn--primary btn--small" href="/admin/agenda/rdv/nouveau?date=<%= ag.date %>"><span class="btn__label">Nouveau rendez-vous</span></a>
+    <a class="btn btn--secondary btn--small" href="/admin/agenda/blocages?date=<%= ag.date %>"><span class="btn__label">Bloquer un créneau</span></a>
+  </div>
+</div>
+
+<div class="a-toolbar">
+  <nav class="a-segment" aria-label="Type de vue">
+<% views.forEach(function (v) { %>
+    <a href="/admin/agenda?vue=<%= v[0] %>&amp;date=<%= ag.date %>"<% if (ag.view === v[0]) { %> aria-current="page"<% } %>><%= v[1] %></a>
+<% }) %>
+  </nav>
+  <div class="a-nav-date">
+    <a class="btn btn--secondary btn--small" href="/admin/agenda?vue=<%= ag.view %>&amp;date=<%= ag.prev %>" aria-label="Période précédente"><%~ include('../partials/admin-icon', { name: 'chevronLeft' }) %></a>
+    <strong><%= title %></strong>
+    <a class="btn btn--secondary btn--small" href="/admin/agenda?vue=<%= ag.view %>&amp;date=<%= ag.next %>" aria-label="Période suivante"><%~ include('../partials/admin-icon', { name: 'chevronRight' }) %></a>
+<% if (ag.date !== ag.today) { %>
+    <a class="btn btn--ghost btn--small" href="/admin/agenda?vue=<%= ag.view %>&amp;date=<%= ag.today %>"><span class="btn__label">Aujourd’hui</span></a>
+<% } %>
+  </div>
+</div>
+
+<% if (ag.view === 'liste') { %>
+<% if (ag.days.length === 0) { %>
+<div class="a-empty"><p>Aucun rendez-vous dans les 60 prochains jours à partir de cette date.</p>
+  <p><a class="btn btn--primary" href="/admin/agenda/rdv/nouveau"><span class="btn__label">Ajouter un rendez-vous</span></a></p></div>
+<% } %>
+<% ag.days.forEach(function (day) { %>
+<section class="a-section">
+  <h2 class="a-day-title"<% if (day.date === ag.today) { %> aria-current="date"<% } %>><%= a.dayLabel(day.date) %></h2>
+  <ul class="a-list" role="list">
+<% day.items.forEach(function (appt) { %>
+    <li><%~ include('../partials/admin-appt-row', { appt: appt, a: a }) %></li>
+<% }) %>
+  </ul>
+</section>
+<% }) %>
+<% } else { %>
+<noscript><p class="a-alert a-alert--warning">La frise horaire a besoin de JavaScript. La vue <a class="link" href="/admin/agenda?vue=liste&amp;date=<%= ag.date %>">Liste</a> fonctionne sans.</p></noscript>
+<% var cols = ag.columns.length; %>
+<div class="tl tl--<%= ag.view %> tl-nojs-hide" data-timeline data-day-start="<%= ag.dayStart %>" data-day-end="<%= ag.dayEnd %>" data-cols="<%= cols %>"<% if (ag.nowMin !== null) { %> data-now="<%= ag.nowMin %>"<% } %> data-move-url="/admin/agenda/rdv/:id/deplacer" role="group" aria-label="Frise horaire">
+  <div class="tl__head">
+    <span></span>
+<% ag.columns.forEach(function (col) { %>
+    <div class="tl__day-title"<% if (col.date === ag.today) { %> aria-current="date"<% } %>><% if (ag.view === 'semaine') { %><a class="link" href="/admin/agenda?vue=jour&amp;date=<%= col.date %>"><%= a.shortDayLabel(col.date) %></a><% } else { %><%= a.shortDayLabel(col.date) %><% } %></div>
+<% }) %>
+  </div>
+  <div class="tl__hours" aria-hidden="true">
+<% ag.marks.forEach(function (m) { %>
+    <span class="tl__hour" data-minutes="<%= m.minutes %>"><%= m.label %></span>
+<% }) %>
+  </div>
+<% ag.columns.forEach(function (col) { %>
+  <div class="tl__col" data-date="<%= col.date %>">
+<% col.closed.forEach(function (r) { %>
+    <span class="tl__closed" data-from="<%= r.from %>" data-to="<%= r.to %>"></span>
+<% }) %>
+<% col.blocks.forEach(function (b) { %>
+    <span class="tl__event tl__event--block" data-start="<%= b.startMin %>" data-span="<%= b.spanMin %>">
+      <span class="tl__event-title">Bloqué</span><span class="tl__event-meta"><%= b.reason || '' %></span>
+    </span>
+<% }) %>
+<% col.items.forEach(function (appt) {
+     var cls = appt.status === 'pending' ? ' tl__event--pending' : (appt.status === 'confirmed' ? '' : ' tl__event--done');
+     if (appt.status.indexOf('cancelled') === 0) return; %>
+    <a class="tl__event<%= cls %>" href="/admin/agenda/rdv/<%= appt.id %>" data-id="<%= appt.id %>" data-start="<%= appt.startMin %>" data-span="<%= appt.spanMin %>" data-buffer="<%= appt.bufferMin %>"<% if (appt.draggable) { %> data-draggable<% } %> data-label="<%= appt.firstName %> <%= appt.lastName %>">
+      <span class="tl__event-title"><%= appt.firstName %> <%= appt.lastName.charAt(0) %>.</span>
+      <span class="tl__event-meta"><%= a.hhmm(appt.startsAt) %> · <%= appt.serviceName %></span>
+    </a>
+<% }) %>
+  </div>
+<% }) %>
+</div>
+
+<% if (ag.view === 'semaine') { %>
+<div class="tl-week-list tl-week-list--only-mobile">
+<% ag.columns.forEach(function (col) { %>
+  <section>
+    <h2 class="a-day-title"<% if (col.date === ag.today) { %> aria-current="date"<% } %>><a class="link" href="/admin/agenda?vue=jour&amp;date=<%= col.date %>"><%= a.dayLabel(col.date) %></a></h2>
+<% var shown = col.items.filter(function (i) { return i.status.indexOf('cancelled') !== 0; }); %>
+<% if (shown.length === 0) { %>
+    <p class="text-muted">Rien de prévu.</p>
+<% } else { %>
+    <ul class="a-list" role="list">
+<% shown.forEach(function (appt) { %>
+      <li><%~ include('../partials/admin-appt-row', { appt: appt, a: a }) %></li>
+<% }) %>
+    </ul>
+<% } %>
+  </section>
+<% }) %>
+</div>
+<% } %>
+
+<% if (ag.view === 'jour') { %>
+<p class="text-muted a-section">Astuce : sur ordinateur, glissez un rendez-vous pour le déplacer ; sur téléphone, ouvrez-le puis « Déplacer ».</p>
+<% } %>
+<% } %>
+
+<dialog class="a-dialog" data-move-dialog aria-labelledby="move-title">
+  <form method="dialog" class="a-form" data-move-form>
+    <h2 id="move-title">Déplacer le rendez-vous ?</h2>
+    <p data-move-summary></p>
+    <label class="check"><input type="checkbox" name="notify" value="1" checked /><span>Prévenir la cliente par email et SMS</span></label>
+    <p class="a-alert" role="alert" data-move-error hidden></p>
+    <div class="a-sticky-actions">
+      <button class="btn btn--primary" type="submit" value="confirm"><span class="btn__label">Déplacer</span></button>
+      <button class="btn btn--secondary" type="submit" value="cancel" formnovalidate><span class="btn__label">Annuler</span></button>
+    </div>
+  </form>
+</dialog>

@@ -1,0 +1,48 @@
+<% layout('../layouts/admin', it) %>
+<% var a = it.a, tabs = [['pending', 'À modérer'], ['approved', 'Publiés'], ['rejected', 'Refusés']]; %>
+<div class="a-head"><div><h1>Avis</h1></div></div>
+<nav class="a-segment" aria-label="Statut des avis">
+<% tabs.forEach(function (t) { %>
+  <a href="/admin/avis?statut=<%= t[0] %>"<% if (it.statut === t[0]) { %> aria-current="page"<% } %>><%= t[1] %> (<%= it.counts[t[0]] %>)</a>
+<% }) %>
+</nav>
+
+<% if (it.reviews.length === 0) { %>
+<div class="a-empty a-section"><p><%= it.statut === 'pending' ? 'Aucun avis à modérer. Les nouveaux avis arrivent ici après le rendez-vous.' : 'Aucun avis dans cette liste.' %></p></div>
+<% } %>
+<ul class="a-grid a-section" role="list">
+<% it.reviews.forEach(function (r) { %>
+  <li class="a-card">
+    <div class="a-review-head"><strong><%= r.author %></strong> <%~ include('../partials/stars', { rating: r.rating, label: r.rating + ' sur 5' }) %>
+      <span class="a-row__meta"><%= r.serviceName || 'Prestation non précisée' %> · <%= a.dateTimeLabel(r.submittedAt).split(',')[0] %><% if (r.verified) { %> · cliente vérifiée<% } %><% if (r.isPlaceholder) { %> · avis d’exemple<% } %></span></div>
+    <p class="a-notes"><%= r.body %></p>
+<% if (r.hasPhoto) { %>
+    <p><a href="/admin/avis/<%= r.id %>/photo" target="_blank" rel="noopener"><img class="a-thumb" src="/admin/avis/<%= r.id %>/photo" alt="Photo jointe à l’avis de <%= r.author %>" width="72" height="72" loading="lazy" /></a></p>
+<% } %>
+<% if (r.ownerReply) { %>
+    <p class="a-notes"><strong>Votre réponse :</strong> <%= r.ownerReply %></p>
+<% } %>
+    <div class="a-actions">
+<% if (r.status !== 'approved') { %>
+      <form method="post" action="/admin/avis/<%= r.id %>/approuver"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><button class="btn btn--primary btn--small" type="submit"><span class="btn__label">Publier</span></button></form>
+<% } %>
+<% if (r.status !== 'rejected') { %>
+      <form method="post" action="/admin/avis/<%= r.id %>/refuser"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Refuser</span></button></form>
+<% } %>
+<% if (r.status === 'approved') { %>
+      <form method="post" action="/admin/avis/<%= r.id %>/vedette"><input type="hidden" name="_csrf" value="<%= it.csrf %>" /><input type="hidden" name="featured" value="<%= r.featured ? '0' : '1' %>" /><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label"><%= r.featured ? 'Retirer de l’accueil' : 'Mettre à l’accueil' %></span></button></form>
+<% } %>
+    </div>
+<% if (r.status === 'approved') { %>
+    <details class="a-section">
+      <summary class="link"><%= r.ownerReply ? 'Modifier ma réponse' : 'Répondre publiquement' %></summary>
+      <form class="a-form" method="post" action="/admin/avis/<%= r.id %>/reponse">
+        <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+        <%~ include('../partials/admin-field', { name: 'reply', idPrefix: 'rep' + r.id, label: 'Réponse visible sous l’avis', type: 'textarea', rows: 4, maxlength: 1000, required: false, value: r.ownerReply || '', hint: 'Laissez vide pour retirer la réponse.', values: {}, errors: {} }) %>
+        <div><button class="btn btn--primary btn--small" type="submit"><span class="btn__label">Enregistrer la réponse</span></button></div>
+      </form>
+    </details>
+<% } %>
+  </li>
+<% }) %>
+</ul>

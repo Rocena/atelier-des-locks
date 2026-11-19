@@ -1,0 +1,25 @@
+<% layout('../layouts/admin', it) %>
+<div class="a-head">
+  <div><h1>Mon compte</h1><p class="a-head__lead"><%= it.user.displayName %> · <%= it.user.email %> · <%= it.user.role === 'owner' ? 'Propriétaire' : 'Équipe' %></p></div>
+</div>
+<div class="a-grid a-grid--2">
+  <section class="a-card">
+    <h2>Mot de passe</h2>
+    <form class="a-form" method="post" action="/admin/compte/mot-de-passe" novalidate>
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <%~ include('../partials/admin-field', { name: 'current', label: 'Mot de passe actuel', type: 'password', autocomplete: 'current-password', values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'next', label: 'Nouveau mot de passe', type: 'password', autocomplete: 'new-password', hint: '12 caractères au moins.', values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'confirm', label: 'Confirmer le nouveau mot de passe', type: 'password', autocomplete: 'new-password', values: it.values, errors: it.errors }) %>
+      <button class="btn btn--primary" type="submit"><span class="btn__label">Changer le mot de passe</span></button>
+    </form>
+  </section>
+  <section class="a-card">
+    <h2>Codes de secours</h2>
+    <p>Il vous en reste <strong><%= it.user.recoveryCodesLeft %></strong>. En générer de nouveaux annule les anciens.</p>
+    <form class="a-form" method="post" action="/admin/compte/codes-secours" novalidate>
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <%~ include('../partials/admin-field', { name: 'code', label: 'Code actuel de l’application', autocomplete: 'one-time-code', inputmode: 'numeric', values: {}, errors: it.errors.recoveryCode ? { code: it.errors.recoveryCode } : {} }) %>
+      <button class="btn btn--secondary" type="submit"><span class="btn__label">Générer de nouveaux codes</span></button>
+    </form>
+  </section>
+</div>

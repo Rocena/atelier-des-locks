@@ -1,0 +1,19 @@
+<% layout('../layouts/admin', it) %>
+<div class="a-head"><h1>Plus</h1></div>
+<ul class="a-list" role="list">
+<% it.nav.filter(function (n) { return !n.tab; }).forEach(function (n) { %>
+  <li><a class="a-row" href="<%= n.href %>">
+    <%~ include('../partials/admin-icon', { name: n.icon }) %>
+    <span class="a-row__title"><%= n.label %></span>
+    <%~ include('../partials/admin-icon', { name: 'chevronRight' }) %>
+  </a></li>
+<% }) %>
+  <li>
+    <form class="a-row" method="post" action="/admin/deconnexion">
+      <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+      <span></span>
+      <button class="btn btn--ghost" type="submit"><span class="btn__label">Se déconnecter</span></button>
+      <span></span>
+    </form>
+  </li>
+</ul>

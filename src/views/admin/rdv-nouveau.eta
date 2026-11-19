@@ -1,0 +1,60 @@
+<% layout('../layouts/admin', it) %>
+<%
+  var a = it.a;
+  var serviceOptions = [{ value: '', label: 'Choisir une prestation…' }].concat(it.services.map(function (s) {
+    return { value: s.slug, label: s.name + (s.onQuote ? ' (sur devis)' : '') };
+  }));
+  var staffOptions = it.staff.map(function (s) { return { value: s.id, label: s.name }; });
+%>
+<p><a class="link" href="/admin/agenda?date=<%= it.values.date %>">← Agenda</a></p>
+<div class="a-head"><div><h1>Nouveau rendez-vous</h1><p class="a-head__lead">Pour un appel, un message WhatsApp ou une cliente sur place.</p></div></div>
+<% if (it.errors._form) { %><p class="a-alert" role="alert"><%= it.errors._form %></p><% } %>
+<form class="a-form a-form--narrow" method="post" action="/admin/agenda/rdv" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <fieldset class="a-form">
+    <legend>Cliente</legend>
+    <div class="a-form__row">
+      <%~ include('../partials/admin-field', { name: 'firstName', label: 'Prénom', autocomplete: 'off', values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'lastName', label: 'Nom', autocomplete: 'off', values: it.values, errors: it.errors }) %>
+    </div>
+    <div class="a-form__row">
+      <%~ include('../partials/admin-field', { name: 'phone', label: 'Téléphone', type: 'tel', inputmode: 'tel', required: false, values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'email', label: 'Email', type: 'email', inputmode: 'email', required: false, hint: 'Sans email, la cliente ne reçoit que les SMS.', values: it.values, errors: it.errors }) %>
+    </div>
+  </fieldset>
+  <fieldset class="a-form">
+    <legend>Prestation</legend>
+    <%~ include('../partials/admin-field', { name: 'service', label: 'Prestation', type: 'select', options: serviceOptions, values: it.values, errors: it.errors }) %>
+<% it.services.filter(function (s) { return s.options.length; }).forEach(function (s) { %>
+    <div class="a-form" data-options-for="<%= s.slug %>" hidden>
+      <p class="field__label">Options de « <%= s.name %> »</p>
+<% s.options.forEach(function (o) { %>
+      <label class="check"><input type="checkbox" name="options" value="<%= o.id %>" disabled /><span><%= o.label %> · <%= a.money(o.price) %><% if (o.extraMinutes) { %> · + <%= o.extraMinutes %> min<% } %></span></label>
+<% }) %>
+    </div>
+<% }) %>
+  </fieldset>
+  <fieldset class="a-form">
+    <legend>Quand</legend>
+    <div class="a-form__row">
+      <%~ include('../partials/admin-field', { name: 'date', label: 'Jour', type: 'date', values: it.values, errors: it.errors }) %>
+      <%~ include('../partials/admin-field', { name: 'time', label: 'Heure', type: 'time', step: 900, values: it.values, errors: it.errors }) %>
+    </div>
+<% if (it.staff.length > 1) { %>
+    <%~ include('../partials/admin-field', { name: 'staffId', label: 'Praticienne', type: 'select', options: staffOptions, values: it.values, errors: it.errors }) %>
+<% } %>
+    <p class="field__hint">Vous pouvez choisir une heure hors des horaires d’ouverture. Un créneau déjà pris ou bloqué est refusé.</p>
+  </fieldset>
+  <fieldset class="a-form">
+    <legend>Notes</legend>
+    <%~ include('../partials/admin-field', { name: 'internalNotes', label: 'Notes internes', type: 'textarea', rows: 3, required: false, values: it.values, errors: it.errors }) %>
+  </fieldset>
+  <%~ include('../partials/admin-check', { name: 'notify', label: 'Envoyer la confirmation et les rappels à la cliente', hint: 'Email avec le lien « Gérer mon RDV », rappel 2 jours avant, SMS la veille.', checked: it.values.notify !== undefined ? !!it.values.notify : true }) %>
+<% if (it.values.date && it.values.date < it.today) { %>
+  <%~ include('../partials/admin-check', { name: 'completed', label: 'Rendez-vous déjà passé : le marquer comme terminé', checked: false }) %>
+<% } %>
+  <div class="a-sticky-actions a-sticky-actions--bar">
+    <button class="btn btn--primary" type="submit"><span class="btn__label">Enregistrer le rendez-vous</span></button>
+    <a class="btn btn--ghost" href="/admin/agenda"><span class="btn__label">Annuler</span></a>
+  </div>
+</form>

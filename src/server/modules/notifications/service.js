@@ -28,6 +28,7 @@ import { buildMessages } from './messages.js';
 import { ProviderError } from './providers.js';
 import { openToken, sealToken } from './seal.js';
 import { findBookingSettings } from '../booking/repo.js';
+import { isPlaceholderEmail } from '../clients/placeholder.js';
 import { HAIR_STATES } from '../booking/schemas.js';
 import { PREPARATION_TIPS } from '../booking/service.js';
 import * as reviews from '../reviews/service.js';
@@ -296,7 +297,7 @@ export function createNotifier({
     if (isReview) {
       // Pas de nouveau lien si l'email est déjà parti (nouvel essai après un échec SMS, par exemple).
       if (await repo.wasSent(db, data.dedupeKey, 'email')) return;
-      if (!ctx.email) return;
+      if (!ctx.email || isPlaceholderEmail(ctx.email)) return;
       const { token } = await reviews.issueReviewToken(
         db,
         data.appointmentId,
@@ -320,7 +321,9 @@ export function createNotifier({
     /** @type {Error|null} */
     let retry = null;
     let reviewSent = false;
+    // Cliente sans adresse email (RDV pris par téléphone) : pas d'email, le SMS part quand même.
     for (const message of messages) {
+      if (message.channel === 'email' && isPlaceholderEmail(message.recipient)) continue;
       const result = await deliver(message, ids);
       if (result.sent && isReview) reviewSent = true;
       retry ??= result.retry;

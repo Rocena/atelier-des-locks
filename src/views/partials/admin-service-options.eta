@@ -1,0 +1,36 @@
+<%
+  /* Options d'une prestation (suppléments). Chaque option a son petit formulaire. */
+  var service = it.service, a = it.a;
+%>
+<section class="a-section" id="options">
+  <h2>Options et suppléments</h2>
+<% if (service.options.length === 0) { %>
+  <p class="a-empty">Aucune option. Ajoutez par exemple une longueur supplémentaire ou des extensions.</p>
+<% } %>
+<% service.options.forEach(function (o) { %>
+  <form class="a-card a-form" method="post" action="/admin/prestations/options/<%= o.id %>" novalidate>
+    <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+    <%~ include('./admin-field', { name: 'label', label: 'Nom', idPrefix: 'opt' + o.id, value: o.label, values: {}, errors: {} }) %>
+    <div class="a-form__row">
+      <%~ include('./admin-field', { name: 'price', label: 'Supplément (€)', idPrefix: 'opt' + o.id, inputmode: 'decimal', value: String(o.price).replace('.', ','), values: {}, errors: {} }) %>
+      <%~ include('./admin-field', { name: 'extraMinutes', label: 'Temps en plus (min)', idPrefix: 'opt' + o.id, type: 'number', inputmode: 'numeric', min: 0, step: 5, value: o.extraMinutes, values: {}, errors: {} }) %>
+    </div>
+    <%~ include('./admin-check', { name: 'active', label: 'Proposée à la réservation', checked: o.active }) %>
+    <div class="a-actions">
+      <button class="btn btn--primary btn--small" type="submit"><span class="btn__label">Enregistrer l’option</span></button>
+      <button class="btn btn--danger btn--small" type="submit" formaction="/admin/prestations/options/<%= o.id %>/supprimer" formnovalidate><span class="btn__label">Supprimer</span></button>
+    </div>
+  </form>
+<% }) %>
+  <form class="a-card a-form" method="post" action="/admin/prestations/<%= service.id %>/options" novalidate>
+    <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+    <h3 class="a-day-title">Ajouter une option</h3>
+    <%~ include('./admin-field', { name: 'label', label: 'Nom', idPrefix: 'new', values: {}, errors: {} }) %>
+    <div class="a-form__row">
+      <%~ include('./admin-field', { name: 'price', label: 'Supplément (€)', inputmode: 'decimal', idPrefix: 'new', value: '0', values: {}, errors: {} }) %>
+      <%~ include('./admin-field', { name: 'extraMinutes', label: 'Temps en plus (min)', type: 'number', inputmode: 'numeric', min: 0, step: 5, idPrefix: 'new', value: '0', values: {}, errors: {} }) %>
+    </div>
+    <input type="hidden" name="active" value="1" />
+    <div><button class="btn btn--secondary btn--small" type="submit"><span class="btn__label">Ajouter l’option</span></button></div>
+  </form>
+</section>

@@ -1,0 +1,15 @@
+<% layout('../layouts/admin', it) %>
+<h1 class="h3">Activez la double authentification</h1>
+<p>Elle est obligatoire : même si votre mot de passe fuite, personne ne peut entrer sans votre téléphone.</p>
+<ol>
+  <li>Installez une application d’authentification (Google Authenticator, Authy, 1Password, Apple Mots de passe).</li>
+  <li>Scannez ce code, ou saisissez la clé à la main.</li>
+  <li>Entrez le code à 6 chiffres affiché.</li>
+</ol>
+<div class="a-qr" role="img" aria-label="Code QR à scanner avec l’application d’authentification"><%~ it.qrSvg %></div>
+<p class="a-secret"><span class="text-muted">Clé :</span> <%= it.secret %></p>
+<form class="a-form" method="post" action="/admin/2fa" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <%~ include('../partials/admin-field', { name: 'code', label: 'Code à 6 chiffres', autocomplete: 'one-time-code', inputmode: 'numeric', values: {}, errors: it.errors }) %>
+  <button class="btn btn--primary" type="submit"><span class="btn__label">Activer et continuer</span></button>
+</form>

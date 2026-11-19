@@ -1,0 +1,4 @@
+<% layout('../layouts/admin', it) %>
+<div class="a-head"><h1>Accès réservé</h1></div>
+<p>Cette page est réservée à la propriétaire du salon.</p>
+<p><a class="btn btn--primary" href="/admin"><span class="btn__label">Retour à l’accueil de l’espace pro</span></a></p>

@@ -1,0 +1,7 @@
+<%
+  /* Case à cocher de l'admin. Paramètres : name, label, checked, hint. */
+%>
+<label class="check">
+  <input type="checkbox" name="<%= it.name %>" value="1"<% if (it.checked) { %> checked<% } %> />
+  <span><%= it.label %><% if (it.hint) { %><br /><span class="text-muted"><%= it.hint %></span><% } %></span>
+</label>

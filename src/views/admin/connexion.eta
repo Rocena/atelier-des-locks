@@ -1,0 +1,12 @@
+<% layout('../layouts/admin', it) %>
+<h1 class="h3">Connexion</h1>
+<% if (it.errors._form) { %>
+<p class="a-alert" role="alert"><%= it.errors._form %></p>
+<% } %>
+<form class="a-form" method="post" action="/admin/connexion" novalidate>
+  <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
+  <%~ include('../partials/admin-field', { name: 'email', label: 'Adresse email', type: 'email', autocomplete: 'username', inputmode: 'email', values: it.values, errors: it.errors }) %>
+  <%~ include('../partials/admin-field', { name: 'password', label: 'Mot de passe', type: 'password', autocomplete: 'current-password', values: it.values, errors: it.errors }) %>
+  <button class="btn btn--primary" type="submit"><span class="btn__label">Se connecter</span></button>
+</form>
+<p class="text-muted">Un code de votre application d’authentification vous sera demandé ensuite.</p>

@@ -1,0 +1,11 @@
+<%
+  /* Un champ décrit par le serveur : case à cocher ou champ de saisie. Paramètres : f, values, errors. */
+  var f = it.f, values = it.values || {};
+  var v = values[f.name];
+  var checked = v !== undefined ? (v === true || v === '1' || v === 'on' || v === 'true') : !!f.checked;
+%>
+<% if (f.kind === 'check') { %>
+<%~ include('./admin-check', { name: f.name, label: f.label, hint: f.hint, checked: checked }) %>
+<% } else { %>
+<%~ include('./admin-field', Object.assign({}, f, { values: values, errors: it.errors || {} })) %>
+<% } %>

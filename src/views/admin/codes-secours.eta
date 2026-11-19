@@ -1,0 +1,9 @@
+<% layout('../layouts/admin', it) %>
+<h1 class="h3">Vos codes de secours</h1>
+<p class="a-alert a-alert--warning">Notez-les maintenant, dans un endroit sûr (gestionnaire de mots de passe, papier rangé). Ils ne seront plus jamais affichés. Chacun ne sert qu’une fois, si vous perdez votre téléphone.</p>
+<ul class="a-code" role="list">
+<% it.recoveryCodes.forEach(function (c) { %>
+  <li><%= c %></li>
+<% }) %>
+</ul>
+<p><a class="btn btn--primary" href="<%= it.continueHref %>"><span class="btn__label">J’ai noté mes codes</span></a></p>

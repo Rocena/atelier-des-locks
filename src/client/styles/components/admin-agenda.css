@@ -1,0 +1,297 @@
+/* Agenda : frise horaire (jour, semaine) avec glisser-déposer, boîte de dialogue de déplacement.
+   Les positions viennent de variables CSS posées par le JS (CSSOM : compatible CSP, aucun
+   attribut style). Sans JavaScript, les rendez-vous restent une liste lisible. */
+@layer components {
+  .tl {
+    --hour-h: 3.5rem; /* hauteur d'une heure */
+    --day-start: 480; /* minutes depuis minuit, posé par le JS */
+    --day-span: 600; /* minutes affichées, posé par le JS */
+    display: grid;
+    grid-template-columns: 3rem repeat(var(--cols, 1), minmax(0, 1fr));
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    overflow: hidden;
+  }
+  .tl__head {
+    display: contents;
+  }
+  .tl__day-title {
+    padding: var(--space-2);
+    border-bottom: var(--border-hairline) solid var(--line);
+    text-align: center;
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+  }
+  .tl__day-title::first-letter {
+    text-transform: uppercase;
+  }
+  .tl__day-title[aria-current='date'] {
+    color: var(--accent-text);
+  }
+  .tl__hours {
+    position: relative;
+    height: calc(var(--day-span) / 60 * var(--hour-h));
+    border-right: var(--border-hairline) solid var(--line);
+  }
+  .tl__hour {
+    position: absolute;
+    left: 0;
+    right: var(--space-1);
+    top: calc((var(--m) - var(--day-start)) / 60 * var(--hour-h));
+    transform: translateY(-50%);
+    text-align: right;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .tl__col {
+    position: relative;
+    height: calc(var(--day-span) / 60 * var(--hour-h));
+    border-right: var(--border-hairline) solid var(--line);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(var(--hour-h) - 1px),
+      var(--line) calc(var(--hour-h) - 1px),
+      var(--line) var(--hour-h)
+    );
+  }
+  .tl__col:last-child {
+    border-right: 0;
+  }
+  .tl__closed {
+    position: absolute;
+    inset-inline: 0;
+    top: calc((var(--from) - var(--day-start)) / 60 * var(--hour-h));
+    height: calc((var(--to) - var(--from)) / 60 * var(--hour-h));
+    background: repeating-linear-gradient(
+      135deg,
+      var(--surface-alt),
+      var(--surface-alt) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .tl__event {
+    position: absolute;
+    inset-inline: 2px;
+    top: calc((var(--start) - var(--day-start)) / 60 * var(--hour-h));
+    height: calc(var(--span) / 60 * var(--hour-h) - 2px);
+    min-height: 1.75rem;
+    display: grid;
+    align-content: start;
+    gap: 0;
+    padding: var(--space-1) var(--space-2);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-left: 4px solid var(--tone, var(--success));
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .tl__event:hover {
+    background: var(--surface-alt);
+  }
+  .tl__event:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+    z-index: 2;
+  }
+  .tl__event--pending {
+    --tone: var(--warning);
+    border-style: dashed;
+  }
+  .tl__event--done {
+    --tone: var(--text-muted);
+    opacity: 0.8;
+  }
+  .tl__event--block {
+    --tone: var(--text-muted);
+    background: var(--surface-alt);
+  }
+  .tl__event-title {
+    font-weight: var(--weight-semibold);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tl__event-meta {
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tl__buffer {
+    position: absolute;
+    inset-inline: 2px;
+    top: calc((var(--start) + var(--span) - var(--day-start)) / 60 * var(--hour-h));
+    height: calc(var(--buffer) / 60 * var(--hour-h));
+    background: repeating-linear-gradient(
+      135deg,
+      var(--line),
+      var(--line) 3px,
+      transparent 3px,
+      transparent 7px
+    );
+    pointer-events: none;
+  }
+  .tl__event.is-dragging {
+    z-index: 5;
+    opacity: 0.9;
+    box-shadow: var(--shadow-lg);
+    cursor: grabbing;
+  }
+  .tl__ghost {
+    position: absolute;
+    inset-inline: 2px;
+    top: calc((var(--start) - var(--day-start)) / 60 * var(--hour-h));
+    height: calc(var(--span) / 60 * var(--hour-h) - 2px);
+    border: 2px dashed var(--accent);
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklch, var(--accent) 10%, transparent);
+    pointer-events: none;
+    z-index: 4;
+  }
+  .tl__now {
+    position: absolute;
+    inset-inline: 0;
+    top: calc((var(--now) - var(--day-start)) / 60 * var(--hour-h));
+    border-top: 2px solid var(--accent);
+    pointer-events: none;
+    z-index: 3;
+  }
+  /* Sur mobile, la semaine devient une liste par jour (lisible, sans défilement horizontal) */
+  .tl-week-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 56em) {
+    .tl-week-list--only-mobile {
+      display: none;
+    }
+  }
+  @media (max-width: 55.99em) {
+    .tl--week {
+      display: none;
+    }
+  }
+  .a-day-title {
+    margin-bottom: var(--space-2);
+    font-family: var(--font-text);
+    font-size: var(--step-0);
+    font-weight: var(--weight-semibold);
+    font-variation-settings: normal;
+  }
+  .a-day-title[aria-current='date'] {
+    color: var(--accent-text);
+  }
+
+  /* Boîte de confirmation du glisser-déposer */
+  .a-dialog {
+    width: min(92vw, 26rem);
+    padding: var(--space-5);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow-lg);
+  }
+  .a-dialog::backdrop {
+    background: color-mix(in oklch, var(--color-ebene) 55%, transparent);
+  }
+  .a-dialog h2 {
+    margin-bottom: var(--space-3);
+    font-size: var(--step-2);
+  }
+  .a-dialog .a-sticky-actions {
+    margin-top: var(--space-4);
+  }
+  .a-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .a-slots label {
+    display: inline-grid;
+    place-items: center;
+    min-width: 4.5rem;
+    min-height: var(--tap-target);
+    padding: 0 var(--space-3);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+  }
+  .a-slots input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .a-slots label:has(input:checked) {
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+  }
+  .a-slots label:has(input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .a-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+    gap: var(--space-3);
+    list-style: none;
+    padding: 0;
+  }
+  .a-gallery__item {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+  }
+  .a-gallery__item img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+  .a-drop {
+    display: grid;
+    place-items: center;
+    gap: var(--space-2);
+    min-height: 8rem;
+    padding: var(--space-5);
+    border: 2px dashed var(--line-strong);
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .a-drop.is-over {
+    border-color: var(--accent);
+    background: color-mix(in oklch, var(--accent) 8%, transparent);
+  }
+  .a-crop {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .a-crop canvas {
+    width: 100%;
+    max-width: 24rem;
+    border-radius: var(--radius-md);
+    touch-action: none;
+    background: var(--surface-alt);
+  }
+  .a-reorder {
+    display: flex;
+    gap: var(--space-1);
+  }
+}
