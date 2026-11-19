@@ -29,6 +29,15 @@ test.describe('styleguide', () => {
     await expect(html).toHaveAttribute('data-theme', 'dark');
   });
 
+  test("le lien d'évitement apparaît au premier Tab", async ({ page }) => {
+    await page.goto('/styleguide');
+    const skip = page.getByRole('link', { name: 'Aller au contenu' });
+    expect((await skip.boundingBox())?.width ?? 0).toBeLessThanOrEqual(1);
+    await page.keyboard.press('Tab');
+    await expect(skip).toBeFocused();
+    expect((await skip.boundingBox())?.width ?? 0).toBeGreaterThan(40);
+  });
+
   test('les champs en erreur sont reliés à leur message', async ({ page }) => {
     await page.goto('/styleguide');
     const email = page.locator('#sg-email');

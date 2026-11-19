@@ -295,9 +295,7 @@
     font-weight: var(--weight-medium);
     line-height: 1.05;
     letter-spacing: var(--tracking-display);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
   .sg-size-7 {
     font-size: var(--step-7);

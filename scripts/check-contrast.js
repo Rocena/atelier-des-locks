@@ -25,7 +25,10 @@ function block(selectorStart) {
 function props(body) {
   /** @type {Record<string, string>} */
   const out = {};
-  for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) out[m[1]] = m[2].trim();
+  // Les valeurs peuvent être réparties sur plusieurs lignes (Prettier) : on normalise les espaces.
+  for (const m of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
+    out[m[1]] = m[2].replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim();
+  }
   return out;
 }
 

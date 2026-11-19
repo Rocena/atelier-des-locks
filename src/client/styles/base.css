@@ -185,11 +185,15 @@
     border-radius: var(--radius-sm);
     font-weight: var(--weight-semibold);
     text-decoration: none;
-    transform: translateY(-200%);
-    transition: transform var(--duration-fast) var(--ease-out);
   }
-  .skip-link:focus-visible {
-    transform: none;
+  /* Invisible tant qu'il n'a pas le focus clavier */
+  .skip-link:not(:focus) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   /* Petites capitales des surtitres et labels (BRAND.md : Manrope 500, +0.2em) */
