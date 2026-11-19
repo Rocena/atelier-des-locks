@@ -1,0 +1,284 @@
+@import '../main.css';
+
+/* Guide des méthodes (/methodes) : sommaire collant, étapes reliées par le fil de loc,
+   fiches méthodes, tableau comparatif. */
+@layer pages {
+  .guide__grid {
+    display: grid;
+    gap: var(--space-8);
+  }
+  .guide__toc {
+    display: grid;
+    gap: var(--space-3);
+    align-self: start;
+    padding: var(--space-5);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: var(--step--1);
+  }
+  .guide__toc-list,
+  .guide__toc-sub {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .guide__toc-sub {
+    margin-left: var(--space-4);
+    padding-left: var(--space-4);
+    border-left: var(--border-hairline) solid var(--brass);
+  }
+  .guide__toc-link {
+    display: inline-block;
+    padding-block: var(--space-1);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .guide__toc-link:hover,
+  .guide__toc-link[aria-current='true'] {
+    color: var(--accent-text);
+  }
+  .guide__toc-link[aria-current='true'] {
+    font-weight: var(--weight-semibold);
+  }
+  @media (max-width: 63.99rem) {
+    .guide__toc-sub {
+      display: none;
+    }
+  }
+  @media (min-width: 64rem) {
+    .guide__grid {
+      grid-template-columns: 3fr 9fr;
+      gap: var(--space-9);
+    }
+    .guide__toc {
+      position: sticky;
+      top: calc(var(--header-height) + var(--space-5));
+      max-height: calc(100vh - var(--header-height) - var(--space-8));
+      overflow-y: auto;
+      border: 0;
+      padding: 0;
+    }
+  }
+
+  .guide__content {
+    display: grid;
+    gap: var(--space-10);
+    min-width: 0;
+  }
+  .guide__section {
+    display: grid;
+    gap: var(--space-5);
+    scroll-margin-top: var(--space-8);
+  }
+  .guide__section > .eyebrow {
+    color: var(--accent-text);
+  }
+  .guide__h2 {
+    font-size: var(--step-5);
+    max-width: 16ch;
+  }
+  .guide__lead {
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--text-muted);
+    max-width: 58ch;
+  }
+  .guide__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4) var(--space-6);
+    margin-top: var(--space-4);
+  }
+
+  /* ---- Étapes : fil de loc vertical qui relie les pastilles ---- */
+  .stages {
+    position: relative;
+    margin-top: var(--space-5);
+  }
+  .stages__thread {
+    position: absolute;
+    top: 0;
+    left: 0.5rem;
+    width: 2rem;
+    height: 100%;
+  }
+  .stages__list {
+    position: relative;
+    display: grid;
+    gap: var(--space-7);
+    padding-left: var(--space-8);
+  }
+  .stages__item {
+    display: grid;
+    gap: var(--space-2);
+  }
+  .stages__dot {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-left: calc(var(--space-8) * -1 + 0.125rem);
+    margin-bottom: calc(var(--space-2) * -1);
+    border: var(--border-hairline) solid var(--brass);
+    border-radius: 50%;
+    background-color: var(--surface);
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+  .stages__period {
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+  .stages__name {
+    font-size: var(--step-3);
+  }
+  .stages__text {
+    color: var(--text-muted);
+  }
+  @media (min-width: 48rem) {
+    .stages__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--space-7);
+    }
+  }
+
+  /* ---- Fiche méthode ---- */
+  .method {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding-top: var(--space-7);
+    border-top: var(--border-hairline) solid var(--line-strong);
+    scroll-margin-top: var(--space-8);
+  }
+  .method__head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-5);
+  }
+  .method__index {
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    font-style: italic;
+    line-height: 1;
+    color: var(--accent-display);
+  }
+  .method__name {
+    font-size: var(--step-4);
+  }
+  .method__aka {
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .method__name .method__aka {
+    font-family: var(--font-text);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+  }
+  .method__summary {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: 1.3;
+    font-variation-settings: 'opsz' 36;
+  }
+  .method__text {
+    color: var(--text-muted);
+  }
+  .method__facts {
+    display: grid;
+    gap: 0;
+    border-top: var(--border-hairline) solid var(--brass);
+  }
+  .method__facts div {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-hairline) solid var(--line);
+    font-size: var(--step--1);
+  }
+  .method__facts dt {
+    color: var(--text-muted);
+  }
+  .method__lists {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .method__list-title {
+    margin-bottom: var(--space-2);
+    font-family: var(--font-text);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0;
+  }
+  .method__list {
+    display: grid;
+    gap: var(--space-2);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .method__list li {
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    gap: var(--space-2);
+  }
+  .method__list li::before {
+    content: '–';
+    color: var(--accent-text);
+  }
+  .method__list--pros li::before {
+    content: '+';
+  }
+  .method--short {
+    padding-top: var(--space-5);
+  }
+  .method--short .method__name {
+    font-size: var(--step-3);
+  }
+  @media (min-width: 48rem) {
+    .method__lists {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* ---- Tableau comparatif (défile horizontalement sur mobile) ---- */
+  .table-wrap {
+    overflow-x: auto;
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-sm);
+  }
+  .compare {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+    font-size: var(--step--1);
+  }
+  .compare th,
+  .compare td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: var(--border-hairline) solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .compare thead th {
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background-color: var(--surface-alt);
+  }
+  .compare tbody th {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+  }
+  .compare tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+}

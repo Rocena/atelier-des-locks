@@ -1,0 +1,21 @@
+<% layout('../../layouts/base', it) %>
+<%~ include('../../partials/page-hero', { fmt: it.fmt, eyebrow: 'Informations légales', title: 'Mentions *légales*.' }) %>
+<section class="section legal" aria-label="<%= it.heading %>">
+  <div class="container">
+    <!-- TODO-PROPRIO : toutes les informations de l'éditeur et de l'hébergeur sont à compléter -->
+    <div class="prose">
+      <h2>Éditeur du site</h2>
+      <p>L’Atelier des Locks, entreprise individuelle [forme juridique à confirmer].<br />
+        Responsable de la publication : [prénom et nom de la fondatrice].<br />
+        Adresse : <%= it.site.address.street %>, <%= it.site.address.postalCode %> <%= it.site.address.city %>.<br />
+        SIRET : [à compléter]. Email : [à compléter].</p>
+      <h2>Hébergement</h2>
+      <p>[Nom, adresse et téléphone de l’hébergeur, à compléter à la mise en ligne.]</p>
+      <h2>Propriété intellectuelle</h2>
+      <p>Les textes, le logo, l’emblème et les photographies de ce site appartiennent à L’Atelier des Locks ou à leurs auteurs. Toute reproduction sans autorisation écrite est interdite.</p>
+      <p>Les photographies de clientes sont publiées avec leur accord écrit. Pour demander le retrait d’une photo, écrivez-nous depuis la page <a href="/contact">Contact</a> : nous la retirons sous 72 heures.</p>
+      <h2>Polices de caractères</h2>
+      <p>Bodoni Moda et Manrope sont distribuées sous licence SIL Open Font License et hébergées sur nos propres serveurs : aucune donnée n’est transmise à un service tiers pour les afficher.</p>
+    </div>
+  </div>
+</section>

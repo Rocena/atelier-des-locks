@@ -1,0 +1,9 @@
+<%
+  /* Note étoilée. Paramètres : rating (0–5), label (texte accessible). */
+  var r = Math.round(it.rating || 0);
+%>
+<span class="stars" role="img" aria-label="<%= it.label || (it.rating + " sur 5") %>">
+<% for (var i = 1; i <= 5; i++) { %>
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"<% if (i > r) { %> class="is-empty"<% } %>><path d="M12 2.8l2.7 5.9 6.4.7-4.8 4.3 1.3 6.3L12 16.8 6.4 20l1.3-6.3-4.8-4.3 6.4-.7z" /></svg>
+<% } %>
+</span>

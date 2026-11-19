@@ -1,0 +1,106 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, sun: true, eyebrow: 'Le guide des méthodes', title: 'Comment naît *une loc*.', lead: 'Comb coils, vanilles, interlocking, crochet, palm rolling… Derrière chaque mot, un geste différent, un rendu différent et un rythme d’entretien différent. Voici, simplement, ce qu’il faut savoir pour choisir.' }) %>
+
+<div class="section guide">
+  <div class="container guide__grid">
+    <nav class="guide__toc" aria-label="Sommaire du guide">
+      <p class="eyebrow">Sommaire</p>
+      <ol class="guide__toc-list" role="list">
+        <li><a class="guide__toc-link" href="#etapes">Les étapes d’une loc</a></li>
+        <li><a class="guide__toc-link" href="#creer">Créer ses locks</a>
+          <ol class="guide__toc-sub" role="list">
+<% it.families.installation.forEach(function (m) { %>
+            <li><a class="guide__toc-link" href="#<%= m.slug %>"><%= m.name %></a></li>
+<% }) %>
+          </ol>
+        </li>
+        <li><a class="guide__toc-link" href="#entretenir">Entretenir ses racines</a></li>
+        <li><a class="guide__toc-link" href="#comparer">Comparer en un coup d’œil</a></li>
+        <li><a class="guide__toc-link" href="#choisir">Comment choisir ?</a></li>
+      </ol>
+    </nav>
+
+    <div class="guide__content">
+      <!-- TODO-PROPRIO : relire et valider le contenu technique du guide -->
+      <section class="guide__section" id="etapes" aria-labelledby="titre-etapes" data-thread-scope>
+        <p class="eyebrow">Avant de choisir</p>
+        <h2 class="guide__h2" id="titre-etapes" data-split>Une loc se construit <em>dans le temps</em>.</h2>
+        <p class="guide__lead">Quelle que soit la méthode, vos cheveux passent par les mêmes étapes avant de devenir des locks matures. Les connaître, c’est éviter de s’inquiéter au mauvais moment.</p>
+        <div class="stages">
+          <%~ include('../partials/loc-thread', { id: 'loc-etapes', animate: 'gsap', className: 'stages__thread', viewBox: '0 0 80 1000', d: 'M40 0 C 0 120, 80 200, 40 330 S 0 540, 40 660 S 80 880, 40 1000' }) %>
+          <ol class="stages__list" role="list">
+<% it.stages.forEach(function (st, i) { %>
+            <li class="stages__item" data-reveal="card">
+              <span class="stages__dot" aria-hidden="true"><%= i + 1 %></span>
+              <p class="stages__period"><%= st.period %></p>
+              <h3 class="stages__name"><%= st.name %></h3>
+              <p class="stages__text"><%= st.text %></p>
+            </li>
+<% }) %>
+          </ol>
+        </div>
+      </section>
+
+      <section class="guide__section" id="creer" aria-labelledby="titre-creer">
+        <p class="eyebrow">Installation</p>
+        <h2 class="guide__h2" id="titre-creer" data-split>Créer <em>ses locks</em>.</h2>
+        <p class="guide__lead">La méthode de création décide de la forme, de la taille et de la vitesse de maturation de vos locks. Elle dépend de la longueur de vos cheveux, de leur texture et de vos envies.</p>
+<% it.families.installation.forEach(function (m, i) { %>
+        <%~ include('../partials/method-article', { m: m, i: i }) %>
+<% }) %>
+      </section>
+
+      <section class="guide__section" id="entretenir" aria-labelledby="titre-entretenir">
+        <p class="eyebrow">Entretien</p>
+        <h2 class="guide__h2" id="titre-entretenir" data-split>Entretenir <em>ses racines</em>.</h2>
+        <p class="guide__lead">Vos cheveux poussent d’environ un centimètre par mois. Le resserrage intègre cette repousse à la loc. Trois gestes existent, souvent combinés : le palm rolling, l’interlocking et le crochet, qui sert aussi à réparer.</p>
+<% it.families.maintenance.forEach(function (m, i) { %>
+        <%~ include('../partials/method-article', { m: m, i: i, short: m.family === 'both' }) %>
+<% }) %>
+      </section>
+
+      <section class="guide__section" id="comparer" aria-labelledby="titre-comparer">
+        <p class="eyebrow">En un coup d’œil</p>
+        <h2 class="guide__h2" id="titre-comparer" data-split>Comparer <em>les méthodes</em>.</h2>
+        <div class="table-wrap" role="region" aria-labelledby="titre-comparer" tabindex="0">
+          <table class="compare">
+            <thead>
+              <tr><th scope="col">Méthode</th><th scope="col">Idéal pour</th><th scope="col">Durée</th><th scope="col">Maturation</th></tr>
+            </thead>
+            <tbody>
+<% it.families.installation.forEach(function (m) { %>
+              <tr>
+                <th scope="row"><a class="link link--quiet" href="#<%= m.slug %>"><%= m.name %></a></th>
+                <td><%= m.idealFor %></td>
+                <td class="num"><%= m.duration %></td>
+                <td class="num"><%= m.maturation %></td>
+              </tr>
+<% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="guide__section" id="choisir" aria-labelledby="titre-choisir">
+        <p class="eyebrow">Notre conseil</p>
+        <h2 class="guide__h2" id="titre-choisir" data-split>Comment <em>choisir</em> ?</h2>
+        <div class="prose">
+          <p><strong>Vos cheveux sont courts (moins de 8 cm) ?</strong> Les comb coils sont faits pour vous. Elles donnent des locks rondes et régulières, à condition d’accepter quelques mois de patience.</p>
+          <p><strong>Vos cheveux sont plus longs ?</strong> Les vanilles deux brins ou les tresses vous permettent de coiffer vos locks dès le départ. Le crochet vous donne des locks matures tout de suite.</p>
+          <p><strong>Vous rêvez de liberté de coiffure ?</strong> Les micro-locks à l’interlocking demandent un vrai engagement, mais offrent une versatilité unique. Nous ne pratiquons pas la méthode Sisterlocks™, marque déposée réservée aux consultantes certifiées : nos micro-locks suivent notre propre savoir-faire.</p>
+          <p><strong>Vous faites beaucoup de sport, ou vous voulez espacer les rendez-vous ?</strong> Pensez à l’interlocking pour l’entretien.</p>
+          <p>Et si vous hésitez encore, c’est normal. La consultation est faite pour ça : on regarde vos cheveux, on vous montre, on décide ensemble.</p>
+        </div>
+        <p class="guide__actions">
+          <a class="btn btn--primary" href="/prestations/consultation-diagnostic" data-magnetic>Réserver une consultation</a>
+          <a class="btn btn--ghost" href="/prestations"><span class="btn__label">Voir les prestations</span>
+            <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </a>
+        </p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'Votre méthode, *votre rythme*.' }) %>

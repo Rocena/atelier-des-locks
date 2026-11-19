@@ -1,0 +1,31 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt, rating = fmt.formatRating(it.summary.average); %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Avis clientes', title: 'Elles nous *font confiance*.', lead: 'Chaque avis publié ici est laissé par une cliente après son rendez-vous, depuis le lien personnel reçu par email. Nous ne les modifions jamais.' }) %>
+
+<!-- TODO-PROPRIO : avis d'exemple, à remplacer par les vrais avis avant la mise en ligne -->
+<section class="section reviews-page" aria-labelledby="titre-note">
+  <div class="container reviews-page__grid">
+    <aside class="score">
+      <h2 class="visually-hidden" id="titre-note">Note moyenne</h2>
+      <p class="score__value"><span class="num"><%= rating %></span><span class="score__outof">/5</span></p>
+      <%~ include('../partials/stars', { rating: it.summary.average, label: 'Note moyenne : ' + rating + ' sur 5' }) %>
+      <p class="text-muted"><%= it.summary.count %> avis vérifiés</p>
+      <ul class="score__bars" role="list">
+<% it.summary.distribution.forEach(function (d) { %>
+        <li class="score__bar">
+          <span class="score__label"><%= d.stars %> étoile<%= d.stars > 1 ? 's' : '' %></span>
+          <meter class="score__meter" min="0" max="1" value="<%= d.share.toFixed(3) %>"><%= Math.round(d.share * 100) %> %</meter>
+          <span class="num score__count"><%= d.count %></span>
+        </li>
+<% }) %>
+      </ul>
+    </aside>
+    <ul class="reviews-page__list" role="list">
+<% it.reviews.forEach(function (r) { %>
+      <li data-reveal="card"><%~ include('../partials/review-card', { review: r, fmt: fmt, serviceName: it.serviceNames[r.service] }) %></li>
+<% }) %>
+    </ul>
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'À votre tour, *prenez soin* de vous.' }) %>

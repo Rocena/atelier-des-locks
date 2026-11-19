@@ -1,0 +1,52 @@
+<% layout('../layouts/base', it) %>
+<%
+  var fmt = it.fmt;
+  var visible = {};
+  it.visibleIds.forEach(function (id) { visible[id] = true; });
+  var filtersDef = [
+    { name: 'categorie', label: 'Prestation', options: it.facets.categories },
+    { name: 'methode', label: 'Méthode', options: it.facets.methods },
+    { name: 'taille', label: 'Taille des locks', options: it.facets.sizes }
+  ];
+%>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Galerie', title: 'Nos réalisations, *loc par loc*.', lead: 'Créations, resserrages, colorations et coiffures réalisées au salon, toujours avec l’accord de nos clientes. Filtrez pour trouver ce qui vous ressemble.' }) %>
+
+<section class="section gallery-page" aria-labelledby="titre-realisations">
+  <h2 class="visually-hidden" id="titre-realisations">Réalisations</h2>
+  <div class="container">
+    <!-- Sans JavaScript, le formulaire recharge la page filtrée ; avec, le filtrage est instantané. -->
+    <form class="filters" method="get" action="/galerie" data-gallery-filters>
+<% filtersDef.forEach(function (f) { %>
+      <div class="field filters__field">
+        <label class="field__label" for="filtre-<%= f.name %>"><%= f.label %></label>
+        <select class="field__control" id="filtre-<%= f.name %>" name="<%= f.name %>">
+          <option value="">Toutes</option>
+<% f.options.forEach(function (o) { %>
+          <option value="<%= o.value %>"<% if (it.filters[f.name] === o.value) { %> selected<% } %>><%= o.label %></option>
+<% }) %>
+        </select>
+      </div>
+<% }) %>
+      <div class="filters__actions">
+        <button class="btn btn--secondary btn--sm" type="submit" data-filters-submit>Filtrer</button>
+        <a class="link filters__reset" href="/galerie" data-filters-reset>Tout afficher</a>
+      </div>
+    </form>
+    <p class="filters__count" aria-live="polite" data-gallery-count><%= it.visibleIds.length %> réalisation<%= it.visibleIds.length > 1 ? 's' : '' %></p>
+
+    <ul class="masonry gallery-page__grid" role="list" data-gallery-grid>
+<% it.items.forEach(function (item) { %>
+      <%~ include('../partials/gallery-tile', { item: item, meta: it.categoryNames[item.category] || '', hidden: !visible[item.id] }) %>
+<% }) %>
+    </ul>
+    <div class="empty" data-gallery-empty<% if (it.visibleIds.length) { %> hidden<% } %>>
+      <p class="empty__title">Aucune réalisation ne correspond <em>pour l’instant</em>.</p>
+      <p class="text-muted">Essayez un autre filtre, ou parlez-nous de votre projet : nous vous montrerons des exemples au salon.</p>
+      <a class="btn btn--secondary btn--sm" href="/galerie" data-filters-reset>Tout afficher</a>
+    </div>
+    <!-- TODO-PROPRIO : photos d'origine à déposer dans content/photos-a-importer/ (script d'import en phase suivante) -->
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'La prochaine, *ce sera vous*.' }) %>
+<%~ include('../partials/lightbox', it) %>

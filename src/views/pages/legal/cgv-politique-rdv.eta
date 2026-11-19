@@ -1,0 +1,23 @@
+<% layout('../../layouts/base', it) %>
+<%~ include('../../partials/page-hero', { fmt: it.fmt, eyebrow: 'Rendez-vous', title: 'Conditions et *politique de rendez-vous*.', lead: 'Des règles simples, pour que chaque cliente ait le temps qu’elle mérite.' }) %>
+<section class="section legal" aria-label="<%= it.heading %>">
+  <div class="container">
+    <!-- TODO-PROPRIO : délai d'annulation, retard toléré, acompte et moyens de paiement à confirmer -->
+    <div class="prose">
+      <h2>Réservation</h2>
+      <p>Le rendez-vous est confirmé par email et par SMS. Les prix affichés sont indicatifs : le prix définitif dépend de la longueur, de la densité et de la taille de vos locks, et vous est annoncé avant de commencer.</p>
+      <p>Certaines prestations (micro-locks, extensions, départ de locks, mariages) se réservent après une consultation ou sur devis.</p>
+      <h2>Annulation et report</h2>
+      <p>Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à <strong>48 heures</strong> avant, depuis le lien reçu dans votre confirmation. Au-delà, contactez-nous : nous chercherons une solution ensemble.</p>
+      <p>En cas d’absences répétées sans prévenir, nous pourrons demander un acompte pour les rendez-vous suivants.</p>
+      <h2>Retard</h2>
+      <p>Au-delà de 15 minutes de retard, nous pourrons raccourcir la prestation ou la reporter, pour respecter les clientes suivantes. Prévenez-nous dès que possible.</p>
+      <h2>Coloration</h2>
+      <p>Un test d’allergie est obligatoire 48 heures avant toute coloration. Sans test, la coloration ne pourra pas être réalisée.</p>
+      <h2>Paiement</h2>
+      <p>Le paiement se fait au salon, à la fin du rendez-vous, par carte bancaire ou en espèces.</p>
+      <h2>Satisfaction</h2>
+      <p>Si quelque chose ne vous convient pas, dites-le nous dans les sept jours suivant votre rendez-vous : nous vous proposerons une retouche.</p>
+    </div>
+  </div>
+</section>

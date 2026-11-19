@@ -1,0 +1,126 @@
+<% layout('../layouts/base', it) %>
+<%
+  var fmt = it.fmt, s = it.service;
+  /* Le dernier mot du nom passe en italique terre cuite (signature des grands titres). */
+  var words = s.name.split(' ');
+  var title = words.length > 1 ? words.slice(0, -1).join(' ') + ' *' + words[words.length - 1] + '*' : '*' + s.name + '*';
+  var cta = s.onQuote
+    ? { href: '/contact', label: 'Demander un devis' }
+    : s.bookableOnline
+      ? { href: '/reserver', label: 'Réserver cette prestation' }
+      : { href: '/prestations/consultation-diagnostic', label: 'Réserver la consultation' };
+%>
+<article class="service-detail">
+  <header class="page-hero grain service-detail__hero">
+    <div class="bogolan bogolan--fade" aria-hidden="true"></div>
+    <div class="container page-hero__inner">
+      <p class="eyebrow"><%= it.category ? it.category.name : 'Sur mesure' %></p>
+      <h1 class="page-title"><%~ fmt.accent(title) %></h1>
+      <p class="lead page-hero__lead"><%= s.summary %></p>
+      <figure class="arch arch--sun arch--framed page-hero__aside service-detail__arch" data-reveal="arch">
+        <div class="arch__frame"><div class="placeholder placeholder--plain" data-parallax="6"><span class="placeholder__label"><%= s.photos[0] || 'Photo à venir' %></span></div></div>
+      </figure>
+    </div>
+  </header>
+
+  <div class="section service-detail__body">
+    <div class="container service-detail__grid">
+      <aside class="facts" aria-labelledby="en-bref">
+        <h2 class="facts__title eyebrow" id="en-bref">En bref</h2>
+        <!-- TODO-PROPRIO : durée, prix et options à confirmer -->
+        <dl class="facts__list">
+          <div class="facts__row"><dt>Durée</dt><dd class="num"><%= fmt.formatDuration(s.durationMin, s.durationMax) %></dd></div>
+          <div class="facts__row"><dt>Prix</dt><dd class="facts__price num"><%= fmt.formatPrice(s) %></dd></div>
+<% if (it.methods.length) { %>
+          <div class="facts__row"><dt>Méthodes</dt><dd><%= it.methods.map(function (m) { return m.name; }).join(', ') %></dd></div>
+<% } %>
+        </dl>
+<% if (s.options.length) { %>
+        <h3 class="facts__subtitle">Options</h3>
+        <ul class="facts__options" role="list">
+<% s.options.forEach(function (o) { %>
+          <li><span><%= o.label %></span><span class="num">+&nbsp;<%= fmt.formatEuro(o.price) %></span></li>
+<% }) %>
+        </ul>
+<% } %>
+<% if (s.allergyTest) { %>
+        <p class="facts__note"><strong>Test d’allergie obligatoire</strong> 48 heures avant le rendez-vous.</p>
+<% } %>
+<% if (!s.bookableOnline && !s.onQuote) { %>
+        <p class="facts__note">Cette prestation se réserve après une consultation, pour estimer précisément la durée et le prix.</p>
+<% } %>
+        <a class="btn btn--primary btn--block" href="<%= cta.href %>" data-magnetic><%= cta.label %></a>
+        <p class="facts__small">Annulation gratuite jusqu’à 48 h avant. <a class="link" href="/cgv-politique-rdv">Politique de rendez-vous</a></p>
+      </aside>
+
+      <div class="service-detail__content">
+        <div class="prose">
+<% s.body.forEach(function (block) { %>
+          <h2><%= block.title %></h2>
+<% block.paragraphs.forEach(function (p) { %>
+          <p><%= p %></p>
+<% }) %>
+<% }) %>
+        </div>
+
+<% if (it.methods.length) { %>
+        <section class="service-methods" aria-labelledby="titre-methodes">
+          <h2 class="service-detail__h2" id="titre-methodes">Les <em>méthodes</em></h2>
+          <ul class="service-methods__list" role="list">
+<% it.methods.forEach(function (m) { %>
+            <li class="service-methods__item">
+              <a class="service-methods__link" href="/methodes#<%= m.slug %>">
+                <span class="service-methods__name"><%= m.name %></span>
+                <span class="service-methods__aka"><%= m.aka %></span>
+                <span class="service-methods__text"><%= m.summary %></span>
+              </a>
+            </li>
+<% }) %>
+          </ul>
+        </section>
+<% } %>
+
+<% if (s.photos.length > 1) { %>
+        <section aria-labelledby="titre-photos">
+          <h2 class="service-detail__h2" id="titre-photos">En <em>images</em></h2>
+          <ul class="service-photos" role="list">
+<% s.photos.slice(1).forEach(function (label) { %>
+            <li class="service-photos__item"><span class="placeholder"><span class="placeholder__label"><%= label %></span></span></li>
+<% }) %>
+          </ul>
+        </section>
+<% } %>
+
+<% if (s.faq.length) { %>
+        <section aria-labelledby="titre-faq">
+          <h2 class="service-detail__h2" id="titre-faq">Vos <em>questions</em></h2>
+          <div class="accordion">
+<% s.faq.forEach(function (f) { %>
+            <details class="accordion__item">
+              <summary class="accordion__summary"><%= f.q %><span class="accordion__icon" aria-hidden="true"></span></summary>
+              <div class="accordion__body"><p><%= f.a %></p></div>
+            </details>
+<% }) %>
+          </div>
+        </section>
+<% } %>
+      </div>
+    </div>
+  </div>
+</article>
+
+<section class="section section--alt related" aria-labelledby="titre-suggestions">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">À découvrir aussi</p>
+      <h2 class="section-head__title" id="titre-suggestions" data-split>Pour aller <em>plus loin</em>.</h2>
+    </header>
+    <ul class="related__grid" role="list">
+<% it.related.forEach(function (r, i) { %>
+      <li data-reveal="card">
+        <%~ include('../partials/service-card', { index: String(i + 1).padStart(2, '0'), category: it.categoryNames[r.category] || 'Sur mesure', title: r.name, text: r.summary, duration: fmt.formatDuration(r.durationMin, r.durationMax), price: r.price != null ? fmt.formatEuro(r.price) : '', from: r.priceFrom, quote: r.onQuote, href: '/prestations/' + r.slug, media: r.photos[0] || 'Photo à venir' }) %>
+      </li>
+<% }) %>
+    </ul>
+  </div>
+</section>

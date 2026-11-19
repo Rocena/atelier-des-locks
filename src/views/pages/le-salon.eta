@@ -1,0 +1,91 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt, founder = it.settings.founder; %>
+<%~ include('../partials/page-hero', { fmt: fmt, sun: true, eyebrow: 'Le salon', title: 'De Dakar à *Toulouse*.', lead: 'Une histoire de mains, de patience et de racines. Celle d’une locticienne qui a appris le geste auprès des femmes de sa famille, et qui l’a fait grandir à Toulouse.' }) %>
+
+<section class="section story" aria-labelledby="titre-histoire" data-thread-scope>
+  <%~ include('../partials/loc-thread', { id: 'loc-histoire', animate: 'gsap', className: 'story__thread', viewBox: '0 0 320 900', d: 'M60 0 C 0 140, 260 220, 180 380 S 20 560, 160 700 S 300 860, 220 900' }) %>
+  <div class="container story__grid">
+    <div class="story__chapter" data-reveal="card">
+      <p class="story__place">Dakar</p>
+      <h2 class="story__title" data-split>Là où <em>tout commence</em>.</h2>
+      <!-- TODO-PROPRIO : histoire personnelle de la fondatrice à relire et compléter -->
+      <p>Le dimanche, les cuisines se transformaient en salons. On tressait, on roulait, on nouait, on racontait. Notre fondatrice y a appris très jeune que le soin des cheveux est un moment de transmission, avant d’être une technique.</p>
+    </div>
+    <figure class="story__figure arch arch--framed" data-reveal="arch">
+      <div class="arch__frame"><div class="placeholder" data-parallax="6"><span class="placeholder__label">Dakar, souvenirs</span></div></div>
+    </figure>
+    <div class="story__chapter" data-reveal="card">
+      <p class="story__place">Toulouse</p>
+      <h2 class="story__title" data-split>Glow in <em>Locks</em>.</h2>
+      <p>Arrivée à Toulouse, elle se forme aux techniques de création et d’entretien des locks : comb coils, interlocking, crochet, soins détox. Elle ouvre Glow in Locks et accompagne, rendez-vous après rendez-vous, une communauté fidèle de clientes.</p>
+    </div>
+    <div class="story__chapter" data-reveal="card">
+      <p class="story__place">Aujourd’hui</p>
+      <h2 class="story__title" data-split>L’Atelier <em>des Locks</em>.</h2>
+      <p>Le nom change, l’exigence reste. L’atelier dit ce que nous sommes : un lieu de savoir-faire, où chaque loc est travaillée à la main, avec le temps qu’il faut. La silhouette de notre emblème, elle, est celle que nos clientes connaissent depuis le début.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--alt founder" aria-labelledby="titre-fondatrice">
+  <div class="container founder__grid">
+    <figure class="founder__portrait arch arch--sun arch--framed" data-reveal="arch">
+      <div class="arch__frame"><div class="placeholder" data-parallax="6"><span class="placeholder__label">Portrait de la fondatrice</span></div></div>
+    </figure>
+    <div class="founder__text">
+      <p class="eyebrow">La fondatrice</p>
+      <!-- TODO-PROPRIO : prénom et nom de la fondatrice, formations, années d'expérience -->
+      <h2 class="founder__name" id="titre-fondatrice" data-split><%= founder.firstName || founder.displayName %>, <em>locticienne</em>.</h2>
+      <blockquote class="founder__quote">
+        <p>Une loc, c’est du temps. Je veux que chaque cliente reparte en sachant ce que j’ai fait, pourquoi, et comment en prendre soin.</p>
+      </blockquote>
+      <p class="text-muted">Formée à la création et à l’entretien des locks, à la coloration et aux soins du cuir chevelu, elle continue de se former chaque année. Elle reçoit seule, une cliente à la fois.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section approach" aria-labelledby="titre-approche">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <p class="eyebrow">Notre approche</p>
+      <h2 class="section-head__title" id="titre-approche" data-split>Quatre <em>engagements</em>.</h2>
+      <p class="section-head__text">Ce qui ne change jamais, quelle que soit la prestation.</p>
+    </header>
+    <ol class="approach__list" role="list">
+<% [
+  { t: 'Le diagnostic d’abord', d: 'Texture, densité, cuir chevelu, histoire de vos cheveux : on regarde avant de toucher. Pas de méthode imposée.' },
+  { t: 'La racine respectée', d: 'Pas de tension excessive, pas de resserrage trop fréquent. Des locks saines durent toute une vie.' },
+  { t: 'Le temps qu’il faut', d: 'Une cliente à la fois. Des créneaux larges, pour ne jamais travailler dans la précipitation.' },
+  { t: 'La transmission', d: 'Vous repartez avec des conseils clairs, adaptés à vos locks et à votre rythme de vie.' }
+].forEach(function (v, i) { %>
+      <li class="approach__item" data-reveal="card">
+        <span class="approach__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span>
+        <h3 class="approach__title"><%= v.t %></h3>
+        <p class="approach__text"><%= v.d %></p>
+      </li>
+<% }) %>
+    </ol>
+  </div>
+</section>
+
+<section class="section section--alt place" aria-labelledby="titre-lieu">
+  <div class="container place__grid">
+    <div class="place__text">
+      <p class="eyebrow">Le lieu</p>
+      <h2 class="section-head__title" id="titre-lieu" data-split>Un atelier <em>calme</em>, au cœur de Toulouse.</h2>
+      <!-- TODO-PROPRIO : description du salon, quartier, accès (métro, bus, parking), accessibilité PMR -->
+      <p class="text-muted">Lumière douce, fauteuil confortable, thé chaud : le salon est pensé pour les longues séances. Vous pouvez venir accompagnée d’une personne.</p>
+      <address class="place__address">
+        <%= it.site.address.street %><br /><%= it.site.address.postalCode %> <%= it.site.address.city %>
+      </address>
+      <a class="btn btn--secondary" href="/contact">Plan, horaires et accès</a>
+    </div>
+    <ul class="place__photos" role="list">
+      <li><span class="placeholder"><span class="placeholder__label">Le fauteuil</span></span></li>
+      <li><span class="placeholder"><span class="placeholder__label">L’atelier</span></span></li>
+      <li><span class="placeholder"><span class="placeholder__label">Les produits</span></span></li>
+    </ul>
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'Venez nous *rencontrer*.' }) %>

@@ -1,0 +1,19 @@
+<%/* Carte d'avis. Paramètres : review, serviceName, fmt. */%>
+<article class="review">
+  <%~ include('./stars', { rating: it.review.rating, label: 'Note : ' + it.review.rating + ' sur 5' }) %>
+  <blockquote class="review__text"><p><%= it.review.text %></p></blockquote>
+  <footer class="review__meta">
+    <span>
+      <span class="review__author"><%= it.review.author %></span>
+<% if (it.serviceName) { %>
+      <span class="review__service"> · <%= it.serviceName %></span>
+<% } %>
+    </span>
+<% if (it.review.verified) { %>
+    <span class="review__verified">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12 4.5 4.5L19 7" /></svg>
+      Avis vérifié · <time datetime="<%= it.review.date %>"><%= it.fmt.formatDate(it.review.date) %></time>
+    </span>
+<% } %>
+  </footer>
+</article>

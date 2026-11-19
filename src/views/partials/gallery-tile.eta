@@ -1,0 +1,19 @@
+<%
+  /* Vignette de galerie, ouvre la lightbox. Paramètres : item, meta (texte), hidden (bool).
+     Placeholder de marque tant que les photos de la propriétaire ne sont pas importées (§12). */
+  var ratios = { portrait: '4 / 5', landscape: '4 / 3', square: '1 / 1' };
+%>
+<li class="tile tile--<%= it.item.ratio %>" data-gallery-item data-category="<%= it.item.category %>" data-method="<%= it.item.method || '' %>" data-size="<%= it.item.size %>"<% if (it.hidden) { %> hidden<% } %>>
+  <button class="tile__button" type="button" data-lightbox-item data-title="<%= it.item.title %>" data-meta="<%= it.meta %>" data-ratio="<%= ratios[it.item.ratio] %>">
+    <span class="tile__media" data-lightbox-media>
+      <span class="placeholder"><span class="placeholder__label">Photo à venir</span></span>
+    </span>
+    <span class="tile__caption">
+      <span class="tile__title"><%= it.item.title %></span>
+      <span class="tile__meta"><%= it.meta %></span>
+    </span>
+    <span class="tile__zoom" aria-hidden="true">
+      <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M15 4h5v5M9 20H4v-5M20 4l-6 6M4 20l6-6" /></svg>
+    </span>
+  </button>
+</li>

@@ -1,0 +1,34 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt, a = it.article; %>
+<article class="article" aria-labelledby="titre-page">
+  <header class="page-hero grain article__hero">
+    <div class="container article__head">
+      <p class="eyebrow"><%= a.topic %> · <%= a.readingMinutes %> min de lecture</p>
+      <h1 class="page-title" id="titre-page"><%~ fmt.accent(a.title) %></h1>
+      <p class="lead"><%= a.excerpt %></p>
+      <p class="article__date">Publié le <time datetime="<%= a.date %>"><%= fmt.formatDate(a.date) %></time> · par l’équipe de l’atelier</p>
+    </div>
+  </header>
+  <div class="container">
+    <figure class="article__cover"><span class="placeholder"><span class="placeholder__label"><%= a.topic %></span></span></figure>
+    <div class="prose article__body">
+<% a.sections.forEach(function (s) { %>
+<% if (s.title) { %>
+      <h2><%= s.title %></h2>
+<% } %>
+<% s.paragraphs.forEach(function (p, i) { %>
+      <p<% if (!s.title && i === 0) { %> class="article__intro"<% } %>><%= p %></p>
+<% }) %>
+<% }) %>
+    </div>
+    <aside class="article__aside" aria-label="Pour aller plus loin">
+      <p class="eyebrow">À lire aussi</p>
+      <ul class="article__more" role="list">
+<% it.more.forEach(function (m) { %>
+        <li><a class="article__more-link" href="/conseils/<%= m.slug %>"><%~ fmt.accent(m.title) %></a></li>
+<% }) %>
+      </ul>
+      <a class="btn btn--primary" href="/reserver" data-magnetic>Réserver un rendez-vous</a>
+    </aside>
+  </div>
+</article>

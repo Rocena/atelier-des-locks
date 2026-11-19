@@ -1,0 +1,27 @@
+<% layout('../../layouts/base', it) %>
+<%~ include('../../partials/page-hero', { fmt: it.fmt, eyebrow: 'Vos données', title: 'Politique de *confidentialité*.', lead: 'Nous collectons le strict nécessaire pour vous recevoir, et rien de plus.' }) %>
+<section class="section legal" aria-label="<%= it.heading %>">
+  <div class="container">
+    <!-- TODO-PROPRIO : à faire relire (durées de conservation, prestataires d'envoi, hébergeur) -->
+    <div class="prose">
+      <h2>Qui est responsable ?</h2>
+      <p>L’Atelier des Locks, <%= it.site.address.city %>, est responsable du traitement de vos données. Pour toute question : page <a href="/contact">Contact</a>.</p>
+      <h2>Quelles données, pourquoi ?</h2>
+      <ul>
+        <li><strong>Prise de rendez-vous</strong> : prénom, nom, email, téléphone, prestation et créneau. Base légale : l’exécution du rendez-vous que vous demandez.</li>
+        <li><strong>Rappels</strong> : email et SMS de confirmation et de rappel. Base légale : l’exécution du rendez-vous.</li>
+        <li><strong>Fiche cliente</strong> : notes techniques sur vos cheveux (méthode, taille, produits) et, si vous l’acceptez, l’autorisation de publier des photos. Base légale : votre consentement pour les photos.</li>
+        <li><strong>Avis</strong> : prénom, initiale, note et texte, publiés seulement si vous laissez un avis.</li>
+        <li><strong>Formulaire de contact</strong> : les informations que vous nous écrivez, pour vous répondre.</li>
+      </ul>
+      <h2>Combien de temps ?</h2>
+      <p>Vos données de cliente sont conservées trois ans après votre dernier rendez-vous, puis supprimées. Les messages de contact sans suite sont supprimés après un an.</p>
+      <h2>Qui y a accès ?</h2>
+      <p>Seulement l’atelier, et nos prestataires techniques pour l’hébergement et l’envoi des emails et SMS, qui agissent sur nos instructions et dans l’Union européenne. Vos données ne sont jamais vendues.</p>
+      <h2>Cookies</h2>
+      <p>Ce site n’utilise aucun cookie publicitaire ni outil de mesure d’audience tiers. Il mémorise seulement, dans votre navigateur, votre choix de thème clair ou sombre et la fermeture du bandeau d’annonce.</p>
+      <h2>Vos droits</h2>
+      <p>Vous pouvez accéder à vos données, les corriger, les supprimer, vous opposer à leur traitement ou demander leur portabilité depuis la page <a href="/contact">Contact</a>. Vous pouvez aussi saisir la CNIL (cnil.fr).</p>
+    </div>
+  </div>
+</section>

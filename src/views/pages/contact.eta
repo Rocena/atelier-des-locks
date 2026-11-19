@@ -1,0 +1,90 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt, a = it.site.address; %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Contact', title: 'Venir *à l’atelier*.', lead: 'Une question avant de réserver, une demande de devis pour un mariage, un doute sur la méthode ? Écrivez-nous, nous répondons sous 48 heures.' }) %>
+
+<section class="section contact" aria-label="Coordonnées et formulaire">
+  <div class="container contact__grid">
+    <div class="contact__info">
+      <div class="contact__block">
+        <h2 class="contact__title">Adresse</h2>
+        <!-- TODO-PROPRIO : adresse exacte, accès (métro, bus, parking), accessibilité -->
+        <address class="contact__address"><%= a.street %><br /><%= a.postalCode %> <%= a.city %></address>
+        <a class="link" href="https://www.openstreetmap.org/search?query=<%= encodeURIComponent(a.street + ' ' + a.postalCode + ' ' + a.city) %>" rel="noopener">Ouvrir le plan<span class="visually-hidden"> (OpenStreetMap, nouvel onglet)</span></a>
+      </div>
+      <div class="contact__block">
+        <h2 class="contact__title">Horaires</h2>
+        <!-- TODO-PROPRIO : horaires réels -->
+        <dl class="hours">
+<% it.site.hours.forEach(function (h) { %>
+          <div class="hours__row"><dt><%= h.days %></dt><dd><%= h.time %></dd></div>
+<% }) %>
+        </dl>
+        <p class="contact__small">Sur rendez-vous uniquement.</p>
+      </div>
+      <div class="contact__block">
+        <h2 class="contact__title">Nous joindre</h2>
+        <ul class="contact__channels" role="list">
+<% if (it.site.whatsapp) { %>
+          <li><a class="btn btn--secondary btn--sm" href="<%= it.site.whatsapp %>" rel="noopener">Écrire sur WhatsApp</a></li>
+<% } %>
+<% if (it.site.phone) { %>
+          <li><a class="link" href="tel:<%= it.site.phone %>"><%= it.site.phone %></a></li>
+<% } %>
+<% if (it.site.instagram) { %>
+          <li><a class="link" href="<%= it.site.instagram %>" rel="noopener">Instagram</a></li>
+<% } %>
+        </ul>
+        <!-- TODO-PROPRIO : téléphone, lien WhatsApp (wa.me) et Instagram -->
+<% if (!it.site.whatsapp && !it.site.phone) { %>
+        <p class="contact__small">Le numéro et le lien WhatsApp seront ajoutés très bientôt.</p>
+<% } %>
+      </div>
+      <div class="map" aria-hidden="true">
+        <span class="map__river"></span>
+        <span class="map__pin"></span>
+        <span class="map__label">Toulouse</span>
+      </div>
+    </div>
+
+    <div class="contact__form-wrap">
+      <h2 class="contact__form-title" data-split>Écrivez-<em>nous</em>.</h2>
+      <!-- Phase suivante : envoi réel (CSRF, rate limiting, honeypot, validation Zod, email Brevo). -->
+      <form class="contact-form" action="/contact" method="post" novalidate data-contact-form>
+        <div class="field">
+          <label class="field__label" for="contact-nom">Prénom et nom</label>
+          <input class="field__control" id="contact-nom" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="contact-email">Email</label>
+          <input class="field__control" id="contact-email" name="email" type="email" autocomplete="email" inputmode="email" required />
+        </div>
+        <div class="field">
+          <label class="field__label" for="contact-tel">Téléphone <span class="field__optional">(facultatif)</span></label>
+          <input class="field__control" id="contact-tel" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+        </div>
+        <div class="field">
+          <label class="field__label" for="contact-sujet">Sujet</label>
+          <select class="field__control" id="contact-sujet" name="topic">
+            <option>Une question sur une prestation</option>
+            <option>Un devis mariage ou événement</option>
+            <option>Un départ de locks</option>
+            <option>Autre chose</option>
+          </select>
+        </div>
+        <div class="field contact-form__full">
+          <label class="field__label" for="contact-message">Votre message</label>
+          <textarea class="field__control" id="contact-message" name="message" rows="6" required aria-describedby="contact-message-aide"></textarea>
+          <p class="field__hint" id="contact-message-aide">Longueur et âge de vos locks, méthode actuelle, date souhaitée : tout nous aide à vous répondre.</p>
+        </div>
+        <label class="check contact-form__full">
+          <input type="checkbox" name="consent" required />
+          <span>J’accepte que mes données servent uniquement à répondre à ma demande. <a class="link" href="/confidentialite">Politique de confidentialité</a></span>
+        </label>
+        <div class="contact-form__full contact-form__actions">
+          <button class="btn btn--primary" type="submit" disabled aria-describedby="contact-indispo">Envoyer le message</button>
+          <p class="contact__small" id="contact-indispo" role="status">L’envoi en ligne sera activé à l’ouverture du site. En attendant, contactez-nous par téléphone ou WhatsApp.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

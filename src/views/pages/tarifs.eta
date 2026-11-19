@@ -1,0 +1,48 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Tarifs', title: 'Des prix *clairs*, sans surprise.', lead: 'Les prix dépendent surtout de la longueur, de la densité et de la taille de vos locks. Ceux-ci sont indicatifs : le prix exact vous est donné avant de commencer.' }) %>
+
+<!-- TODO-PROPRIO : tous les prix, durées et options sont des valeurs d'exemple à confirmer -->
+<section class="section pricing" aria-label="Grille tarifaire">
+  <div class="container pricing__grid">
+<% it.groups.concat([{ slug: 'sur-mesure', name: 'Sur mesure', headline: 'Consultation et *départ de locks*', services: it.others }]).forEach(function (g) { %>
+    <section class="pricing__group" aria-labelledby="tarifs-<%= g.slug %>" data-reveal="card">
+      <h2 class="pricing__title" id="tarifs-<%= g.slug %>"><%~ fmt.accent(g.headline) %></h2>
+      <p class="eyebrow"><%= g.name %></p>
+      <ul class="price-list" role="list">
+<% g.services.forEach(function (s) { %>
+        <li class="price-list__item">
+          <div class="price-list__line">
+            <a class="price-list__name" href="/prestations/<%= s.slug %>"><%= s.name %></a>
+            <span class="price-list__dots" aria-hidden="true"></span>
+            <span class="price-list__price num"><%= fmt.formatPrice(s) %></span>
+          </div>
+          <p class="price-list__meta num"><%= fmt.formatDuration(s.durationMin, s.durationMax) %><% if (s.allergyTest) { %> · test d’allergie 48 h avant<% } %><% if (!s.bookableOnline && !s.onQuote) { %> · après consultation<% } %></p>
+<% if (s.options.length) { %>
+          <ul class="price-list__options" role="list">
+<% s.options.forEach(function (o) { %>
+            <li><span><%= o.label %></span><span class="num">+&nbsp;<%= fmt.formatEuro(o.price) %></span></li>
+<% }) %>
+          </ul>
+<% } %>
+        </li>
+<% }) %>
+      </ul>
+    </section>
+<% }) %>
+  </div>
+</section>
+
+<section class="section section--alt" aria-labelledby="titre-bon-a-savoir">
+  <div class="container pricing__notes">
+    <h2 class="section-head__title" id="titre-bon-a-savoir" data-split>Bon <em>à savoir</em>.</h2>
+    <ul class="notes-list" role="list">
+      <li><strong>Consultation déduite.</strong> Si vous réservez une création après votre consultation, son prix est déduit.</li>
+      <li><strong>Longueur et densité.</strong> Au-delà des épaules, ou pour des locks fines, un supplément s’applique : il est indiqué avant de commencer.</li>
+      <li><strong>Annulation.</strong> Gratuite jusqu’à 48 heures avant le rendez-vous. <a class="link" href="/cgv-politique-rdv">Voir la politique de rendez-vous</a></li>
+      <li><strong>Paiement.</strong> Au salon, par carte bancaire ou en espèces.</li>
+    </ul>
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'Prête pour *vos locks* ?' }) %>

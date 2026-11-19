@@ -1,0 +1,82 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, sun: true, eyebrow: 'Prestations', title: 'Le soin des locks, *de A à Z*.', lead: 'Création, resserrage, détox, coloration, coiffure : chaque prestation commence par un regard attentif sur vos cheveux, et se termine par des conseils pour la suite.' }) %>
+
+<nav class="category-nav" aria-label="Catégories de prestations">
+  <div class="container">
+    <ul class="category-nav__list" role="list">
+<% it.groups.forEach(function (g, i) { %>
+      <li><a class="category-nav__link" href="#<%= g.slug %>"><span class="category-nav__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span><%= g.name %></a></li>
+<% }) %>
+      <li><a class="category-nav__link" href="#sur-mesure"><span class="category-nav__index" aria-hidden="true">+</span>Sur mesure</a></li>
+    </ul>
+  </div>
+</nav>
+
+<% it.groups.forEach(function (g, i) { %>
+<section class="section category<%= i % 2 ? ' section--alt' : '' %>" id="<%= g.slug %>" aria-labelledby="titre-<%= g.slug %>">
+  <div class="container category__grid">
+    <header class="category__head">
+      <p class="eyebrow"><span class="category__index"><%= String(i + 1).padStart(2, '0') %></span> <%= g.name %></p>
+      <h2 class="category__title" id="titre-<%= g.slug %>" data-split><%~ fmt.accent(g.headline) %></h2>
+      <p class="category__intro"><%= g.intro %></p>
+      <figure class="arch arch--framed category__arch" data-reveal="arch">
+        <div class="arch__frame"><div class="placeholder" data-parallax="6"><span class="placeholder__label"><%= g.media %></span></div></div>
+      </figure>
+    </header>
+    <ul class="service-list" role="list">
+<% g.services.forEach(function (s) { %>
+      <li class="service-row" data-reveal="card">
+        <a class="service-row__link" href="/prestations/<%= s.slug %>">
+          <span class="service-row__main">
+            <span class="service-row__name"><%= s.name %></span>
+            <span class="service-row__summary"><%= s.summary %></span>
+          </span>
+          <!-- TODO-PROPRIO : durée et prix à confirmer -->
+          <span class="service-row__meta">
+            <span class="service-row__duration"><span class="visually-hidden">Durée : </span><%= fmt.formatDuration(s.durationMin, s.durationMax) %></span>
+            <span class="service-row__price"><%= fmt.formatPrice(s) %></span>
+          </span>
+          <svg class="icon service-row__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+<% if (s.allergyTest || !s.bookableOnline) { %>
+        <p class="service-row__notes">
+<% if (s.allergyTest) { %><span class="badge badge--soft">Test d’allergie 48 h avant</span><% } %>
+<% if (!s.bookableOnline) { %><span class="badge badge--soft">Sur consultation</span><% } %>
+        </p>
+<% } %>
+      </li>
+<% }) %>
+    </ul>
+  </div>
+</section>
+<% }) %>
+
+<section class="section section--alt category" id="sur-mesure" aria-labelledby="titre-sur-mesure">
+  <div class="container category__grid">
+    <header class="category__head">
+      <p class="eyebrow"><span class="category__index">+</span> Sur mesure</p>
+      <h2 class="category__title" id="titre-sur-mesure" data-split>Commencer, <em>ou recommencer</em>.</h2>
+      <p class="category__intro">Une consultation pour choisir en confiance, ou un départ de locks fait avec patience, sans tout couper.</p>
+    </header>
+    <ul class="service-list" role="list">
+<% it.others.forEach(function (s) { %>
+      <li class="service-row" data-reveal="card">
+        <a class="service-row__link" href="/prestations/<%= s.slug %>">
+          <span class="service-row__main">
+            <span class="service-row__name"><%= s.name %></span>
+            <span class="service-row__summary"><%= s.summary %></span>
+          </span>
+          <span class="service-row__meta">
+            <span class="service-row__duration"><span class="visually-hidden">Durée : </span><%= fmt.formatDuration(s.durationMin, s.durationMax) %></span>
+            <span class="service-row__price"><%= fmt.formatPrice(s) %></span>
+          </span>
+          <svg class="icon service-row__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </a>
+      </li>
+<% }) %>
+    </ul>
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, eyebrow: 'Vous hésitez ?', title: 'Parlons de *vos envies*.', text: 'Une consultation de trente minutes, en salon ou en visio, pour choisir la bonne méthode et connaître le prix exact.' }) %>

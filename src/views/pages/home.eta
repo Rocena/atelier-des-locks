@@ -1,25 +1,256 @@
 <% layout('../layouts/base', it) %>
-<section class="section grain home-soon" aria-labelledby="titre-accueil">
+<%
+  var fmt = it.fmt;
+  var rating = fmt.formatRating(it.summary.average);
+  var minPrice = function (services) {
+    var prices = services.filter(function (s) { return !s.onQuote && s.price != null; }).map(function (s) { return s.price; });
+    return prices.length ? Math.min.apply(null, prices) : null;
+  };
+  var categoryNames = {};
+  it.categories.forEach(function (c) { categoryNames[c.slug] = c.name; });
+  var founder = it.settings.founder;
+%>
+
+<%/* 1. Hero plein écran : titre révélé ligne par ligne (CSS, sans attendre le JS : LCP rapide) */%>
+<section class="hero grain" aria-labelledby="titre-accueil">
   <div class="bogolan bogolan--fade" aria-hidden="true"></div>
-  <div class="container home-soon__grid">
-    <div class="home-soon__text stack">
-      <p class="eyebrow">Locticienne · Toulouse</p>
-      <h1 id="titre-accueil" class="display">L’art de la <em>loc</em>, à&nbsp;Toulouse.</h1>
-      <p class="lead">Création, entretien et soin des locks, par une locticienne passionnée. Notre nouveau site ouvre très bientôt.</p>
-      <div class="cluster home-soon__actions">
-        <a class="btn btn--primary btn--lg" href="/reserver">Réserver</a>
+  <div class="container hero__grid">
+    <div class="hero__text">
+      <p class="eyebrow hero__eyebrow">Locticienne · Toulouse</p>
+      <h1 id="titre-accueil" class="display hero__title page-title">
+        <span class="hero__line"><span>L’art de la <em>loc</em>,</span></span>
+        <span class="hero__line"><span>à&nbsp;Toulouse.</span></span>
+      </h1>
+      <p class="lead hero__lead">Création, entretien et soin des locks, par une locticienne passionnée.</p>
+      <div class="cluster hero__actions">
+        <a class="btn btn--primary btn--lg" href="/reserver" data-magnetic>Réserver</a>
         <a class="btn btn--ghost" href="/prestations"><span class="btn__label">Découvrir les prestations</span>
           <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
       </div>
     </div>
-    <figure class="arch arch--sun arch--framed home-soon__arch" data-reveal="arch">
+    <!-- TODO-PROPRIO : portrait (ou vidéo de 10 s, muette, < 2 Mo, avec poster) pour le hero -->
+    <figure class="arch arch--sun arch--framed hero__arch" data-reveal="arch">
       <div class="arch__frame">
-        <div class="placeholder"><span class="placeholder__label">Portrait à venir</span></div>
+        <div class="placeholder" data-parallax="5"><span class="placeholder__label">Portrait à venir</span></div>
       </div>
     </figure>
   </div>
-<% if (it.dev) { %>
-  <p class="container home-soon__dev"><a class="link" href="/styleguide">Ouvrir le styleguide (dev)</a></p>
-<% } %>
 </section>
+
+<%/* 2. Bandeau de réassurance défilant (le second passage est décoratif) */%>
+<section class="marquee" aria-label="L’atelier en bref">
+<% var marquee = [
+  rating + '/5 · ' + it.summary.count + ' avis *vérifiés*',
+  'Plus de ' + it.settings.stats.clients + ' *clientes* accompagnées',
+  'Spécialiste des *locks*',
+  it.settings.stats.yearsOfPractice + ' ans de *savoir-faire*',
+  'De Dakar à *Toulouse*'
+]; %>
+  <!-- TODO-PROPRIO : nombre de clientes et années d’expérience à confirmer (settings.json) -->
+<% [false, true].forEach(function (copy) { %>
+  <ul class="marquee__track" role="list"<% if (copy) { %> aria-hidden="true"<% } %>>
+<% marquee.forEach(function (m) { %>
+    <li class="marquee__item"><%~ fmt.accent(m) %></li>
+<% }) %>
+  </ul>
+<% }) %>
+</section>
+
+<%/* 3. Manifeste : mise en page asymétrique, fondatrice dans une arche */%>
+<section class="section manifesto" aria-labelledby="titre-manifeste" data-thread-scope>
+  <%~ include('../partials/loc-thread', { id: 'loc-manifeste', animate: 'gsap', className: 'manifesto__thread', viewBox: '0 0 320 900', d: 'M250 0 C 330 120, 120 200, 170 330 S 320 520, 180 640 S 40 820, 140 900' }) %>
+  <div class="container manifesto__grid">
+    <figure class="manifesto__portrait">
+      <div class="arch arch--framed" data-reveal="arch">
+        <div class="arch__frame">
+          <div class="placeholder" data-parallax="8"><span class="placeholder__label">Portrait de la fondatrice</span></div>
+        </div>
+      </div>
+      <!-- TODO-PROPRIO : prénom de la fondatrice -->
+      <figcaption class="arch__caption"><%= founder.firstName || founder.displayName %>, <%= founder.role.toLowerCase() %></figcaption>
+    </figure>
+    <div class="manifesto__text">
+      <p class="eyebrow">Notre histoire</p>
+      <h2 id="titre-manifeste" class="manifesto__title" data-split>Prendre soin de <em>vos racines</em>.</h2>
+      <div class="manifesto__body">
+        <p class="manifesto__lede">Tout a commencé à Dakar, entre les mains de femmes qui tressaient, roulaient et nouaient les cheveux avec une patience infinie.</p>
+        <p>Ce geste, notre fondatrice l’a appris, affiné, puis apporté à Toulouse. Sous le nom de Glow in Locks, elle a accompagné des centaines de clientes. Aujourd’hui, l’atelier change de nom, pas de méthode : chaque loc est montée, entretenue et soignée comme une pièce unique.</p>
+        <p>Ici, on prend le temps. On explique ce que l’on fait. On respecte votre texture et votre cuir chevelu, et on vous apprend à prendre soin de vos locks entre deux rendez-vous.</p>
+      </div>
+      <a class="btn btn--ghost" href="/le-salon"><span class="btn__label">Découvrir le salon</span>
+        <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<%/* 4. Prestations : 5 grandes cartes, image révélée au survol (desktop) ou au scroll (mobile) */%>
+<section class="section section--alt services-home" aria-labelledby="titre-prestations">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <p class="eyebrow">Prestations</p>
+      <h2 id="titre-prestations" class="section-head__title" data-split>Cinq savoir-faire, <em>une exigence</em>.</h2>
+      <p class="section-head__text">De la première loc au chignon de mariée, chaque prestation commence par un diagnostic et se termine par des conseils pour la suite.</p>
+    </header>
+    <ol class="services-home__grid" role="list">
+<% it.categories.forEach(function (cat, i) { var from = minPrice(cat.services); %>
+      <li class="services-home__item services-home__item--<%= i + 1 %>" data-reveal="card">
+        <article class="service-card<%= i === 0 || i === 3 ? ' service-card--arch' : '' %>">
+          <div class="service-card__media">
+            <div class="placeholder"><span class="placeholder__label"><%= cat.media %></span></div>
+          </div>
+          <span class="service-card__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span>
+          <div class="service-card__body">
+            <p class="eyebrow"><%= cat.name %></p>
+            <h3 class="service-card__title"><%~ fmt.accent(cat.headline) %></h3>
+            <p class="service-card__text"><%= cat.summary %></p>
+            <!-- TODO-PROPRIO : prix à confirmer -->
+            <div class="service-card__meta">
+              <span class="service-card__duration"><%= cat.services.length %> prestation<%= cat.services.length > 1 ? 's' : '' %></span>
+              <span class="service-card__price"><% if (from != null) { %><small>dès </small><%= fmt.formatEuro(from) %><% } else { %>Sur devis<% } %></span>
+            </div>
+            <a class="service-card__link" href="/prestations#<%= cat.slug %>">
+              Découvrir<span class="visually-hidden"> : <%= cat.name %></span>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+          </div>
+        </article>
+      </li>
+<% }) %>
+    </ol>
+  </div>
+</section>
+
+<%/* 5. Méthodes : carrousel horizontal piloté par le scroll (desktop), glissable (mobile) */%>
+<section class="methods-rail" aria-labelledby="titre-methodes" data-methods-rail>
+  <div class="methods-rail__viewport" data-methods-viewport>
+    <ol class="methods-rail__track" role="list" data-methods-track>
+      <li class="methods-rail__intro">
+        <p class="eyebrow">Méthodes</p>
+        <h2 id="titre-methodes" class="methods-rail__title">Une méthode pour <em>chaque cheveu</em>.</h2>
+        <p class="methods-rail__lead">Comb coils, vanilles, interlocking, crochet… Chaque technique a ses forces. Voici celles que nous pratiquons le plus.</p>
+        <a class="btn btn--secondary" href="/methodes">Lire le guide complet</a>
+        <p class="methods-rail__hint" aria-hidden="true">
+          <span>Faites défiler</span>
+          <svg class="icon" viewBox="0 0 24 24" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </p>
+      </li>
+<% it.methods.forEach(function (m, i) { %>
+      <li class="method-panel">
+        <span class="method-panel__index" aria-hidden="true"><%= String(i + 1).padStart(2, '0') %></span>
+        <div class="method-panel__body">
+          <p class="eyebrow"><%= m.aka %></p>
+          <h3 class="method-panel__name"><%= m.name %></h3>
+          <p class="method-panel__text"><%= m.summary %></p>
+          <dl class="method-panel__facts">
+            <div><dt>Idéal pour</dt><dd><%= m.idealFor %></dd></div>
+            <div><dt>Durée</dt><dd><%= m.duration %></dd></div>
+          </dl>
+          <a class="link" href="/methodes#<%= m.slug %>">En savoir plus<span class="visually-hidden"> sur la méthode <%= m.name %></span></a>
+        </div>
+      </li>
+<% }) %>
+    </ol>
+  </div>
+</section>
+
+<%/* 6. Galerie : sélection en masonry, lightbox */%>
+<section class="section gallery-home" aria-labelledby="titre-galerie">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <p class="eyebrow">Galerie</p>
+      <h2 id="titre-galerie" class="section-head__title" data-split>Le geste, <em>en images</em>.</h2>
+      <p class="section-head__text">Quelques réalisations récentes, avec l’accord de nos clientes. <a class="link" href="/galerie">Voir toute la galerie</a></p>
+    </header>
+    <ul class="masonry" role="list">
+<% it.gallery.forEach(function (item) { %>
+      <%~ include('../partials/gallery-tile', { item: item, meta: categoryNames[item.category] || '' }) %>
+<% }) %>
+    </ul>
+  </div>
+</section>
+
+<%/* 7. Avis */%>
+<section class="section section--alt reviews-home" aria-labelledby="titre-avis">
+  <!-- TODO-PROPRIO : avis d'exemple, à remplacer par les vrais avis avant la mise en ligne -->
+  <div class="container reviews-home__grid">
+    <div class="reviews-home__score">
+      <p class="eyebrow">Avis clientes</p>
+      <h2 id="titre-avis" class="reviews-home__title" data-split>Elles en <em>parlent</em>.</h2>
+      <p class="reviews-home__rating"><span class="num"><%= rating %></span><span class="reviews-home__outof">/5</span></p>
+      <%~ include('../partials/stars', { rating: it.summary.average, label: 'Note moyenne : ' + rating + ' sur 5' }) %>
+      <p class="text-muted"><%= it.summary.count %> avis vérifiés, laissés après un rendez-vous.</p>
+      <a class="btn btn--ghost" href="/avis"><span class="btn__label">Lire tous les avis</span>
+        <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </a>
+    </div>
+    <ul class="reviews-home__list" role="list">
+<% it.reviews.forEach(function (r) { %>
+      <li data-reveal="card"><%~ include('../partials/review-card', { review: r, fmt: fmt, serviceName: null }) %></li>
+<% }) %>
+    </ul>
+  </div>
+</section>
+
+<%/* 8. Le parcours d'une cliente, relié par le fil de loc */%>
+<section class="section journey" aria-labelledby="titre-parcours" data-thread-scope>
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Le parcours</p>
+      <h2 id="titre-parcours" class="section-head__title" data-split>De la première idée <em>à la maturité</em>.</h2>
+    </header>
+    <div class="journey__wrap">
+      <%~ include('../partials/loc-thread', { id: 'loc-parcours', animate: 'gsap', className: 'journey__thread journey__thread--h', viewBox: '0 0 1200 140', d: 'M0 70 C 150 10, 250 130, 400 70 S 650 10, 800 70 S 1050 130, 1200 60' }) %>
+      <%~ include('../partials/loc-thread', { id: 'loc-parcours-v', animate: 'gsap', className: 'journey__thread journey__thread--v', viewBox: '0 0 80 1000', d: 'M40 0 C 0 120, 80 200, 40 330 S 0 540, 40 660 S 80 880, 40 1000' }) %>
+      <ol class="journey__steps" role="list">
+<% [
+  { t: 'Consultation', d: 'Trente minutes pour observer votre texture, parler de vos envies et choisir la méthode. En salon ou en visio.', h: '/prestations/consultation-diagnostic', l: 'La consultation' },
+  { t: 'Installation', d: 'La création de vos locks, section par section, avec la méthode choisie. Vous repartez avec une fiche de conseils.', h: '/prestations#installation', l: 'Les créations' },
+  { t: 'Entretien', d: 'Un resserrage toutes les 4 à 8 semaines, une détox de temps en temps. Vos racines restent saines.', h: '/prestations#resserrage', l: 'Les resserrages' },
+  { t: 'Sublimer', d: 'Couleur, coiffure de tous les jours ou de grand jour : vos locks deviennent une signature.', h: '/prestations#coiffure', l: 'Les coiffures' }
+].forEach(function (step, i) { %>
+        <li class="journey__step" data-reveal="card">
+          <span class="journey__dot" aria-hidden="true"><%= i + 1 %></span>
+          <h3 class="journey__name"><%= step.t %></h3>
+          <p class="journey__text"><%= step.d %></p>
+          <a class="link" href="<%= step.h %>"><%= step.l %></a>
+        </li>
+<% }) %>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<%/* 9. Instagram : grille de liens (6 à 9 visuels choisis en admin, §12) */%>
+<section class="section section--alt instagram" aria-labelledby="titre-instagram">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <p class="eyebrow">Instagram<% if (it.settings.instagram.handle) { %> · @<%= it.settings.instagram.handle %><% } %></p>
+      <h2 id="titre-instagram" class="section-head__title" data-split>L’atelier, <em>au quotidien</em>.</h2>
+      <p class="section-head__text">Les coulisses, les racines du jour et les coiffures du samedi.</p>
+    </header>
+    <!-- TODO-PROPRIO : compte Instagram et sélection de 6 à 9 photos -->
+    <ul class="instagram__grid" role="list">
+<% it.settings.instagram.tiles.forEach(function (label) { %>
+      <li class="instagram__tile">
+<% if (it.settings.instagram.url) { %>
+        <a class="instagram__link" href="<%= it.settings.instagram.url %>" rel="noopener" aria-label="<%= label %>, sur Instagram">
+<% } %>
+          <span class="placeholder"><span class="placeholder__label"><%= label %></span></span>
+<% if (it.settings.instagram.url) { %>
+        </a>
+<% } %>
+      </li>
+<% }) %>
+    </ul>
+<% if (it.settings.instagram.url) { %>
+    <p class="instagram__cta"><a class="btn btn--secondary" href="<%= it.settings.instagram.url %>" rel="noopener">Suivre l’atelier sur Instagram</a></p>
+<% } %>
+  </div>
+</section>
+
+<%/* 10. CTA final sur fond ébène */%>
+<%~ include('../partials/cta-band', { fmt: fmt, title: 'Vos locks, *un art*.' }) %>
+
+<%~ include('../partials/lightbox', it) %>

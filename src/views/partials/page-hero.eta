@@ -1,0 +1,15 @@
+<%/* En-tête de page intérieure. Paramètres : eyebrow, title (avec *accent*), lead, fmt, sun (bool), id. */%>
+<header class="page-hero grain<%= it.sun ? ' page-hero--sun' : '' %>">
+  <div class="bogolan bogolan--fade" aria-hidden="true"></div>
+<%/* Le soleil après la trame : il passe devant elle */%>
+<% if (it.sun) { %>
+  <span class="sun" aria-hidden="true"></span>
+<% } %>
+  <div class="container page-hero__inner">
+    <p class="eyebrow"><%= it.eyebrow %></p>
+    <h1 class="page-title" id="<%= it.id || 'titre-page' %>"><%~ it.fmt.accent(it.title) %></h1>
+<% if (it.lead) { %>
+    <p class="lead page-hero__lead"><%= it.lead %></p>
+<% } %>
+  </div>
+</header>

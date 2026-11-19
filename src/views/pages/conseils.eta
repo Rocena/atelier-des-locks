@@ -1,0 +1,25 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Le journal', title: 'Conseils, *sans jargon*.', lead: 'Débuter ses locks, les laver, choisir son entretien : ce que nous expliquons chaque jour au salon, écrit pour vous.' }) %>
+
+<section class="section journal" aria-label="Articles">
+  <div class="container">
+    <ol class="journal__list" role="list">
+<% it.articles.forEach(function (a, i) { %>
+      <li class="journal__item<%= i === 0 ? ' journal__item--lead' : '' %>" data-reveal="card">
+        <article class="post-card">
+          <div class="post-card__media"><span class="placeholder"><span class="placeholder__label"><%= a.topic %></span></span></div>
+          <div class="post-card__body">
+            <p class="eyebrow"><%= a.topic %> · <%= a.readingMinutes %> min de lecture</p>
+            <h2 class="post-card__title"><a class="post-card__link" href="/conseils/<%= a.slug %>"><%~ fmt.accent(a.title) %></a></h2>
+            <p class="post-card__excerpt"><%= a.excerpt %></p>
+            <p class="post-card__date"><time datetime="<%= a.date %>"><%= fmt.formatDate(a.date) %></time></p>
+          </div>
+        </article>
+      </li>
+<% }) %>
+    </ol>
+  </div>
+</section>
+
+<%~ include('../partials/cta-band', { fmt: fmt, eyebrow: 'Une question précise ?', title: 'Posez-la *au salon*.', text: 'Chaque chevelure est différente. Le plus simple reste d’en parler pendant une consultation.' }) %>

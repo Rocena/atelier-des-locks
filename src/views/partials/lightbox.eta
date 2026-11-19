@@ -1,0 +1,23 @@
+<dialog class="lightbox" data-lightbox data-lenis-prevent aria-labelledby="lightbox-title">
+  <figure class="lightbox__figure">
+    <div class="lightbox__media" data-lightbox-target></div>
+    <figcaption class="lightbox__caption">
+      <div>
+        <p class="lightbox__title" id="lightbox-title" data-lightbox-title></p>
+        <p class="text-muted" data-lightbox-meta></p>
+      </div>
+      <div class="lightbox__nav">
+        <span class="text-muted num" data-lightbox-counter aria-live="polite"></span>
+        <button class="icon-btn" type="button" data-lightbox-prev aria-label="Réalisation précédente">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>
+        </button>
+        <button class="icon-btn" type="button" data-lightbox-next aria-label="Réalisation suivante">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+        </button>
+      </div>
+    </figcaption>
+  </figure>
+  <button class="icon-btn lightbox__close" type="button" data-lightbox-close aria-label="Fermer">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18" /></svg>
+  </button>
+</dialog>

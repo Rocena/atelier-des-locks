@@ -1,0 +1,31 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Questions fréquentes', title: 'Vos questions, *nos réponses*.', lead: 'Préparer votre rendez-vous, sa durée, l’entretien de vos locks, l’annulation : tout ce que l’on nous demande le plus souvent.' }) %>
+
+<section class="section faq" aria-label="Questions par thème">
+  <div class="container faq__grid">
+    <nav class="faq__nav" aria-label="Thèmes">
+      <ul class="faq__nav-list" role="list">
+<% it.groups.forEach(function (g) { %>
+        <li><a class="faq__nav-link" href="#<%= g.slug %>"><%= g.title %></a></li>
+<% }) %>
+      </ul>
+    </nav>
+    <div class="faq__groups">
+<% it.groups.forEach(function (g) { %>
+      <section class="faq__group" id="<%= g.slug %>" aria-labelledby="faq-<%= g.slug %>">
+        <h2 class="faq__title" id="faq-<%= g.slug %>"><%= g.title %></h2>
+        <div class="accordion">
+<% g.items.forEach(function (item) { %>
+          <details class="accordion__item">
+            <summary class="accordion__summary"><%= item.q %><span class="accordion__icon" aria-hidden="true"></span></summary>
+            <div class="accordion__body"><p><%= item.a %></p></div>
+          </details>
+<% }) %>
+        </div>
+      </section>
+<% }) %>
+      <p class="faq__more">Vous ne trouvez pas votre réponse ? <a class="link" href="/contact">Écrivez-nous</a>, nous répondons sous 48 heures.</p>
+    </div>
+  </div>
+</section>

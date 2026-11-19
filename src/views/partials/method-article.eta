@@ -1,0 +1,50 @@
+<%/* Fiche d'une méthode dans le guide. Paramètres : m (méthode), i (index), short (rappel bref :
+     méthode déjà détaillée dans la partie création). */%>
+<% var m = it.m; %>
+<% if (it.short) { %>
+<article class="method method--short" aria-labelledby="<%= m.slug %>-entretien-titre">
+  <h3 class="method__name" id="<%= m.slug %>-entretien-titre"><%= m.name %> <span class="method__aka">pour l’entretien</span></h3>
+  <p class="method__text"><%= m.maintenance %> <a class="link" href="#<%= m.slug %>">Lire la fiche complète</a></p>
+</article>
+<% } else { %>
+<article class="method" id="<%= m.slug %>" aria-labelledby="<%= m.slug %>-titre" data-reveal="card">
+  <header class="method__head">
+    <span class="method__index" aria-hidden="true"><%= String(it.i + 1).padStart(2, '0') %></span>
+    <div>
+      <h3 class="method__name" id="<%= m.slug %>-titre"><%= m.name %></h3>
+      <p class="method__aka"><%= m.aka %></p>
+    </div>
+  </header>
+  <p class="method__summary"><%= m.summary %></p>
+  <p class="method__text"><%= m.principle %></p>
+  <dl class="method__facts">
+    <div><dt>Idéal pour</dt><dd><%= m.idealFor %></dd></div>
+    <div><dt>Durée</dt><dd><%= m.duration %></dd></div>
+<% if (m.maturation && m.maturation !== '—') { %>
+    <div><dt>Maturation</dt><dd><%= m.maturation %></dd></div>
+<% } %>
+    <div><dt>Entretien</dt><dd><%= m.maintenance %></dd></div>
+  </dl>
+  <div class="method__lists">
+    <div>
+      <h4 class="method__list-title">Ses forces</h4>
+      <ul class="method__list method__list--pros" role="list">
+<% m.pros.forEach(function (p) { %>
+        <li><%= p %></li>
+<% }) %>
+      </ul>
+    </div>
+    <div>
+      <h4 class="method__list-title">À savoir</h4>
+      <ul class="method__list" role="list">
+<% m.watchouts.forEach(function (w) { %>
+        <li><%= w %></li>
+<% }) %>
+      </ul>
+    </div>
+  </div>
+  <a class="btn btn--ghost" href="/prestations/<%= m.service %>"><span class="btn__label">La prestation associée</span>
+    <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+  </a>
+</article>
+<% } %>

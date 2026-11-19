@@ -1,0 +1,44 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt; %>
+<%~ include('../partials/page-hero', { fmt: fmt, sun: true, eyebrow: 'Réserver', title: 'Votre rendez-vous, *en quatre étapes*.', lead: 'Choisissez votre prestation, votre créneau, laissez vos coordonnées : vous recevez une confirmation par email et par SMS, avec un lien pour déplacer ou annuler.' }) %>
+
+<section class="section booking-preview" aria-labelledby="titre-etapes-resa">
+  <div class="container">
+    <h2 class="visually-hidden" id="titre-etapes-resa">Les étapes</h2>
+    <ol class="booking-steps" role="list">
+<% ['Prestation', 'Créneau', 'Coordonnées', 'Confirmation'].forEach(function (step, i) { %>
+      <li class="booking-steps__item<%= i === 0 ? ' is-current' : '' %>"<% if (i === 0) { %> aria-current="step"<% } %>>
+        <span class="booking-steps__index" aria-hidden="true"><%= i + 1 %></span>
+        <span class="booking-steps__label"><%= step %></span>
+      </li>
+<% }) %>
+    </ol>
+
+    <div class="notice" role="note">
+      <p class="notice__title">La réservation en ligne ouvre <em>très bientôt</em>.</p>
+      <p class="text-muted">En attendant, choisissez votre prestation ci-dessous, puis contactez-nous pour fixer votre créneau.</p>
+      <a class="btn btn--primary" href="/contact" data-magnetic>Demander un rendez-vous</a>
+    </div>
+
+    <!-- Phase suivante : tunnel fonctionnel (§7). Cette page ne montre que la première étape. -->
+    <h2 class="booking-preview__title" data-split>1. Choisissez <em>votre prestation</em>.</h2>
+<% it.groups.concat([{ slug: 'sur-mesure', name: 'Sur mesure', services: it.others }]).forEach(function (g) { %>
+    <section class="booking-group" aria-labelledby="resa-<%= g.slug %>">
+      <h3 class="booking-group__title" id="resa-<%= g.slug %>"><%= g.name %></h3>
+      <ul class="booking-group__list" role="list">
+<% g.services.forEach(function (s) { %>
+        <li>
+          <a class="booking-option" href="/prestations/<%= s.slug %>">
+            <span class="booking-option__name"><%= s.name %></span>
+            <span class="booking-option__meta num"><%= fmt.formatDuration(s.durationMin, s.durationMax) %> · <%= fmt.formatPrice(s) %></span>
+<% if (!s.bookableOnline) { %>
+            <span class="badge badge--soft"><%= s.onQuote ? 'Sur devis' : 'Après consultation' %></span>
+<% } %>
+          </a>
+        </li>
+<% }) %>
+      </ul>
+    </section>
+<% }) %>
+  </div>
+</section>
