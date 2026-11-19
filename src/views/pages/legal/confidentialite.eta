@@ -12,14 +12,16 @@
         <li><strong>Rappels</strong> : email et SMS de confirmation et de rappel. Base légale : l’exécution du rendez-vous.</li>
         <li><strong>Fiche cliente</strong> : notes techniques sur vos cheveux (méthode, taille, produits) et, si vous l’acceptez, l’autorisation de publier des photos. Base légale : votre consentement pour les photos.</li>
         <li><strong>Avis</strong> : prénom, initiale, note et texte, publiés seulement si vous laissez un avis.</li>
+        <li><strong>Photo de vos cheveux</strong> (facultative) : jointe à votre demande de rendez-vous pour préparer la séance, jamais publiée. Base légale : votre consentement.</li>
+        <li><strong>Lettre du salon</strong> (case non cochée par défaut) : votre email, pour vous envoyer conseils et disponibilités. Base légale : votre consentement, retirable en un clic. Les SMS de rappel sont distincts de toute communication commerciale.</li>
         <li><strong>Formulaire de contact</strong> : les informations que vous nous écrivez, pour vous répondre.</li>
       </ul>
       <h2>Combien de temps ?</h2>
-      <p>Vos données de cliente sont conservées trois ans après votre dernier rendez-vous, puis supprimées. Les messages de contact sans suite sont supprimés après un an.</p>
+      <p>Vos données de cliente (identité, coordonnées, historique) sont anonymisées trois ans après votre dernier rendez-vous. Les photos de cheveux sont effacées un an après le rendez-vous. Les destinataires de nos messages et les adresses IP techniques sont effacés après douze mois. Les messages de contact sans suite sont supprimés après un an. Vous pouvez aussi demander l’effacement à tout moment.</p>
       <h2>Qui y a accès ?</h2>
       <p>Seulement l’atelier, et nos prestataires techniques pour l’hébergement et l’envoi des emails et SMS, qui agissent sur nos instructions et dans l’Union européenne. Vos données ne sont jamais vendues.</p>
       <h2>Cookies</h2>
-      <p>Ce site n’utilise aucun cookie publicitaire ni outil de mesure d’audience tiers. Il mémorise seulement, dans votre navigateur, votre choix de thème clair ou sombre et la fermeture du bandeau d’annonce.</p>
+      <p>Ce site n’utilise aucun cookie publicitaire ni outil de mesure d’audience : il n’y a donc pas de bandeau de consentement. Seuls des cookies strictement nécessaires sont déposés (protection contre les formulaires frauduleux, session de l’espace d’administration). Votre navigateur mémorise aussi votre choix de thème clair ou sombre et la fermeture du bandeau d’annonce.</p>
       <h2>Vos droits</h2>
       <p>Vous pouvez accéder à vos données, les corriger, les supprimer, vous opposer à leur traitement ou demander leur portabilité depuis la page <a href="/contact">Contact</a>. Vous pouvez aussi saisir la CNIL (cnil.fr).</p>
     </div>

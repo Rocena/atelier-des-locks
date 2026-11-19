@@ -149,7 +149,7 @@ Les 8 avis actuels sont des **exemples** (`is_placeholder = true`) à remplacer 
 | Sessions expirées                             | `sessions`                     | Purge quotidienne (`expires_at < now()`)                         |
 | Adresse IP                                    | `sessions`, `audit_log`        | Purge après 12 mois                                              |
 
-Durées à valider avec la propriétaire et à reporter dans la politique de confidentialité.
+Ces durées sont **appliquées chaque jour** par `modules/retention` (lancée par `index.js`). La durée des clientes est le réglage `privacy.client_retention_years` (1 à 10, 3 par défaut ; pas d'écran d'admin, à modifier en base). La politique de confidentialité reprend ces durées. Les adresses IP du journal d'audit sont mises à NULL (migration 0011), jamais les lignes.
 
 ## Seeds
 

@@ -2,6 +2,7 @@
 /** Point d'entrée : charge la config, démarre Vite en dev, écoute le port. */
 import { loadConfig, loadDotEnv } from './config.js';
 import { buildApp } from './app.js';
+import { runRetention } from './modules/retention/service.js';
 
 loadDotEnv();
 const config = loadConfig();
@@ -35,3 +36,15 @@ for (const signal of /** @type {const} */ (['SIGINT', 'SIGTERM'])) {
     process.exit(0);
   });
 }
+
+// Purge quotidienne RGPD (§14) : 1 minute après le démarrage, puis toutes les 24 h.
+const runPurge = async () => {
+  try {
+    const result = await runRetention(app.db, { uploadDir: config.booking.uploadDir });
+    app.log.info({ retention: result }, 'purge RGPD terminée');
+  } catch (error) {
+    app.log.error(error, 'purge RGPD en échec');
+  }
+};
+setTimeout(runPurge, 60_000).unref();
+setInterval(runPurge, 24 * 3600_000).unref();

@@ -41,6 +41,7 @@
 <section class="a-section">
   <h2>Données personnelles (RGPD)</h2>
   <p class="text-muted">À la demande de la cliente, ses données peuvent être effacées. Les statistiques sont conservées, sans nom ni coordonnées.</p>
+  <% if (it.isOwner) { %><p><a class="link" href="/admin/clientes/<%= c.id %>/export.json">Exporter les données de cette cliente (JSON)</a></p><% } %>
   <p><a class="btn btn--danger btn--small" href="/admin/clientes/<%= c.id %>/supprimer"><span class="btn__label">Supprimer cette cliente</span></a></p>
 </section>
 <% } %>

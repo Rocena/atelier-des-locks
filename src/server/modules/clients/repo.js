@@ -188,3 +188,42 @@ export async function anonymizeClient(db, id) {
   await db.query(`UPDATE notifications_log SET recipient = '' WHERE client_id = $1`, [id]);
   return photos.rows.map((r) => /** @type {string} */ (r.hair_photo_path ?? r.photo_path));
 }
+
+/**
+ * Droit d'accès (RGPD art. 15) : toutes les données d'une cliente, sans jeton ni secret.
+ * @param {Db} db @param {string} id
+ */
+export async function findClientDataExport(db, id) {
+  const client = await db.query(
+    `SELECT id, first_name, last_name, email, phone, sms_reminders, newsletter_opt_in,
+            newsletter_opt_in_at, internal_notes, created_at
+       FROM clients WHERE id = $1 AND anonymized_at IS NULL`,
+    [id],
+  );
+  if (!client.rows[0]) return null;
+  const appointments = await db.query(
+    `SELECT a.id, a.status, a.starts_at, a.duration_minutes, a.price_cents, a.price_from,
+            a.hair_state, a.client_notes, a.internal_notes, a.hair_photo_path IS NOT NULL AS has_hair_photo,
+            a.policy_accepted_at, s.name AS service
+       FROM appointments a JOIN services s ON s.id = a.service_id
+      WHERE a.client_id = $1 ORDER BY a.starts_at`,
+    [id],
+  );
+  const reviews = await db.query(
+    `SELECT r.rating, r.body, r.author_name, r.status, r.consent_publication, r.submitted_at
+       FROM reviews r JOIN appointments a ON a.id = r.appointment_id WHERE a.client_id = $1`,
+    [id],
+  );
+  const messages = await db.query(
+    `SELECT channel, template, status, created_at FROM notifications_log
+      WHERE client_id = $1 ORDER BY created_at`,
+    [id],
+  );
+  return {
+    exportedAt: new Date().toISOString(),
+    client: client.rows[0],
+    appointments: appointments.rows,
+    reviews: reviews.rows,
+    messages: messages.rows,
+  };
+}

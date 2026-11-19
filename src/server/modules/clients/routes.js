@@ -86,6 +86,21 @@ export default async function clientsRoutes(app, { config }) {
     return { client: { ...client, email: displayEmail(client.email) }, history: history.reverse() };
   }
 
+  // Droit d'accès (RGPD) : export JSON des données d'une cliente, propriétaire uniquement, tracé.
+  app.get('/clientes/:id/export.json', { config: { roles: OWNER } }, async (request, reply) => {
+    const params = uuidParams.safeParse(request.params);
+    const data = params.success ? await repo.findClientDataExport(app.db, params.data.id) : null;
+    if (!params.success || !data) return reply.callNotFound();
+    await audit(request, 'client.export_one', { type: 'client', id: params.data.id });
+    return reply
+      .header(
+        'content-disposition',
+        `attachment; filename="donnees-cliente-${params.data.id}.json"`,
+      )
+      .type('application/json; charset=utf-8')
+      .send(JSON.stringify(data, null, 2));
+  });
+
   app.get('/clientes/:id', { config: { roles: ANY } }, async (request, reply) => {
     const params = uuidParams.safeParse(request.params);
     const data = params.success ? await clientPage(params.data.id) : null;
