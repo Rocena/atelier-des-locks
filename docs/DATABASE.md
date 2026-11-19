@@ -84,16 +84,16 @@ erDiagram
 
 ### Planning et réservation (phase 4)
 
-| Table                 | Rôle                                                                                                                                             |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `staff`               | Praticiennes réservables (une seule au départ, multi-praticiennes prêt).                                                                         |
-| `staff_services`      | Qui réalise quoi.                                                                                                                                |
-| `opening_hours`       | Plages hebdomadaires (ISO : 1 = lundi). Plusieurs par jour ; chevauchement interdit (`EXCLUDE`). Vide tant que la propriétaire n'a pas confirmé. |
-| `closures`            | Jours fermés, congés, horaires spéciaux (`staff_id` NULL = tout le salon).                                                                       |
-| `blocks`              | Blocages manuels en instants précis.                                                                                                             |
-| `clients`             | Clientes : email unique (`citext`), consentements SMS et newsletter (opt-in avec preuve horodatée), `anonymized_at`.                             |
-| `appointments`        | Rendez-vous : statut, instantané durée/prix, jeton « gérer mon RDV » hashé.                                                                      |
-| `appointment_options` | Options choisies, libellé et prix figés.                                                                                                         |
+| Table                 | Rôle                                                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `staff`               | Praticiennes réservables (une seule au départ, multi-praticiennes prêt).                                                                           |
+| `staff_services`      | Qui réalise quoi.                                                                                                                                  |
+| `opening_hours`       | Plages hebdomadaires (ISO : 1 = lundi). Plusieurs par jour ; chevauchement interdit (`EXCLUDE`). Horaires par défaut 9h-18h, modifiables en admin. |
+| `closures`            | Jours fermés, congés, horaires spéciaux (`staff_id` NULL = tout le salon).                                                                         |
+| `blocks`              | Blocages manuels en instants précis.                                                                                                               |
+| `clients`             | Clientes : email unique (`citext`), consentements SMS et newsletter (opt-in avec preuve horodatée), `anonymized_at`.                               |
+| `appointments`        | Rendez-vous : statut, instantané durée/prix, jeton « gérer mon RDV » hashé.                                                                        |
+| `appointment_options` | Options choisies, libellé et prix figés.                                                                                                           |
 
 **Anti-double-réservation.** `appointments_no_overlap` est une contrainte `EXCLUDE USING gist`
 `(staff_id WITH =, tstzrange(starts_at, ends_at, '[)') WITH &&)` limitée aux statuts qui occupent le planning
@@ -156,8 +156,8 @@ Durées à valider avec la propriétaire et à reporter dans la politique de con
 Les contenus de la phase 2 (`src/server/db/seeds/*.json`) sont chargés par `db/seed-content.js` (SQL paramétré,
 `ON CONFLICT … DO UPDATE` : relançable sans doublon). Tout ce qui est chiffré est marqué `is_placeholder = true`.
 Le seed crée aussi une praticienne par défaut (« La fondatrice ») rattachée aux prestations réservables.
-**Aucun horaire n'est semé** (`TODO-PROPRIO`) : sans horaires, aucun créneau n'est proposé en phase 4.
-
+Horaires par défaut : **9h-18h du lundi au samedi** (heures données par la propriétaire ; jours à confirmer), semés
+seulement si la praticienne n'en a aucun, donc modifiables sans être écrasés.
 `db:seed` est refusé en production.
 
 ## Tests

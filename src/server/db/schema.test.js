@@ -105,7 +105,7 @@ describe('autres garde-fous du schéma', () => {
       const insert = (/** @type {string} */ from, /** @type {string} */ to) =>
         c.query(
           `INSERT INTO opening_hours (staff_id, weekday, opens_at, closes_at)
-           VALUES ($1, 2, $2, $3)`,
+           VALUES ($1, 7, $2, $3)`,
           [staff, from, to],
         );
       await insert('09:00', '12:00');
@@ -151,6 +151,15 @@ describe('autres garde-fous du schéma', () => {
               (SELECT count(*) FROM reviews WHERE NOT is_placeholder) AS reviews`,
     );
     expect(rows[0]).toEqual({ services: '0', options: '0', reviews: '0' });
+  });
+
+  it('sème les horaires 9h-18h du lundi au samedi, sans écraser une modification', async () => {
+    const { rows } = await pool.query(
+      `SELECT weekday, opens_at::text AS o, closes_at::text AS c FROM opening_hours ORDER BY weekday`,
+    );
+    expect(rows).toHaveLength(6);
+    expect(rows[0]).toEqual({ weekday: 1, o: '09:00:00', c: '18:00:00' });
+    expect(rows.at(-1)?.weekday).toBe(6);
   });
 
   it('le seed est idempotent (deux exécutions, mêmes effectifs)', async () => {

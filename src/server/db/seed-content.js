@@ -6,7 +6,9 @@
  *
  * Les prix, durées et options sont des valeurs d'exemple : is_placeholder = true (§6).
  * Les avis sont des exemples : is_placeholder = true, à remplacer avant la mise en ligne (§8).
- * Aucun horaire d'ouverture n'est semé : à confirmer par la propriétaire (TODO-PROPRIO).
+ * Horaires par défaut : 9h-18h (donnés par la propriétaire), du lundi au samedi (jours à confirmer,
+ * TODO-PROPRIO). Ils ne sont semés que si la praticienne n'en a aucun : une modification (future
+ * admin) n'est jamais écrasée.
  */
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -293,5 +295,11 @@ async function seedStaff(db) {
     `INSERT INTO staff_services (staff_id, service_id)
      SELECT (SELECT min(id) FROM staff), s.id FROM services s WHERE s.bookable_online
      ON CONFLICT DO NOTHING`,
+  );
+  await db.query(
+    `INSERT INTO opening_hours (staff_id, weekday, opens_at, closes_at)
+     SELECT st.id, d, '09:00', '18:00'
+       FROM (SELECT min(id) AS id FROM staff) st, generate_series(1, 6) AS d
+      WHERE NOT EXISTS (SELECT 1 FROM opening_hours WHERE staff_id = st.id)`,
   );
 }
