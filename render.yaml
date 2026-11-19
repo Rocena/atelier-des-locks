@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# Environnement de PRÉ-PRODUCTION sur Render (tests avant le vrai serveur).
+# Utilise le même Dockerfile que la production : même image, même comportement.
+# Guide : docs/PREPROD_RENDER.md
+# ---------------------------------------------------------------------------
+databases:
+  - name: atelier-db
+    databaseName: atelier_des_locks
+    user: atelier
+    plan: basic-256mb
+
+services:
+  - type: web
+    name: atelier-des-locks-preprod
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /health
+    # Migrations + contenus de départ avant chaque mise en ligne (sûr à relancer).
+    preDeployCommand: node scripts/init-production.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: atelier-db
+          property: connectionString
+      # Généré par Render (256 bits en base64 = 44 caractères, au-dessus du minimum de 43).
+      - key: SESSION_SECRET
+        generateValue: true
+      # Adresse https publique du service, à remplir après la 1re création
+      # (https://atelier-des-locks-preprod.onrender.com ou votre domaine de test).
+      - key: PUBLIC_URL
+        sync: false
+      # Render place un proxy devant l'application (adresses privées). Sans cela, toutes les
+      # visiteuses auraient l'IP du proxy : le rate limiting serait faussé.
+      - key: TRUST_PROXY
+        value: uniquelocal,loopback
+      # Les secrets ci-dessous sont saisis dans le tableau de bord Render, jamais dans ce fichier.
+      - key: NOTIFICATIONS_PROVIDER
+        value: brevo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        sync: false
+      - key: BREVO_SENDER_NAME
+        value: L’Atelier des Locks
+      - key: SMS_SENDER
+        value: AtelierLock
+      - key: OWNER_EMAIL
+        sync: false
+      - key: ICAL_FEED_TOKEN
+        sync: false
+      - key: GOOGLE_REVIEW_URL
+        value: ''
+      - key: BOOKING_PROVIDER
+        value: internal
+    # Photos des clientes : pour les conserver entre deux déploiements, ajouter un disque
+    # (le volume doit rester inscriptible par l'utilisateur « node » de l'image) :
+    # disk:
+    #   name: uploads
+    #   mountPath: /app/storage/uploads
+    #   sizeGB: 1
