@@ -11,7 +11,7 @@
 | 1 · Design system   | ✅ terminée (2026-11-19), en attente de validation visuelle par la propriétaire | Styleguide validé (captures dans `docs/screenshots/`) |
 | 2 · Pages publiques | ✅ terminée (2026-11-19), contenus seed à valider par la propriétaire           | Pages du §5, budgets §16 (Lighthouse mobile)          |
 | 3 · Base de données | ✅ terminée (2026-11-19)                                                        | Seeds JSON migrés en tables, `docs/DATABASE.md`       |
-| 4 · Réservation     | ⏭️ prochaine                                                                    | Tests du moteur, e2e réservation                      |
+| 4 · Réservation     | ✅ terminée (2026-11-19), règles de prestation longue à valider                 | Tests du moteur, e2e réservation                      |
 
 ## Phase 0 : fait
 
@@ -88,15 +88,77 @@
 - **Pages publiques branchées** sur la base ; données communes (méga-menu, bandeau) relues au plus toutes les 30 s.
 - **Tests** : base dédiée `<base>_test` créée, migrée et seedée automatiquement (`vitest globalSetup`), fichiers exécutés en série. 84 tests unitaires et 45 e2e passent ; lint et typecheck propres.
 
-## Reste à faire (phase 4 et suivantes)
+## Phase 4 : fait
+
+- **Moteur de disponibilités** (`modules/booking/availability.js`), fonction pure écrite en TDD (48 tests) :
+  - horaires à plusieurs plages par jour ;
+  - exceptions (fermetures, congés, horaires spéciaux) et blocages ;
+  - prestations longues ;
+  - tampon, délai minimum, horizon en date locale ;
+  - Europe/Paris et changements d'heure (mars et octobre 2026, mars 2027) ;
+  - plusieurs praticiennes.
+- **Conversions de fuseau** sans dépendance (`lib/zoned-time.js`) : une heure inexistante est décalée vers l'avant, une heure ambiguë prend la première occurrence.
+- **Politique** (`policy.js`) :
+  - durée bloquée = durée max + options + tampon ;
+  - prix estimé calculé en centimes ;
+  - déplacement et annulation en libre-service jusqu'à `booking.cancellation_hours` avant (borne incluse).
+- **API** :
+  - `GET /api/booking/slots` : 42 jours au plus par requête ;
+  - `GET /api/booking/challenge` ;
+  - `POST /api/booking/appointments` (multipart) ;
+  - `/rdv/:token` (voir, `deplacer`, `annuler`, `rdv.ics`) ;
+  - `/agenda/<ICAL_FEED_TOKEN>.ics` : flux privé de la propriétaire.
+- **Anti-double-réservation** : revalidation du créneau dans une transaction, puis contrainte d'exclusion. Testé avec 3 réservations simultanées du même créneau : une seule passe.
+- **Sécurité** :
+  - CSRF (cookie signé) et rate limit ;
+  - pot de miel et preuve de travail anti-robot maison (HMAC, expiration, usage unique, sans tiers) ;
+  - jetons de 32 octets hachés en SHA-256, valables jusqu'à 30 jours après le RDV ;
+  - pages à jeton en `no-store`, `noindex` et `no-referrer` ;
+  - photo vérifiée par magic bytes (8 Mo max), ré-encodée en WebP par sharp (EXIF supprimé), nom UUID, stockée dans `UPLOAD_DIR` hors webroot ;
+  - CSP : `img-src blob:` ajouté pour l'aperçu local de la photo.
+- **Adaptateur `BOOKING_PROVIDER`** :
+  - avec `fresha_link`, `/reserver` fait une redirection 302 vers Fresha, l'API de création répond 404 et `/reserver` sort du sitemap ;
+  - tous les boutons « Réserver » utilisent `bookingHref` ;
+  - les liens « Gérer mon RDV » restent actifs.
+- **Tunnel `/reserver`** (entrée Vite `booking`), en 4 étapes avec barre de progression :
+  - le bouton retour du navigateur revient à l'étape précédente ;
+  - récapitulatif « ticket » collant sur desktop, barre compacte en bas sur mobile ;
+  - calendrier mensuel au clavier (flèches, Début/Fin, PageUp/PageDown, Entrée) ;
+  - créneaux en boutons radio natifs, groupés matin / après-midi ;
+  - états chargement (squelette), erreur (« Réessayer »), mois vide (« Voir le mois suivant ») et créneau pris entre-temps (retour à l'étape 2) ;
+  - résumé d'erreurs relié aux champs ;
+  - prestation présélectionnée depuis sa fiche (`/reserver?prestation=slug`) ;
+  - prestations sur devis ou après consultation non réservables, avec lien vers le contact.
+- **Gérer mon RDV** : pages serveur sans JS (ticket, déplacement semaine par semaine, annulation confirmée, page « lien expiré »).
+- **Tests** :
+  - unitaires : 213 (moteur, fuseau, politique, jetons, anti-bot, .ics, photo, validation, 32 tests d'intégration API) ;
+  - e2e : 21 tests dans `tests/e2e/booking.spec.js` (11 desktop, 10 mobile ; le parcours au clavier est testé sur desktop), sur mobile et desktop (parcours complet avec photo, déplacement et annulation, erreurs, créneau pris, états du calendrier, présélection, clavier, axe-core WCAG A/AA) ;
+  - les réservations e2e (`@e2e.test.invalid`) sont nettoyées avant et après la suite (`tests/e2e/cleanup.js`).
+
+## Reste à faire (phase 5 et suivantes)
+
+- **Notifications** (§7.6, Brevo, pg-boss) : aujourd'hui, la création, le déplacement et l'annulation ne font que journaliser un événement (`appointment.created`…), sans donnée personnelle. L'email de confirmation avec le lien « Gérer mon RDV » est **indispensable avant la mise en production** : sans lui, la cliente ne garde le lien que si elle le note à l'étape 4.
+- Admin (phase 6) : validation des RDV `pending`, consultation des photos (`UPLOAD_DIR/hair/`), blocages, fermetures, réglages `booking.*`.
+- Purge RGPD des photos de cheveux après le RDV (durée à fixer, cf. `docs/DATABASE.md`).
 
 - Formulaire de contact réel (CSRF, rate limiting, honeypot, Zod, envoi Brevo) : le bouton est désactivé avec une explication en attendant.
-- Tunnel de réservation (§7), pages à jeton `/rdv/:token` et `/avis/laisser/:token`.
+- Page à jeton `/avis/laisser/:token` (phase 5).
 - Script d'import des photos (§12 : AVIF/WebP, `srcset`, EXIF supprimé), puis remplacer les placeholders.
 - Textes d'interface dans des fichiers de traduction (i18n, §18) : non fait en phase 2, les contenus métier sont déjà séparés des templates (seeds JSON).
 - CI (lint, tests, `npm audit`) à mettre en place.
 
 ## Décisions prises
+
+- **Phase 4, prestations longues** : un RDV de 4 h ou plus (`booking.long_service_minutes`, durée bloquée tampon compris) peut traverser la pause de midi. Il commence dans une plage et finit au plus tard à la dernière fermeture du jour. Sinon, aucune création de locks (6h15 bloquées) ne tiendrait dans les plages actuelles (3 h et 4 h). À faire valider par la propriétaire.
+- **Phase 4, durées réelles** : les créneaux avancent en temps UTC depuis l'ouverture. Un RDV de 3 h dure 3 h, même la nuit du changement d'heure.
+- **Phase 4, grille** : créneaux toutes les 30 min depuis l'ouverture de chaque plage (`booking.slot_step_minutes`).
+- **Phase 4, praticienne** : pas de choix dans le tunnel. La première praticienne libre est attribuée (et conservée au déplacement si elle est libre). Les identifiants ne sortent jamais de l'API.
+- **Phase 4, fiche cliente** : clé = email. Une nouvelle réservation met à jour nom, téléphone et choix SMS ; la newsletter n'est jamais décochée par une réservation (opt-in daté).
+- **Phase 4, anti-robot** : preuve de travail maison sur le principe d'ALTCHA plutôt que le widget ALTCHA, qui injecte des styles incompatibles avec la CSP. Turnstile a été écarté (tiers, cookies). Difficulté : 20 000 essais, calculés par lots pendant l'étape 3.
+- **Phase 4, `.ics`** : la fin affichée exclut le tampon de rangement ; le flux de la propriétaire montre l'occupation complète. Le lien Google Agenda ne contient jamais le jeton.
+- **Phase 4, données communes** (correctif des phases 2-3) : le hook `onRequest` relançait 7 requêtes SQL **à chaque requête** dès que le cache expirait (y compris pour chaque module servi par Vite). Sous charge, le pool saturait. Il y a maintenant un seul rechargement à la fois, en arrière-plan, et les requêtes servent le cache en attendant.
+- **Phase 4, outillage de dev** : GSAP et Lenis sont pré-optimisés par Vite (`optimizeDeps.include`). Avant, leur découverte tardive rechargeait toutes les pages ouvertes. Le pool PostgreSQL active le keep-alive TCP.
+- **Phase 4, `/rdv/:token`** : pages serveur avec formulaires classiques, utilisables sans JS. Seul le tunnel exige JavaScript (message `<noscript>` avec lien vers le contact).
 
 - **Phase 3, modules** : noms du §11 (`services`, `content`). Le SQL ne vit que dans les `repo.js` ; migrations et seeds sont les seules autres sources de SQL.
 - **Phase 3, statuts en anglais** en base (`pending`, `confirmed`, `completed`, `cancelled_by_client`, `cancelled_by_salon`, `no_show`), libellés français à l'affichage.
@@ -127,6 +189,7 @@
 - **Horaires** : mardi-vendredi 9h-12h puis 14h-18h, samedi 14h-18h, fermé lundi et dimanche (donnés par la propriétaire). Modifiables et blocables depuis l'admin (phase 6, tables `opening_hours`, `closures`, `blocks`), jamais écrasés par le seed.
 - Les e2e et `npm run dev` utilisent la base de dev : lancer `npm run db:up && npm run db:migrate && npm run db:seed` d'abord.
 
+- **e2e sur cette machine (4 Go de RAM)** : Playwright tourne avec **un seul worker** en local (`E2E_WORKERS` pour en mettre plus). Avec plusieurs Chromium, Vite et PostgreSQL (Docker) en parallèle, la mémoire libre tombait à ~50 Mo : requêtes de l'API sans réponse pendant une minute, puis workers qui plantent (`0xC0000142`). Si besoin, lancer les specs séparément (`npx playwright test tests/e2e/booking.spec.js --project=desktop`). Dernier passage : 66 verts, 4 ignorés (desktop uniquement).
 - Le projet est dans **OneDrive** : `node_modules` et `dist/` sont synchronisés en continu, ce qui ralentit et peut verrouiller des fichiers. Il est conseillé de déplacer le dépôt hors de OneDrive, ou d'exclure ces dossiers de la synchronisation. La base, elle, est dans un volume Docker.
 - Le serveur de dev de Vite affiche le port HMR `PORT + 21000` (24000 pour le port 3000).
 
@@ -136,11 +199,13 @@
 2. Prix et durées réels de chaque prestation et option (les valeurs du styleguide sont des exemples).
 3. Validez-vous la direction visuelle du styleguide (captures dans `docs/screenshots/`), en particulier le fil de loc et la trame bogolan ?
 4. Pouvez-vous fournir des fichiers d'emblème aux noms intacts (les accents ont été perdus à la décompression) ?
-5. Validation manuelle des RDV ou confirmation automatique ? Délai d'annulation (48 h par défaut) ?
-6. Composition exacte de la détox ; certification Sisterlocks™ ; formations proposées ?
-7. Photos originales (réalisations, portrait, salon), idéalement une vidéo de 10 s pour le hero, à déposer dans `content/photos-a-importer/`.
-8. Nom de domaine souhaité, compte Brevo, hébergement.
-9. **Avis** : les 8 avis du site sont des **exemples** (`reviews.json`). Pouvez-vous fournir de vrais avis (Google, messages de clientes, avec leur accord) ? Ils doivent remplacer les exemples avant la mise en ligne.
-10. Relire les textes : histoire Dakar → Toulouse, guide des méthodes, articles, FAQ, pages légales (SIRET, hébergeur), composition du bain détox.
-11. Nombre de clientes accompagnées et années d'expérience (bandeau de l'accueil : « 400 » et « 8 ans » sont provisoires).
-12. Compte Instagram et sélection de 6 à 9 photos pour la grille de l'accueil.
+5. Validation manuelle des RDV ou confirmation automatique (automatique pour l'instant, réglage `booking.manual_validation`) ? Délai d'annulation (48 h par défaut) ? Texte de la politique de RDV (`booking.policy_text`) ?
+6. **Prestations longues** : travaillez-vous pendant la pause de midi pour une création (6 à 8 h) ? Le site l'autorise à partir de 4 h. Faut-il un délai minimum plus long (24 h aujourd'hui) ou des créneaux seulement le matin pour ces prestations ?
+7. Conseils de préparation affichés à la confirmation (`PREPARATION_TIPS` dans `booking/service.js`) : à relire.
+8. Composition exacte de la détox ; certification Sisterlocks™ ; formations proposées ?
+9. Photos originales (réalisations, portrait, salon), idéalement une vidéo de 10 s pour le hero, à déposer dans `content/photos-a-importer/`.
+10. Nom de domaine souhaité, compte Brevo, hébergement.
+11. **Avis** : les 8 avis du site sont des **exemples** (`reviews.json`). Pouvez-vous fournir de vrais avis (Google, messages de clientes, avec leur accord) ? Ils doivent remplacer les exemples avant la mise en ligne.
+12. Relire les textes : histoire Dakar → Toulouse, guide des méthodes, articles, FAQ, pages légales (SIRET, hébergeur), composition du bain détox.
+13. Nombre de clientes accompagnées et années d'expérience (bandeau de l'accueil : « 400 » et « 8 ans » sont provisoires).
+14. Compte Instagram et sélection de 6 à 9 photos pour la grille de l'accueil.

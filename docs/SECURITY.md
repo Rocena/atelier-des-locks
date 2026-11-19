@@ -16,8 +16,8 @@
 - [x] Requêtes SQL paramétrées uniquement (`pool.js`, `migrate.js`)
 - [x] Échappement automatique Eta (`autoEscape: true`)
 - [x] Configuration validée par Zod au démarrage (`config.js`)
-- [ ] Validation Zod de toutes les entrées de routes — dès la phase 3
-- [ ] Schémas Zod partagés front / back — phase 4
+- [x] Validation Zod des entrées des routes publiques et de réservation (`booking/schemas.js`) — tests `helpers.test.js`, `routes.test.js`
+- [ ] Schémas Zod partagés front / back : non retenu (le navigateur fait des contrôles de confort, le serveur reste seul juge)
 
 ## Authentification admin (A07)
 
@@ -33,20 +33,24 @@
 
 ## Formulaires publics
 
-- [ ] CSRF (`@fastify/csrf-protection`) — phase 4
-- [ ] Rate limiting (`@fastify/rate-limit`) : login, réservation, contact, avis — phases 4 à 6
-- [ ] Honeypot + anti-bot respectueux (ALTCHA ou Turnstile) — phase 4
+- [x] CSRF (`@fastify/csrf-protection`, cookie signé HttpOnly SameSite=Lax) sur la réservation et « Gérer mon RDV » — test `routes.test.js` (contact : phase suivante)
+- [x] Rate limiting sur la réservation (`BOOKING_RATE_LIMIT` / 10 min / IP), les créneaux, « Gérer mon RDV » et le flux iCal — test `routes.test.js`
+- [ ] Rate limiting : login, contact, avis — phases 5 et 6
+- [x] Pot de miel + preuve de travail maison sur le principe d'ALTCHA (HMAC, expiration, usage unique, sans tiers ni cookie) — tests `helpers.test.js`, `routes.test.js`
 
 ## Jetons et uploads
 
-- [ ] Jetons « gérer mon RDV » / « laisser un avis » : ≥ 32 octets, stockés hashés, expirants — phases 4–5
-- [ ] Uploads : magic bytes, taille max, ré-encodage sharp, EXIF supprimé, noms aléatoires, hors webroot — phase 6
+- [x] Jetons « gérer mon RDV » : 32 octets, SHA-256 en base, expirent 30 jours après le RDV ; pages `no-store`, `noindex`, `Referrer-Policy: no-referrer` — tests
+- [ ] Jetons « laisser un avis » — phase 5
+- [x] Photo des cheveux : magic bytes, 8 Mo max, garde-fou pixels, ré-encodage sharp en WebP, EXIF supprimé, nom UUID, `UPLOAD_DIR` hors webroot, jamais servie publiquement — tests
+- [ ] Uploads admin (photos de galerie) — phase 6
 
 ## Secrets, logs, dépendances
 
 - [x] Secrets uniquement par variables d'environnement ; `.env` ignoré par git ; `.env.example` documenté
 - [x] `SESSION_SECRET` ≥ 32 caractères exigé au démarrage
-- [x] Logs : en-têtes `cookie` et `authorization` masqués
+- [x] Logs : en-têtes `cookie` et `authorization` masqués ; événements de réservation journalisés par identifiant, sans donnée personnelle
+- [x] Flux iCal privé : secret ≥ 32 caractères (`ICAL_FEED_TOKEN`), comparaison à temps constant, prénom + initiale uniquement
 - [ ] Journal d'audit des actions admin — phase 6
 - [ ] `npm audit` en CI + Dependabot / Renovate — phase 7
 
