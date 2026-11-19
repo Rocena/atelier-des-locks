@@ -79,6 +79,30 @@ export function formatDate(isoDate) {
   return longDate.format(new Date(`${isoDate}T12:00:00Z`));
 }
 
+const weekdayDate = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'Europe/Paris',
+});
+const hourMinute = new Intl.DateTimeFormat('fr-FR', {
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZone: 'Europe/Paris',
+});
+
+/** Instant → « mardi 1 décembre 2026 » (heure de Paris). @param {Date|string} instant */
+export function formatDay(instant) {
+  return weekdayDate.format(new Date(instant)).replace(/^(\S+) 1 /, '$1 1er ');
+}
+
+/** Instant → « 9h », « 14h30 » (heure de Paris). @param {Date|string} instant */
+export function formatTime(instant) {
+  const [h, m] = hourMinute.format(new Date(instant)).split(':');
+  return `${Number(h)}h${m === '00' ? '' : m}`;
+}
+
 /** 4.875 → « 4,9 ». @param {number} value */
 export function formatRating(value) {
   return value.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -92,5 +116,7 @@ export const fmt = {
   formatMinutes,
   formatDuration,
   formatDate,
+  formatDay,
+  formatTime,
   formatRating,
 };

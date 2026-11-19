@@ -88,4 +88,4 @@
   </div>
 </section>
 
-<%~ include('../partials/cta-band', { fmt: fmt, title: 'Venez nous *rencontrer*.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'Venez nous *rencontrer*.' }) %>

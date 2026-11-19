@@ -65,7 +65,7 @@
           <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" />
         </svg>
       </button>
-      <a class="btn btn--primary btn--sm site-header__cta" href="/reserver" data-magnetic>Réserver</a>
+      <a class="btn btn--primary btn--sm site-header__cta" href="<%= it.bookingHref %>" data-magnetic>Réserver</a>
       <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="menu-mobile">
         <span class="menu-toggle__label">Menu</span>
         <span class="menu-toggle__bars" aria-hidden="true"><span></span><span></span></span>
@@ -101,7 +101,7 @@
       </ul>
     </nav>
     <div class="mobile-menu__footer">
-      <a class="btn btn--primary btn--block" href="/reserver">Réserver un rendez-vous</a>
+      <a class="btn btn--primary btn--block" href="<%= it.bookingHref %>">Réserver un rendez-vous</a>
       <p class="mobile-menu__meta"><%= it.site.tagline %></p>
     </div>
   </div>

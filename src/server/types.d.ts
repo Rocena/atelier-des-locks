@@ -7,6 +7,8 @@ declare module 'fastify' {
     publicUrl: string;
     /** Pool PostgreSQL partagé (passé aux repo.js des modules). */
     db: import('pg').Pool;
+    /** Fournisseur de réservation actif (adaptateur BOOKING_PROVIDER, §7.1). */
+    bookingProvider: 'internal' | 'fresha_link';
   }
   interface FastifyReply {
     /** Rend un template Eta dans le layout, avec les assets de la page `entry`. */

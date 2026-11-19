@@ -1,0 +1,8 @@
+<% layout('../layouts/base', it) %>
+<%~ include('../partials/page-hero', { fmt: it.fmt, eyebrow: 'Gérer mon rendez-vous', title: 'Ce lien n’est *plus valable*.', lead: 'Il a peut-être expiré (30 jours après le rendez-vous), ou il a été mal copié. Vérifiez le lien reçu par email, ou contactez le salon.' }) %>
+<section class="section manage">
+  <div class="container manage__actions">
+    <a class="btn btn--primary" href="/contact">Contacter le salon</a>
+    <a class="btn btn--ghost" href="<%= it.bookingHref %>"><span class="btn__label">Prendre un nouveau rendez-vous</span></a>
+  </div>
+</section>

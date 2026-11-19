@@ -28,7 +28,7 @@
         <li><a class="article__more-link" href="/conseils/<%= m.slug %>"><%~ fmt.accent(m.title) %></a></li>
 <% }) %>
       </ul>
-      <a class="btn btn--primary" href="/reserver" data-magnetic>Réserver un rendez-vous</a>
+      <a class="btn btn--primary" href="<%= it.bookingHref %>" data-magnetic>Réserver un rendez-vous</a>
     </aside>
   </div>
 </article>

@@ -1,6 +1,6 @@
-<% if (it.pathname !== '/reserver') { %>
+<% if (it.pathname !== '/reserver' && it.pathname.indexOf('/rdv/') !== 0) { %>
 <div class="book-bar" data-book-bar>
   <p class="book-bar__text"><span class="book-bar__eyebrow">Toulouse</span> Création, entretien, soin</p>
-  <a class="btn btn--primary btn--sm book-bar__cta" href="/reserver">Réserver</a>
+  <a class="btn btn--primary btn--sm book-bar__cta" href="<%= it.bookingHref %>">Réserver</a>
 </div>
 <% } %>

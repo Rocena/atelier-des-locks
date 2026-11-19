@@ -45,4 +45,4 @@
   </div>
 </section>
 
-<%~ include('../partials/cta-band', { fmt: fmt, title: 'Prête pour *vos locks* ?' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'Prête pour *vos locks* ?' }) %>

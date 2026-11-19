@@ -28,6 +28,11 @@ export const entries = /** @type {const} */ ({
     css: 'src/client/styles/pages/editorial.css',
     js: 'src/client/scripts/pages/editorial.js',
   },
+  /** /reserver (tunnel en 4 étapes), /rdv/:token (gérer mon RDV) */
+  booking: {
+    css: 'src/client/styles/pages/booking.css',
+    js: 'src/client/scripts/pages/booking.js',
+  },
   styleguide: {
     css: 'src/client/styles/pages/styleguide.css',
     js: 'src/client/scripts/pages/styleguide.js',

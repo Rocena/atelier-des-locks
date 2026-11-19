@@ -23,7 +23,7 @@
       </h1>
       <p class="lead hero__lead">Création, entretien et soin des locks, par une locticienne passionnée.</p>
       <div class="cluster hero__actions">
-        <a class="btn btn--primary btn--lg" href="/reserver" data-magnetic>Réserver</a>
+        <a class="btn btn--primary btn--lg" href="<%= it.bookingHref %>" data-magnetic>Réserver</a>
         <a class="btn btn--ghost" href="/prestations"><span class="btn__label">Découvrir les prestations</span>
           <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
         </a>
@@ -251,6 +251,6 @@
 </section>
 
 <%/* 10. CTA final sur fond ébène */%>
-<%~ include('../partials/cta-band', { fmt: fmt, title: 'Vos locks, *un art*.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'Vos locks, *un art*.' }) %>
 
 <%~ include('../partials/lightbox', it) %>

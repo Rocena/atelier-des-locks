@@ -103,4 +103,4 @@
   </div>
 </div>
 
-<%~ include('../partials/cta-band', { fmt: fmt, title: 'Votre méthode, *votre rythme*.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'Votre méthode, *votre rythme*.' }) %>

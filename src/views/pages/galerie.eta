@@ -48,5 +48,5 @@
   </div>
 </section>
 
-<%~ include('../partials/cta-band', { fmt: fmt, title: 'La prochaine, *ce sera vous*.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'La prochaine, *ce sera vous*.' }) %>
 <%~ include('../partials/lightbox', it) %>

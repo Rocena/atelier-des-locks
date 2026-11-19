@@ -7,6 +7,11 @@ import Fastify from 'fastify';
 import helmet from '@fastify/helmet';
 import compress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
+import cookie from '@fastify/cookie';
+import csrf from '@fastify/csrf-protection';
+import formbody from '@fastify/formbody';
+import multipart from '@fastify/multipart';
+import rateLimit from '@fastify/rate-limit';
 import { fileURLToPath } from 'node:url';
 import { createPool } from './db/pool.js';
 import { createAssetResolver } from './lib/assets.js';
@@ -22,6 +27,8 @@ import { findCatalog } from './modules/services/repo.js';
 import { buildNavigation } from './modules/services/service.js';
 import { findSettings } from './modules/content/repo.js';
 import styleguideRoutes from './modules/styleguide/routes.js';
+import bookingRoutes from './modules/booking/routes.js';
+import { MAX_PHOTO_BYTES } from './modules/booking/upload.js';
 
 /**
  * @typedef {object} BuildOptions
@@ -29,6 +36,7 @@ import styleguideRoutes from './modules/styleguide/routes.js';
  * @property {import('vite').ViteDevServer} [vite]  serveur Vite en mode middleware (dev)
  * @property {boolean} [logger]
  * @property {import('pg').Pool} [db]  pool PostgreSQL (créé depuis la config s'il est absent)
+ * @property {() => Date} [now]  horloge (les tests la figent)
  */
 
 /**
@@ -41,7 +49,8 @@ function cspDirectives(dev) {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'"],
     styleSrc: ["'self'"],
-    imgSrc: ["'self'", 'data:'],
+    // blob: : aperçu local de la photo des cheveux avant envoi (jamais d'image distante).
+    imgSrc: ["'self'", 'data:', 'blob:'],
     fontSrc: ["'self'"],
     connectSrc: dev ? ["'self'", 'ws:'] : ["'self'"],
     formAction: ["'self'"],
@@ -53,7 +62,7 @@ function cspDirectives(dev) {
 }
 
 /** @param {BuildOptions} options */
-export async function buildApp({ config, vite, logger = true, db }) {
+export async function buildApp({ config, vite, logger = true, db, now }) {
   const dev = !config.isProd;
   const app = Fastify({
     logger: logger && {
@@ -71,6 +80,19 @@ export async function buildApp({ config, vite, logger = true, db }) {
     crossOriginEmbedderPolicy: false,
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   });
+
+  // Cookies signés (jeton CSRF), formulaires classiques, uploads limités, limitation de débit.
+  await app.register(cookie, { secret: config.sessionSecret });
+  await app.register(csrf, {
+    sessionPlugin: '@fastify/cookie',
+    cookieOpts: { path: '/', httpOnly: true, sameSite: 'lax', secure: config.isProd, signed: true },
+  });
+  await app.register(formbody, { bodyLimit: 16 * 1024 });
+  await app.register(multipart, {
+    limits: { fileSize: MAX_PHOTO_BYTES, files: 1, fields: 40, fieldSize: 4096, parts: 41 },
+  });
+  // Pas de limite globale : chaque route sensible déclare la sienne (réservation, gestion, flux).
+  await app.register(rateLimit, { global: false });
 
   // Compression brotli/gzip des réponses (HTML, CSS, JS, SVG) : -70 % sur le transfert.
   await app.register(compress, { global: true, threshold: 1024 });
@@ -97,6 +119,10 @@ export async function buildApp({ config, vite, logger = true, db }) {
   }
 
   app.decorate('publicUrl', config.publicUrl);
+  // Adaptateur de réservation : les boutons « Réserver » pointent vers notre tunnel ou vers Fresha.
+  const bookingHref =
+    config.booking.provider === 'fresha_link' ? config.booking.freshaUrl : '/reserver';
+  app.decorate('bookingProvider', config.booking.provider);
 
   // Pool PostgreSQL partagé par tous les modules (les repo.js reçoivent app.db). Fermé avec l'app.
   const pool = db ?? createPool(config.databaseUrl);
@@ -115,8 +141,21 @@ export async function buildApp({ config, vite, logger = true, db }) {
     return { navigation: buildNavigation(categories, services), settings, loadedAt: Date.now() };
   }
   let shared = await loadShared();
+  // Un seul rechargement à la fois, en arrière-plan : les requêtes servent la version en cache.
+  // Avant, chaque requête (y compris chaque module JS servi par Vite en dev) relançait 7 requêtes
+  // SQL dès l'expiration : sous charge, le pool PostgreSQL saturait et l'API ne répondait plus.
+  /** @type {Promise<void>|null} */
+  let refreshing = null;
   app.addHook('onRequest', async () => {
-    if (Date.now() - shared.loadedAt > SHARED_TTL_MS) shared = await loadShared();
+    if (refreshing || Date.now() - shared.loadedAt <= SHARED_TTL_MS) return;
+    refreshing = loadShared()
+      .then((fresh) => {
+        shared = fresh;
+      })
+      .catch((error) => app.log.error({ err: error }, 'rechargement des données communes'))
+      .finally(() => {
+        refreshing = null;
+      });
   });
   const render = createRenderer({ cache: config.isProd });
 
@@ -147,6 +186,7 @@ export async function buildApp({ config, vite, logger = true, db }) {
       assets: resolveAssets(entry),
       nonce: reply.cspNonce?.script ?? '',
       path: reply.request.url,
+      bookingHref,
       dev,
     });
     return reply.type('text/html; charset=utf-8').send(html);
@@ -160,6 +200,7 @@ export async function buildApp({ config, vite, logger = true, db }) {
   await app.register(galleryRoutes);
   await app.register(reviewsRoutes);
   await app.register(contentRoutes);
+  await app.register(bookingRoutes, { config, now });
   if (config.styleguideEnabled) await app.register(styleguideRoutes);
 
   app.setNotFoundHandler((request, reply) => {

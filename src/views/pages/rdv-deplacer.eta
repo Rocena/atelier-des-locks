@@ -1,0 +1,47 @@
+<% layout('../layouts/base', it) %>
+<% var fmt = it.fmt, a = it.appointment; var hasSlots = it.days.some(function (d) { return d.slots.length > 0; }); %>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Déplacer mon rendez-vous', title: 'Un *nouveau créneau*.', lead: 'Actuellement : ' + a.serviceName + ', ' + it.dayLabel + ' à ' + it.timeLabel + '. La durée reste la même.' }) %>
+
+<section class="section manage" aria-labelledby="semaine-titre">
+  <div class="container">
+<% if (it.error) { %>
+    <div class="booking-alert booking-alert--error" role="alert">
+      <p class="booking-alert__title"><%= it.error %></p>
+    </div>
+<% } %>
+    <nav class="week-nav" aria-label="Changer de semaine">
+<% if (it.previousWeek) { %>
+      <a class="btn btn--ghost btn--sm" href="?semaine=<%= it.previousWeek %>"><span class="btn__label">← <span class="visually-hidden">Semaine </span>Précédente</span></a>
+<% } else { %>
+      <span></span>
+<% } %>
+      <h2 class="week-nav__title" id="semaine-titre">Semaine du <%= fmt.formatDay(it.week + 'T12:00:00Z') %></h2>
+<% if (it.nextWeek) { %>
+      <a class="btn btn--ghost btn--sm" href="?semaine=<%= it.nextWeek %>"><span class="btn__label"><span class="visually-hidden">Semaine </span>Suivante →</span></a>
+<% } %>
+    </nav>
+
+    <form method="post" action="/rdv/<%= it.token %>/deplacer" class="reschedule">
+      <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+<% if (!hasSlots) { %>
+      <p class="calendar__empty">Aucun créneau libre cette semaine pour cette durée. Essayez la semaine suivante.</p>
+<% } %>
+<% it.days.filter(function (d) { return d.slots.length > 0; }).forEach(function (d) { %>
+      <fieldset class="slots">
+        <legend class="slots__title"><%= d.label %></legend>
+        <div class="slots__list">
+<% d.slots.forEach(function (s) { %>
+          <label class="slot"><input class="slot__input" type="radio" name="startsAt" value="<%= s.value %>" required /><span class="slot__label num"><%= s.label %></span></label>
+<% }) %>
+        </div>
+      </fieldset>
+<% }) %>
+      <div class="booking-step__actions">
+        <a class="btn btn--ghost" href="/rdv/<%= it.token %>"><span class="btn__label">Retour</span></a>
+<% if (hasSlots) { %>
+        <button class="btn btn--primary" type="submit">Déplacer à ce créneau</button>
+<% } %>
+      </div>
+    </form>
+  </div>
+</section>

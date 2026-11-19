@@ -1,0 +1,850 @@
+@import '../main.css';
+
+/* Réservation : tunnel /reserver (4 étapes) et « Gérer mon RDV » (/rdv/:token).
+   Direction : un carnet de rendez-vous d'atelier. Une colonne de choix, un récapitulatif
+   « ticket » qui se remplit à mesure, liseré laiton, chiffres en Bodoni italique. */
+@layer pages {
+  .booking {
+    padding-top: var(--space-7);
+  }
+  .booking fieldset,
+  .manage fieldset {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  /* ================= Progression ================= */
+  .booking-progress {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .booking-progress__item {
+    display: grid;
+    gap: var(--space-1);
+    padding-top: var(--space-3);
+    border-top: 3px solid var(--line);
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    transition:
+      border-color var(--duration-base) var(--ease-standard),
+      color var(--duration-base) var(--ease-standard);
+  }
+  .booking-progress__item.is-done {
+    border-top-color: var(--brass);
+    color: var(--text);
+  }
+  .booking-progress__item.is-current {
+    border-top-color: var(--accent);
+    color: var(--text);
+    font-weight: var(--weight-semibold);
+  }
+  .booking-progress__index {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1;
+  }
+  @media (max-width: 29.99rem) {
+    .booking-progress__label {
+      font-size: var(--text-label);
+    }
+  }
+
+  /* ================= Mise en page ================= */
+  .booking__layout {
+    display: grid;
+    gap: var(--space-8);
+  }
+  @media (min-width: 64rem) {
+    .booking__layout {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+      align-items: start;
+      gap: var(--space-9);
+    }
+  }
+
+  .booking-step {
+    display: grid;
+    gap: var(--space-6);
+    min-width: 0;
+  }
+  .booking-step[hidden] {
+    display: none;
+  }
+  .booking-step__title {
+    font-size: var(--step-4);
+    line-height: var(--leading-heading);
+    text-wrap: balance;
+  }
+  .booking-step__title:focus {
+    outline: none;
+  }
+  .booking-step__title em,
+  .booking-done__subtitle em,
+  .manage__title em {
+    color: var(--accent-display);
+  }
+  .booking-step__lead {
+    max-width: var(--measure);
+    margin-top: calc(-1 * var(--space-3));
+  }
+  .booking-step__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: var(--border-hairline) solid var(--line);
+  }
+  .booking-step__actions > :only-child {
+    margin-left: auto;
+  }
+  .booking-step__error:empty {
+    display: none;
+  }
+  .booking-step__error {
+    color: var(--error);
+    font-weight: var(--weight-medium);
+  }
+
+  /* ================= Étape 1 : prestations ================= */
+  .booking-group {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .booking-group__title {
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    line-height: var(--leading-heading);
+  }
+  .booking-group__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+  @media (min-width: 40rem) {
+    .booking-group__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .service-choice {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5) var(--space-4) calc(var(--space-5) + 1.75rem);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) var(--ease-standard),
+      box-shadow var(--duration-fast) var(--ease-standard);
+  }
+  .service-choice:hover {
+    border-color: var(--line-strong);
+  }
+  .service-choice:has(:checked) {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
+  }
+  .service-choice:has(:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .service-choice__input {
+    position: absolute;
+    top: calc(var(--space-4) + 0.15rem);
+    left: var(--space-4);
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+  .service-choice__input:focus-visible {
+    outline: none;
+  }
+  .service-choice__name {
+    font-weight: var(--weight-semibold);
+  }
+  .service-choice__meta {
+    font-size: var(--step--1);
+    color: var(--accent-text);
+  }
+  .service-choice__summary {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .service-choice--offline {
+    padding-left: var(--space-5);
+    background-color: transparent;
+    border-style: dashed;
+    cursor: default;
+  }
+  .service-choice--offline .service-choice__meta {
+    color: var(--text-muted);
+  }
+  .service-choice__link {
+    justify-self: start;
+    margin-top: var(--space-1);
+    font-size: var(--step--1);
+  }
+
+  .booking-options__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .option-choice {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+  .option-choice:has(:checked) {
+    border-color: var(--accent);
+  }
+  .option-choice:has(:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .option-choice input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    accent-color: var(--accent);
+  }
+  .option-choice input:focus-visible {
+    outline: none;
+  }
+  .option-choice__price {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .booking-note {
+    max-width: var(--measure);
+    padding: var(--space-4) var(--space-5);
+    border-left: 2px solid var(--brass);
+    background-color: var(--surface-alt);
+    font-size: var(--step--1);
+  }
+  .booking-note[hidden] {
+    display: none;
+  }
+
+  /* ================= Étape 2 : calendrier et créneaux ================= */
+  .calendar {
+    max-width: 30rem;
+    padding: var(--space-4);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+  .calendar__head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+  .calendar__month {
+    font-family: var(--font-display);
+    font-size: var(--step-1);
+    text-align: center;
+  }
+  .calendar__month::first-letter {
+    text-transform: uppercase;
+  }
+  .calendar__nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .calendar__nav:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .calendar__body {
+    position: relative;
+  }
+  .calendar__grid {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: var(--space-1);
+    table-layout: fixed;
+  }
+  .calendar__grid th {
+    padding-bottom: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .calendar__grid td {
+    padding: 0;
+    text-align: center;
+  }
+  .calendar__day {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 100%;
+    max-width: var(--tap-target);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
+  }
+  .calendar__day[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.45;
+  }
+  .calendar__day.is-available {
+    color: var(--text);
+    font-weight: var(--weight-semibold);
+  }
+  /* Point terre cuite : jour avec au moins un créneau (en plus du gras, jamais la couleur seule). */
+  .calendar__day.is-available::after {
+    content: '';
+    position: absolute;
+    bottom: 18%;
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+    background-color: var(--accent);
+  }
+  .calendar__day.is-available:hover {
+    background-color: var(--surface-alt);
+  }
+  .calendar__day[aria-pressed='true'] {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+  .calendar__day[aria-pressed='true']::after {
+    background-color: var(--on-accent);
+  }
+  .calendar__day.is-today {
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .calendar__day:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  /* Squelette pendant le chargement (forme du contenu, pas de spinner). */
+  .calendar__body[aria-busy='true'] .calendar__day {
+    color: transparent;
+    background-color: var(--surface-alt);
+    animation: calendar-pulse 1.4s var(--ease-in-out) infinite;
+  }
+  .calendar__body[aria-busy='true'] .calendar__day::after {
+    display: none;
+  }
+  @keyframes calendar-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+  .calendar__state {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    font-size: var(--step--1);
+  }
+  .calendar__state[hidden] {
+    display: none;
+  }
+  .calendar__state--error {
+    color: var(--error);
+  }
+  .calendar__empty {
+    color: var(--text-muted);
+  }
+
+  .slots {
+    display: grid;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .slots[hidden] {
+    display: none;
+  }
+  .slots__title {
+    margin-bottom: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+  }
+  .slots__title::first-letter {
+    text-transform: uppercase;
+  }
+  .slots__groups {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .slots__period {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-label);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .slots__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .slot {
+    position: relative;
+    display: inline-flex;
+    cursor: pointer;
+  }
+  .slot__input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .slot__label {
+    display: inline-grid;
+    place-items: center;
+    min-width: 5rem;
+    min-height: var(--tap-target);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    font-weight: var(--weight-medium);
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard);
+  }
+  .slot:hover .slot__label {
+    border-color: var(--accent);
+  }
+  .slot__input:checked + .slot__label {
+    border-color: var(--accent);
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+  .slot__input:focus-visible + .slot__label {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  /* ================= Étape 3 : coordonnées ================= */
+  .booking-fields {
+    display: grid;
+    gap: var(--space-5);
+  }
+  .booking-fields .field {
+    max-width: none;
+  }
+  @media (min-width: 40rem) {
+    .booking-fields {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .booking-fields__full {
+      grid-column: 1 / -1;
+    }
+  }
+  .field__message:empty {
+    display: none;
+  }
+  .field:has([aria-invalid='true']) .field__message,
+  .booking-consents .field__message {
+    color: var(--error);
+  }
+
+  .photo-field__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  /* Le vrai champ fichier reste focusable et lisible par les lecteurs d'écran ;
+     on l'habille par le bouton-label. */
+  .photo-field__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .photo-field__row:has(.photo-field__input:focus-visible) .photo-field__pick {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .photo-field__pick {
+    cursor: pointer;
+  }
+  .photo-field__preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    font-size: var(--step--1);
+  }
+  .photo-field__preview[hidden] {
+    display: none;
+  }
+  .photo-field__preview img {
+    width: 4rem;
+    height: 4rem;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+  }
+  .photo-field__preview figcaption {
+    overflow: hidden;
+    max-width: 14rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .booking-consents {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .booking-policy {
+    display: grid;
+    gap: var(--space-2);
+    max-width: var(--measure);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-hairline) solid var(--line);
+    border-radius: var(--radius-sm);
+    font-size: var(--step--1);
+  }
+  .booking-policy__title {
+    font-weight: var(--weight-semibold);
+  }
+  .booking-legal {
+    font-size: var(--step--1);
+  }
+  /* Pot de miel : hors écran, sans display:none (certains robots l'ignorent). */
+  .booking-hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .booking-alert {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-hairline) solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-raised);
+  }
+  .booking-alert[hidden] {
+    display: none;
+  }
+  .booking-alert:focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .booking-alert__title {
+    font-weight: var(--weight-semibold);
+  }
+  .booking-alert--error {
+    border-color: var(--error);
+  }
+  .booking-alert--error .booking-alert__title {
+    color: var(--error);
+  }
+  .booking-alert--success {
+    border-color: var(--success);
+  }
+  .booking-alert ul {
+    padding-left: var(--space-5);
+    list-style: disc;
+  }
+
+  /* ================= Étape 4 : confirmation ================= */
+  .booking-done__recap,
+  .booking-summary__list,
+  .ticket__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .booking-done__recap > div,
+  .booking-summary__list > div,
+  .ticket__list > div {
+    display: grid;
+    grid-template-columns: minmax(7rem, 2fr) 3fr;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--border-hairline) solid var(--line);
+  }
+  .booking-summary__list > div[hidden] {
+    display: none;
+  }
+  .booking-done__recap dt,
+  .booking-summary__list dt,
+  .ticket__list dt {
+    font-size: var(--step--1);
+    color: var(--text-muted);
+  }
+  .booking-done__recap dd,
+  .ticket__list dd {
+    font-weight: var(--weight-medium);
+  }
+  .booking-done__recap {
+    max-width: 36rem;
+  }
+  .booking-done__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .booking-done__subtitle {
+    font-size: var(--step-2);
+  }
+  .booking-done__tips {
+    display: grid;
+    gap: var(--space-3);
+    max-width: var(--measure);
+    counter-reset: tip;
+  }
+  .booking-done__tips li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    counter-increment: tip;
+  }
+  .booking-done__tips li::before {
+    content: counter(tip);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: var(--step-1);
+    line-height: 1.2;
+    color: var(--accent-display);
+  }
+
+  /* ================= Récapitulatif (ticket) ================= */
+  .booking-summary {
+    position: sticky;
+    z-index: 2;
+    padding: var(--space-5) var(--space-6);
+    border: var(--border-hairline) solid var(--brass);
+    border-radius: var(--radius-arch) var(--radius-arch) var(--radius-md) var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .booking-summary__title {
+    margin-bottom: var(--space-4);
+    font-family: var(--font-display);
+    font-size: var(--step-2);
+    text-align: center;
+  }
+  @media (min-width: 64rem) {
+    .booking-summary {
+      top: calc(var(--header-height) + var(--space-6));
+      padding-top: var(--space-7);
+    }
+  }
+  /* Mobile et tablette : barre compacte collée en bas (durée, prix, date). */
+  @media (max-width: 63.99rem) {
+    .booking-summary {
+      bottom: 0;
+      order: 2;
+      margin-inline: calc(-1 * var(--space-gutter));
+      padding: var(--space-3) var(--space-gutter);
+      border-width: var(--border-hairline) 0 0;
+      border-radius: 0;
+      box-shadow: var(--shadow-md);
+    }
+    .booking-summary__title {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .booking-summary__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+    .booking-summary__list > div {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 0;
+      border: 0;
+      min-width: 0;
+    }
+    .booking-summary__list > div:first-child,
+    .booking-summary__list > div[data-sum-options-row] {
+      display: none;
+    }
+    .booking-summary__list dt {
+      font-size: var(--text-label);
+      letter-spacing: 0.04em;
+    }
+    .booking-summary__list dd {
+      overflow: hidden;
+      font-size: var(--step--1);
+      font-weight: var(--weight-semibold);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+  /* Confirmation : le récapitulatif ferait doublon. */
+  .booking[data-step-current='4'] .booking-summary {
+    display: none;
+  }
+  .booking[data-step-current='4'] .booking__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* ================= Gérer mon RDV ================= */
+  .manage {
+    padding-top: var(--space-7);
+  }
+  .manage__layout {
+    display: grid;
+    gap: var(--space-8);
+  }
+  .manage__layout > .booking-alert {
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 64rem) {
+    .manage__layout {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+      gap: var(--space-9);
+    }
+  }
+  .ticket {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-7) var(--space-6) var(--space-6);
+    border: var(--border-hairline) solid var(--brass);
+    border-radius: var(--radius-arch) var(--radius-arch) var(--radius-md) var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .ticket--cancelled .ticket__date,
+  .ticket--cancelled .ticket__time {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    color: var(--text-muted);
+  }
+  .ticket__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .ticket__date {
+    font-family: var(--font-display);
+    font-size: var(--step-3);
+    line-height: var(--leading-heading);
+  }
+  .ticket__date::first-letter {
+    text-transform: uppercase;
+  }
+  .ticket__time {
+    margin-bottom: var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--step-5);
+    font-style: italic;
+    line-height: 1;
+    color: var(--accent-display);
+  }
+  .ticket__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+  .manage__side {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+  }
+  .manage__title {
+    font-size: var(--step-3);
+  }
+  .manage__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+  .manage__cancel {
+    width: 100%;
+    max-width: 32rem;
+    border-top: var(--border-hairline) solid var(--line);
+    padding-top: var(--space-4);
+  }
+  .manage__cancel-toggle {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-target);
+    font-weight: var(--weight-medium);
+    color: var(--error);
+    cursor: pointer;
+  }
+  .manage__cancel-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .manage__cancel-form {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+  }
+  .manage__cancel-confirm {
+    --btn-border: var(--error);
+    --btn-fg: var(--error);
+  }
+
+  .week-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+  .week-nav__title {
+    flex-basis: 100%;
+    order: -1;
+    font-size: var(--step-2);
+    text-wrap: balance;
+  }
+  .week-nav > :last-child {
+    margin-left: auto;
+  }
+  @media (min-width: 48rem) {
+    .week-nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+    }
+    .week-nav__title {
+      order: 0;
+      text-align: center;
+    }
+    .week-nav > :last-child {
+      justify-self: end;
+    }
+  }
+  .reschedule {
+    display: grid;
+    gap: var(--space-6);
+  }
+}

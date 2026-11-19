@@ -7,7 +7,7 @@
     <h2 class="cta-band__title" id="cta-final" data-split><%~ it.fmt.accent(it.title || 'Vos locks, *un art*.') %></h2>
     <p class="cta-band__text"><%= it.text || 'Choisissez votre prestation et votre créneau. Nous nous occupons du reste.' %></p>
     <div class="cluster">
-      <a class="btn btn--primary btn--lg" href="/reserver" data-magnetic>Réserver un rendez-vous</a>
+      <a class="btn btn--primary btn--lg" href="<%= it.bookingHref %>" data-magnetic>Réserver un rendez-vous</a>
       <a class="btn btn--ghost" href="/contact"><span class="btn__label">Poser une question</span>
         <svg class="icon btn__arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </a>

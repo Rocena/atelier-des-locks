@@ -22,4 +22,4 @@
   </div>
 </section>
 
-<%~ include('../partials/cta-band', { fmt: fmt, eyebrow: 'Une question précise ?', title: 'Posez-la *au salon*.', text: 'Chaque chevelure est différente. Le plus simple reste d’en parler pendant une consultation.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, eyebrow: 'Une question précise ?', title: 'Posez-la *au salon*.', text: 'Chaque chevelure est différente. Le plus simple reste d’en parler pendant une consultation.' }) %>

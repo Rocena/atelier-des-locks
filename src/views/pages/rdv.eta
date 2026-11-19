@@ -1,0 +1,92 @@
+<% layout('../layouts/base', it) %>
+<%
+  var fmt = it.fmt, a = it.appointment, p = it.policy;
+  var cancelled = a.status.indexOf('cancelled') === 0;
+  var statusLabels = {
+    pending: ['En attente de validation', 'warning'],
+    confirmed: ['Confirmé', 'success'],
+    completed: ['Terminé', 'success'],
+    cancelled_by_client: ['Annulé', 'error'],
+    cancelled_by_salon: ['Annulé par le salon', 'error'],
+    no_show: ['Absence', 'error'],
+  };
+  var status = statusLabels[a.status] || [a.status, 'soft'];
+%>
+<%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Gérer mon rendez-vous', title: cancelled ? 'Rendez-vous *annulé*.' : 'À très vite, *' + a.firstName + '*.', lead: '' }) %>
+
+<section class="section manage" aria-label="Détails du rendez-vous">
+  <div class="container manage__layout">
+<% if (it.done === 'deplace') { %>
+    <div class="booking-alert booking-alert--success" role="status">
+      <p class="booking-alert__title">Votre rendez-vous a bien été déplacé.</p>
+      <p>Pensez à mettre à jour votre agenda avec le nouveau fichier ci-dessous.</p>
+    </div>
+<% } else if (it.done === 'annule') { %>
+    <div class="booking-alert booking-alert--success" role="status">
+      <p class="booking-alert__title">Votre rendez-vous est annulé.</p>
+      <p>Le créneau est libéré. Au plaisir de vous accueillir une prochaine fois.</p>
+    </div>
+<% } %>
+
+    <article class="ticket<%= cancelled ? ' ticket--cancelled' : '' %>">
+      <header class="ticket__head">
+        <p class="eyebrow">Votre rendez-vous</p>
+        <span class="badge badge--status badge--<%= status[1] %>"><%= status[0] %></span>
+      </header>
+      <p class="ticket__date"><%= it.dayLabel %></p>
+      <p class="ticket__time num"><%= it.timeLabel %></p>
+      <dl class="ticket__list">
+        <div><dt>Prestation</dt><dd><%= a.serviceName %></dd></div>
+<% if (a.options.length) { %>
+        <div><dt>Options</dt><dd><%= a.options.join(', ') %></dd></div>
+<% } %>
+        <div><dt>Durée à prévoir</dt><dd class="num">jusqu’à <%= fmt.formatMinutes(a.durationMinutes) %></dd></div>
+        <div><dt>Prix estimé</dt><dd class="num"><%= a.price == null ? 'Sur devis' : (a.priceFrom ? 'à partir de ' : '') + fmt.formatEuro(a.price) %></dd></div>
+        <div><dt>Avec</dt><dd><%= a.staffName %></dd></div>
+      </dl>
+<% if (!cancelled) { %>
+      <div class="ticket__actions">
+        <a class="btn btn--secondary btn--sm" href="/rdv/<%= it.token %>/rdv.ics" download>Ajouter à mon agenda (.ics)</a>
+        <a class="btn btn--ghost btn--sm" href="<%= it.googleUrl %>" target="_blank" rel="noopener noreferrer"><span class="btn__label">Google Agenda<span class="visually-hidden"> (nouvel onglet)</span></span></a>
+      </div>
+<% } %>
+    </article>
+
+    <div class="manage__side">
+<% if (p.allowed) { %>
+      <h2 class="manage__title">Un <em>empêchement</em> ?</h2>
+      <p>Vous pouvez déplacer ou annuler gratuitement jusqu’au <strong><%= it.deadlineLabel %></strong>.</p>
+      <div class="manage__actions">
+        <a class="btn btn--primary" href="/rdv/<%= it.token %>/deplacer">Déplacer le rendez-vous</a>
+      </div>
+      <details class="manage__cancel">
+        <summary class="manage__cancel-toggle">Annuler le rendez-vous</summary>
+        <form class="manage__cancel-form" method="post" action="/rdv/<%= it.token %>/annuler">
+          <input type="hidden" name="_csrf" value="<%= it.csrfToken %>" />
+          <div class="field">
+            <label class="field__label" for="annulation-motif">Un mot sur la raison <span class="field__optional">(facultatif)</span></label>
+            <textarea class="field__control" id="annulation-motif" name="reason" rows="3" maxlength="500"></textarea>
+          </div>
+          <p class="text-muted">L’annulation est définitive et libère votre créneau.</p>
+          <button class="btn btn--secondary manage__cancel-confirm" type="submit">Oui, annuler mon rendez-vous</button>
+        </form>
+      </details>
+<% } else if (p.reason === 'too_late') { %>
+      <h2 class="manage__title">Besoin de <em>changer</em> ?</h2>
+      <p>Le délai de <%= it.cancellationHours %> h pour modifier ce rendez-vous en ligne est dépassé. Contactez le salon : nous trouverons une solution ensemble.</p>
+      <!-- TODO-PROPRIO : afficher le numéro de téléphone du salon quand il est connu. -->
+      <a class="btn btn--primary" href="/contact">Contacter le salon</a>
+<% } else if (!cancelled) { %>
+      <h2 class="manage__title">Merci de votre <em>visite</em>.</h2>
+      <p>Ce rendez-vous ne peut plus être modifié en ligne.</p>
+<% } else { %>
+      <h2 class="manage__title">Envie d’un <em>autre créneau</em> ?</h2>
+      <a class="btn btn--primary" href="<%= it.bookingHref %>">Reprendre rendez-vous</a>
+<% } %>
+      <div class="booking-policy">
+        <p class="booking-policy__title">Politique de rendez-vous</p>
+        <p><%= it.policyText %></p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -12,6 +12,10 @@ export function createPool(connectionString) {
     connectionString,
     max: 10,
     idleTimeoutMillis: 30_000,
+    // Keep-alive TCP : certains proxys (Docker Desktop, pare-feu) coupent en silence les
+    // connexions inactives ; une requête envoyée dessus resterait sans réponse.
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 5_000,
     options: '-c timezone=UTC',
   });
 }

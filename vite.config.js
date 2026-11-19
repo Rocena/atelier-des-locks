@@ -22,4 +22,8 @@ export default defineConfig({
     rollupOptions: { input },
   },
   css: { devSourcemap: true },
+  // Dépendances chargées à la demande (première interaction) : pré-optimisées au démarrage.
+  // Sinon Vite les découvre en cours de route et recharge toutes les pages ouvertes
+  // (un tunnel de réservation à moitié rempli repartirait à l'étape 1 en développement).
+  optimizeDeps: { include: ['gsap', 'gsap/ScrollTrigger', 'gsap/SplitText', 'lenis'] },
 });

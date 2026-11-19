@@ -79,4 +79,4 @@
   </div>
 </section>
 
-<%~ include('../partials/cta-band', { fmt: fmt, eyebrow: 'Vous hésitez ?', title: 'Parlons de *vos envies*.', text: 'Une consultation de trente minutes, en salon ou en visio, pour choisir la bonne méthode et connaître le prix exact.' }) %>
+<%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, eyebrow: 'Vous hésitez ?', title: 'Parlons de *vos envies*.', text: 'Une consultation de trente minutes, en salon ou en visio, pour choisir la bonne méthode et connaître le prix exact.' }) %>

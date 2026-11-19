@@ -4,7 +4,7 @@
     <div class="site-footer__brand">
       <img src="/brand/logo-vertical-sombre.svg" alt="L’Atelier des Locks" width="200" height="155" loading="lazy" />
       <p class="site-footer__pitch">Création, entretien et soin des locks, avec patience et savoir-faire.</p>
-      <a class="btn btn--primary site-footer__cta" href="/reserver" data-magnetic>Réserver un rendez-vous</a>
+      <a class="btn btn--primary site-footer__cta" href="<%= it.bookingHref %>" data-magnetic>Réserver un rendez-vous</a>
     </div>
 
     <div class="site-footer__col">

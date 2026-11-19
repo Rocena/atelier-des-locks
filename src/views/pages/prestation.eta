@@ -7,7 +7,7 @@
   var cta = s.onQuote
     ? { href: '/contact', label: 'Demander un devis' }
     : s.bookableOnline
-      ? { href: '/reserver', label: 'Réserver cette prestation' }
+      ? { href: it.bookingHref === '/reserver' ? '/reserver?prestation=' + s.slug : it.bookingHref, label: 'Réserver cette prestation' }
       : { href: '/prestations/consultation-diagnostic', label: 'Réserver la consultation' };
 %>
 <article class="service-detail">

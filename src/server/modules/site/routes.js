@@ -94,16 +94,6 @@ export default async function siteRoutes(app) {
     });
   });
 
-  // Vitrine du tunnel de réservation : le module fonctionnel arrive dans une phase suivante.
-  app.get('/reserver', async (_request, reply) => {
-    const { categories, services } = await findCatalog(app.db);
-    return reply.page('pages/reserver', 'editorial', {
-      title: 'Réserver un rendez-vous · L’Atelier des Locks',
-      description: 'Réservez votre rendez-vous locks à Toulouse en quatre étapes.',
-      ...groupByCategory(categories, services),
-    });
-  });
-
   for (const page of LEGAL) {
     app.get(page.path, (_request, reply) =>
       reply.page(page.template, 'editorial', {
@@ -140,7 +130,7 @@ export default async function siteRoutes(app) {
       ...articles.map((a) => `/conseils/${a.slug}`),
       '/faq',
       '/contact',
-      '/reserver',
+      ...(app.bookingProvider === 'internal' ? ['/reserver'] : []),
       ...LEGAL.map((p) => p.path),
     ];
     return reply.type('application/xml; charset=utf-8').send(sitemapXml(app.publicUrl, paths));

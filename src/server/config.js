@@ -23,6 +23,17 @@ const envSchema = z
     SESSION_SECRET: z.string().min(32, 'SESSION_SECRET doit faire au moins 32 caractères'),
     BOOKING_PROVIDER: z.enum(['internal', 'fresha_link']).default('internal'),
     FRESHA_BOOKING_URL: z.union([z.url(), z.literal('')]).default(''),
+    // Flux iCal privé de la propriétaire (/agenda/<jeton>.ics). Vide = flux désactivé.
+    ICAL_FEED_TOKEN: z
+      .union([
+        z.string().min(32, 'ICAL_FEED_TOKEN doit faire au moins 32 caractères'),
+        z.literal(''),
+      ])
+      .default(''),
+    // Photos envoyées par les clientes : dossier HORS du webroot, jamais servi publiquement.
+    UPLOAD_DIR: z.string().min(1).default('storage/uploads'),
+    // Réservations acceptées par adresse IP et par fenêtre de 10 minutes.
+    BOOKING_RATE_LIMIT: z.coerce.number().int().min(1).max(10000).default(5),
     STYLEGUIDE_ENABLED: booleanString.optional(),
   })
   .superRefine((env, ctx) => {
@@ -44,7 +55,7 @@ const envSchema = z
  * @property {string} publicUrl
  * @property {string} databaseUrl
  * @property {string} sessionSecret
- * @property {{ provider: 'internal'|'fresha_link', freshaUrl: string }} booking
+ * @property {{ provider: 'internal'|'fresha_link', freshaUrl: string, icalFeedToken: string, uploadDir: string, rateLimit: number }} booking
  * @property {boolean} styleguideEnabled
  */
 
@@ -71,7 +82,13 @@ export function loadConfig(source = process.env) {
     publicUrl: env.PUBLIC_URL.replace(/\/$/, ''),
     databaseUrl: env.DATABASE_URL,
     sessionSecret: env.SESSION_SECRET,
-    booking: { provider: env.BOOKING_PROVIDER, freshaUrl: env.FRESHA_BOOKING_URL },
+    booking: {
+      provider: env.BOOKING_PROVIDER,
+      freshaUrl: env.FRESHA_BOOKING_URL,
+      icalFeedToken: env.ICAL_FEED_TOKEN,
+      uploadDir: env.UPLOAD_DIR,
+      rateLimit: env.BOOKING_RATE_LIMIT,
+    },
     styleguideEnabled: env.STYLEGUIDE_ENABLED ?? !isProd,
   };
 }

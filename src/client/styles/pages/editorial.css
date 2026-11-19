@@ -1,7 +1,7 @@
 @import '../main.css';
 
 /* Pages éditoriales : le salon, avis, conseils (liste + article), FAQ, contact,
-   réserver (vitrine), pages légales, 404. */
+   pages légales, 404. */
 @layer pages {
   /* ================= Le salon ================= */
   .story__grid {
@@ -561,109 +561,6 @@
   @media (min-width: 64rem) {
     .contact__grid {
       grid-template-columns: 5fr 7fr;
-    }
-  }
-
-  /* ================= Réserver (vitrine) ================= */
-  .booking-steps {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin-bottom: var(--space-8);
-    counter-reset: step;
-  }
-  .booking-steps__item {
-    display: grid;
-    gap: var(--space-2);
-    padding-top: var(--space-3);
-    border-top: 3px solid var(--line);
-    font-size: var(--step--1);
-    color: var(--text-muted);
-  }
-  .booking-steps__item.is-current {
-    border-top-color: var(--accent);
-    color: var(--text);
-    font-weight: var(--weight-semibold);
-  }
-  .booking-steps__index {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--step-1);
-  }
-  @media (max-width: 29.99rem) {
-    .booking-steps__label {
-      font-size: var(--text-label);
-    }
-  }
-  .notice {
-    display: grid;
-    justify-items: start;
-    gap: var(--space-3);
-    margin-bottom: var(--space-9);
-    padding: var(--space-6);
-    border: var(--border-hairline) solid var(--line);
-    border-radius: var(--radius-sm);
-    background-color: var(--surface-raised);
-  }
-  .notice__title {
-    font-family: var(--font-display);
-    font-size: var(--step-3);
-    line-height: 1.2;
-  }
-  .notice__title em {
-    color: var(--accent-display);
-  }
-  .booking-preview__title {
-    margin-bottom: var(--space-7);
-    font-size: var(--step-4);
-  }
-  .booking-group {
-    margin-bottom: var(--space-7);
-  }
-  .booking-group__title {
-    margin-bottom: var(--space-4);
-    font-size: var(--step-2);
-  }
-  .booking-group__list {
-    display: grid;
-    gap: var(--space-3);
-  }
-  .booking-option {
-    display: grid;
-    gap: var(--space-1);
-    height: 100%;
-    padding: var(--space-4) var(--space-5);
-    border: var(--border-hairline) solid var(--line-strong);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    text-decoration: none;
-    transition:
-      border-color var(--duration-fast) var(--ease-standard),
-      background-color var(--duration-fast) var(--ease-standard);
-  }
-  .booking-option:hover {
-    border-color: var(--accent);
-    background-color: var(--surface-raised);
-  }
-  .booking-option__name {
-    font-weight: var(--weight-semibold);
-  }
-  .booking-option__meta {
-    font-size: var(--step--1);
-    color: var(--text-muted);
-  }
-  .booking-option .badge {
-    justify-self: start;
-    margin-top: var(--space-1);
-  }
-  @media (min-width: 48rem) {
-    .booking-group__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 64rem) {
-    .booking-group__list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
