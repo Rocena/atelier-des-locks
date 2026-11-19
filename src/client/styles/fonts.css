@@ -1,0 +1,6 @@
+/* Polices auto-hébergées (RGPD) via Fontsource, licence OFL.
+   Bodoni Moda : axe optique « opsz » (droit + italique). Manrope : axe de graisse.
+   Le serveur précharge Bodoni latin et Manrope latin (src/server/lib/assets.js). */
+@import '@fontsource-variable/bodoni-moda/opsz.css';
+@import '@fontsource-variable/bodoni-moda/opsz-italic.css';
+@import '@fontsource-variable/manrope/wght.css';

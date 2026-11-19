@@ -1,0 +1,216 @@
+/* ==========================================================================
+   L'Atelier des Locks · Design tokens
+   Source : brand/BRAND.md. Aucune valeur « magique » hors de ce fichier.
+   1. Primitives (palette de marque en OKLCH)  2. Tokens sémantiques (clair / sombre)
+   3. Typographie  4. Espacements  5. Rayons, bordures, ombres  6. Mouvement  7. Mise en page
+   Vérifier les contrastes après toute modification : npm run check:contrast
+   ========================================================================== */
+
+@layer tokens {
+  :root {
+    /* ---- 1. Primitives : palette BRAND.md (hex d'origine en commentaire) ---- */
+    --color-ebene: oklch(19.73% 0.0162 39.23); /* #1C1310 */
+    --color-cacao: oklch(30.12% 0.0278 47.78); /* #3A2A22 */
+    --color-terre: oklch(52.31% 0.1351 35.42); /* #A9472E : l'accent unique */
+    --color-laiton: oklch(67.88% 0.1009 80.66); /* #B8914A : décoratif */
+    --color-lin: oklch(88.35% 0.0333 74.77); /* #E6D6C1 */
+    --color-karite: oklch(94.66% 0.0159 73.68); /* #F4ECE2 : fond, jamais de blanc pur */
+
+    /* Déclinaisons (même teinte, luminosité ajustée) */
+    --color-ebene-850: oklch(23.5% 0.019 41); /* surface élevée en sombre */
+    --color-cacao-600: oklch(42% 0.03 48); /* texte secondaire sur clair */
+    --color-terre-600: oklch(46.5% 0.13 35); /* survol / lien sur lin */
+    --color-terre-400: oklch(69% 0.115 40); /* accent-texte sur fond sombre */
+    --color-terre-300: oklch(75% 0.095 42);
+    --color-lin-300: oklch(81% 0.035 70); /* filets sur karité */
+    --color-sable: oklch(84% 0.045 68); /* placeholders */
+    --color-karite-50: oklch(97.4% 0.009 75); /* carte sur karité */
+    --color-taupe: oklch(56% 0.03 55); /* bordure de champ (3:1) */
+
+    /* Sémantiques d'état, accordées à la palette (pas de rouge/vert saturés) */
+    --color-feuille: oklch(45% 0.07 140); /* succès : vert feuille de baobab */
+    --color-feuille-300: oklch(74% 0.08 140);
+    --color-bordeaux: oklch(44% 0.13 20); /* erreur : bordeaux, distinct de la terre */
+    --color-bordeaux-300: oklch(73% 0.1 18);
+    --color-ocre: oklch(50% 0.095 75); /* alerte : laiton assombri, lisible sur clair */
+
+    /* ---- 3. Typographie ---- */
+    --font-display: 'Bodoni Moda Variable', 'Bodoni 72', 'Didot', Georgia, serif;
+    --font-text: 'Manrope Variable', 'Segoe UI', system-ui, sans-serif;
+
+    /* Échelle fluide 360 → 1440 px : ratio 1.2 (mobile) → 1.333 (desktop), base 16 → 18 px */
+    --step--1: clamp(0.8331rem, 0.8192rem + 0.062vw, 0.875rem);
+    --step-0: clamp(1rem, 0.9583rem + 0.1852vw, 1.125rem);
+    --step-1: clamp(1.2rem, 1.1rem + 0.4444vw, 1.5rem);
+    --step-2: clamp(1.44rem, 1.2533rem + 0.8296vw, 2rem);
+    --step-3: clamp(1.7281rem, 1.4187rem + 1.375vw, 2.6563rem);
+    --step-4: clamp(2.0737rem, 1.5879rem + 2.1593vw, 3.5313rem);
+    --step-5: clamp(2.4881rem, 1.755rem + 3.2583vw, 4.6875rem);
+    --step-6: clamp(2.9863rem, 1.8983rem + 4.8352vw, 6.25rem);
+    --step-7: clamp(3.5831rem, 2.1108rem + 6.5435vw, 8rem);
+    --text-label: 0.78125rem; /* 12.5 px : surtitres en capitales */
+
+    --leading-display: 1.04;
+    --leading-heading: 1.12;
+    --leading-text: 1.6;
+    --tracking-display: -0.015em;
+    --tracking-label: 0.2em;
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --measure: 65ch;
+
+    /* ---- 4. Espacements (base 4/8) ---- */
+    --space-1: 0.25rem; /* 4 */
+    --space-2: 0.5rem; /* 8 */
+    --space-3: 0.75rem; /* 12 */
+    --space-4: 1rem; /* 16 */
+    --space-5: 1.5rem; /* 24 */
+    --space-6: 2rem; /* 32 */
+    --space-7: 3rem; /* 48 */
+    --space-8: 4rem; /* 64 */
+    --space-9: 6rem; /* 96 */
+    --space-10: 8rem; /* 128 */
+    --space-11: 10rem; /* 160 */
+    --space-section: clamp(var(--space-8), 4rem + 6vw, var(--space-11));
+    --space-gutter: clamp(var(--space-4), 0.5rem + 3vw, var(--space-8));
+
+    /* ---- 5. Rayons, bordures, ombres ---- */
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-pill: 999px;
+    --radius-arch: 999px 999px 0 0; /* arche : demi-cercle parfait (rayons réduits à largeur/2) */
+    --border-hairline: 1px;
+    --border-strong: 1.5px;
+
+    /* Ombres en couches, teintées ébène (jamais de noir dur) */
+    --shadow-color: 39deg 30% 12%;
+    --shadow-sm:
+      0 1px 2px hsl(var(--shadow-color) / 0.06), 0 1px 1px hsl(var(--shadow-color) / 0.04);
+    --shadow-md:
+      0 1px 2px hsl(var(--shadow-color) / 0.05), 0 4px 8px -2px hsl(var(--shadow-color) / 0.06),
+      0 12px 24px -8px hsl(var(--shadow-color) / 0.1);
+    --shadow-lg:
+      0 2px 4px hsl(var(--shadow-color) / 0.04), 0 12px 24px -6px hsl(var(--shadow-color) / 0.08),
+      0 32px 64px -16px hsl(var(--shadow-color) / 0.16);
+
+    /* ---- 6. Mouvement (design-craft §6) ---- */
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* entrées */
+    --ease-in: cubic-bezier(0.55, 0, 1, 0.45); /* sorties */
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* transformations à l'écran */
+    --ease-standard: ease; /* survols */
+    --duration-instant: 100ms; /* pression */
+    --duration-fast: 150ms; /* micro-interactions */
+    --duration-base: 220ms; /* standard */
+    --duration-panel: 300ms; /* menus, panneaux */
+    --duration-exit: 180ms; /* sorties ~20 % plus rapides */
+    --duration-reveal: 900ms; /* révélations éditoriales (arche, fil) : hors UI */
+    --stagger: 45ms;
+
+    /* ---- 7. Mise en page ---- */
+    --container-max: 90rem; /* 1440 */
+    --container-text: 44rem;
+    --header-height: 4.5rem;
+    --tap-target: 2.75rem; /* 44 px minimum */
+    --z-header: 50;
+    --z-menu: 60;
+    --z-skip: 100;
+  }
+
+  /* ---- 2. Tokens sémantiques : thème clair (défaut) ---- */
+  :root,
+  [data-surface='karite'] {
+    color-scheme: light;
+    --surface: var(--color-karite);
+    --surface-raised: var(--color-karite-50);
+    --surface-alt: var(--color-lin);
+    --surface-inverse: var(--color-ebene);
+    --text: var(--color-ebene);
+    --text-muted: var(--color-cacao-600);
+    --text-inverse: var(--color-karite);
+    --accent: var(--color-terre);
+    --accent-hover: var(--color-terre-600);
+    --accent-text: var(
+      --color-terre-600
+    ); /* liens et petits textes : marge AA, y compris sur lin */
+    --accent-display: var(--color-terre); /* mot en italique des grands titres */
+    --on-accent: var(--color-karite);
+    --line: var(--color-lin-300);
+    --line-strong: var(--color-taupe);
+    --brass: var(--color-laiton);
+    --focus: var(--color-terre);
+    --success: var(--color-feuille);
+    --error: var(--color-bordeaux);
+    --warning: var(--color-ocre);
+    --placeholder-a: var(--color-lin);
+    --placeholder-b: var(--color-sable);
+    --grain-opacity: 0.045;
+    --bogolan-ink: var(--color-lin);
+    --shadow-color: 39deg 30% 12%;
+  }
+
+  /* ---- Thème sombre : fond ébène, texte karité (pas une inversion) ---- */
+  [data-theme='dark'],
+  [data-surface='ebene'] {
+    color-scheme: dark;
+    --surface: var(--color-ebene);
+    --surface-raised: var(--color-ebene-850);
+    --surface-alt: var(--color-cacao);
+    --surface-inverse: var(--color-karite);
+    --text: var(--color-karite);
+    --text-muted: var(--color-lin-300);
+    --text-inverse: var(--color-ebene);
+    --accent: var(--color-terre);
+    --accent-hover: var(--color-terre-600);
+    --accent-text: var(--color-terre-400);
+    --accent-display: var(--color-terre-400);
+    --on-accent: var(--color-karite);
+    --line: oklch(32% 0.025 45);
+    --line-strong: oklch(58% 0.03 60);
+    --brass: var(--color-laiton);
+    --focus: var(--color-terre-300);
+    --success: var(--color-feuille-300);
+    --error: var(--color-bordeaux-300);
+    --warning: var(--color-laiton);
+    --placeholder-a: var(--color-cacao);
+    --placeholder-b: var(--color-ebene-850);
+    --grain-opacity: 0.06;
+    --bogolan-ink: var(--color-cacao);
+    --shadow-color: 30deg 40% 4%;
+  }
+
+  /* Sans JavaScript : on suit la préférence système. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      color-scheme: dark;
+      --surface: var(--color-ebene);
+      --surface-raised: var(--color-ebene-850);
+      --surface-alt: var(--color-cacao);
+      --surface-inverse: var(--color-karite);
+      --text: var(--color-karite);
+      --text-muted: var(--color-lin-300);
+      --text-inverse: var(--color-ebene);
+      --accent-text: var(--color-terre-400);
+      --accent-display: var(--color-terre-400);
+      --line: oklch(32% 0.025 45);
+      --line-strong: oklch(58% 0.03 60);
+      --focus: var(--color-terre-300);
+      --success: var(--color-feuille-300);
+      --error: var(--color-bordeaux-300);
+      --warning: var(--color-laiton);
+      --placeholder-a: var(--color-cacao);
+      --placeholder-b: var(--color-ebene-850);
+      --grain-opacity: 0.06;
+      --bogolan-ink: var(--color-cacao);
+      --shadow-color: 30deg 40% 4%;
+    }
+  }
+
+  /* En thème sombre, une section « ébène » s'élève légèrement pour rester distincte. */
+  [data-theme='dark'] [data-surface='ebene'] {
+    --surface: var(--color-ebene-850);
+    --surface-raised: var(--color-cacao);
+  }
+}
