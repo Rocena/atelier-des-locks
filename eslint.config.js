@@ -11,7 +11,8 @@ export default [
     languageOptions: { globals: { ...globals.node } },
   },
   {
-    files: ['src/client/**/*.js'],
+    // Code client, et callbacks exécutés dans la page par Playwright (page.evaluate)
+    files: ['src/client/**/*.js', 'tests/e2e/**/*.js', 'scripts/screenshots.js'],
     languageOptions: { globals: { ...globals.browser } },
   },
   {

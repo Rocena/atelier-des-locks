@@ -22,6 +22,7 @@
     "db:migrate": "node src/server/db/migrate.js",
     "db:seed": "node src/server/db/seed.js",
     "screenshots": "node scripts/screenshots.js",
+    "check:contrast": "node scripts/check-contrast.js",
     "prepare": "husky"
   },
   "lint-staged": {

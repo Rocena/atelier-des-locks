@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title><%= it.title %></title>
+    <meta name="description" content="<%= it.description %>" />
+<% if (it.noindex) { %>
+    <meta name="robots" content="noindex, nofollow" />
+<% } %>
+    <meta name="theme-color" content="#F4ECE2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1C1310" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Thème appliqué avant le premier rendu (évite le flash) : choix mémorisé, sinon préférence système. -->
+    <script nonce="<%= it.nonce %>">
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('adl-theme'); } catch (e) {}
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t;
+        document.documentElement.classList.add('js');
+      })();
+    </script>
+<% it.assets.fonts.forEach(function (href) { %>
+    <link rel="preload" href="<%= href %>" as="font" type="font/woff2" crossorigin />
+<% }) %>
+<% it.assets.styles.forEach(function (href) { %>
+    <link rel="stylesheet" href="<%= href %>" />
+<% }) %>
+<% it.assets.scripts.forEach(function (src) { %>
+    <script type="module" src="<%= src %>"></script>
+<% }) %>
+  </head>
+  <body class="<%= it.bodyClass || '' %>">
+    <a class="skip-link" href="#contenu">Aller au contenu</a>
+    <%~ include('../partials/header', it) %>
+    <main id="contenu" tabindex="-1">
+<%~ it.body %>
+    </main>
+    <%~ include('../partials/footer', it) %>
+  </body>
+</html>

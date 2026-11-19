@@ -1,0 +1,12 @@
+<% layout('../layouts/base', it) %>
+<section class="section grain" aria-labelledby="titre-404">
+  <div class="container stack">
+    <p class="eyebrow">Erreur 404</p>
+    <h1 id="titre-404">Cette page s’est <em>détachée</em>.</h1>
+    <p class="lead">Le lien est peut-être ancien, ou l’adresse contient une faute de frappe. Reprenons depuis l’accueil.</p>
+    <div class="cluster">
+      <a class="btn btn--primary" href="/">Revenir à l’accueil</a>
+      <a class="btn btn--secondary" href="/prestations">Voir les prestations</a>
+    </div>
+  </div>
+</section>

@@ -14,3 +14,6 @@ Thumbs.db
 content/photos-a-importer/*
 !content/photos-a-importer/.gitkeep
 storage/
+# Captures pleine page : régénérables (npm run screenshots), seules les vues « top » sont suivies
+docs/screenshots/*.png
+!docs/screenshots/*-top.png
