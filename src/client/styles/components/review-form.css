@@ -1,0 +1,140 @@
+/* Formulaire d'avis (/avis/laisser/:token) : note en étoiles (boutons radio natifs, sans JS),
+   zone d'erreurs, état « lien fermé ». Valeurs uniquement via les tokens. */
+@layer components {
+  .review-form {
+    padding-top: var(--space-7);
+  }
+  .review-form__layout {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 40rem;
+  }
+  .review-form__form {
+    display: grid;
+    gap: var(--space-6);
+  }
+  .review-form__form fieldset {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .review-form__form .field {
+    max-width: none;
+  }
+
+  /* Note : les étoiles sont rangées de 5 à 1 dans le HTML et affichées de 1 à 5 (row-reverse),
+     ce qui permet de remplir « toutes les étoiles précédentes » avec le seul sélecteur ~. */
+  .rating-input__stars {
+    position: relative;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+  }
+  .rating-input__radio {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .rating-input__label {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    cursor: pointer;
+    color: var(--accent-display);
+  }
+  .rating-input__label svg {
+    inline-size: 2rem;
+    block-size: 2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    transition: fill var(--duration-fast) var(--ease-standard);
+  }
+  .rating-input__radio:checked ~ .rating-input__label svg,
+  .rating-input__label:hover svg,
+  .rating-input__label:hover ~ .rating-input__label svg {
+    fill: currentColor;
+  }
+  .rating-input__radio:focus-visible + .rating-input__label {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  .field--invalid .rating-input__label {
+    color: var(--error);
+  }
+
+  .review-form__name {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 7rem;
+    gap: var(--space-4);
+    align-items: start;
+  }
+  .review-form__initial {
+    text-transform: uppercase;
+  }
+  .review-form__name-hint {
+    margin-top: calc(var(--space-3) * -1);
+  }
+  .review-form__actions {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-3);
+  }
+
+  /* Pot de miel : hors écran, sans display:none (certains robots l'ignorent). */
+  .review-hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .review-alert {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border: var(--border-hairline) solid var(--error);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-raised);
+  }
+  .review-alert:focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .review-alert__title {
+    font-weight: var(--weight-semibold);
+    color: var(--error);
+  }
+  .review-alert ul {
+    padding-left: var(--space-5);
+    list-style: disc;
+  }
+
+  .review-form__closed {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+  }
+  .review-form__subtitle {
+    font-size: var(--step-3);
+  }
+  .review-form__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .reviews-empty {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    max-width: 36rem;
+  }
+}

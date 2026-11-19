@@ -18,6 +18,8 @@ if (!config.isProd) {
 }
 
 const app = await buildApp({ config, vite });
+// Jobs de notification (confirmations, rappels, demandes d'avis) : persistés dans PostgreSQL.
+await app.notifications.start();
 
 try {
   await app.listen({ host: config.host, port: config.port });

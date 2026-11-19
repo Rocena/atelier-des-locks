@@ -3,6 +3,17 @@
 <%~ include('../partials/page-hero', { fmt: fmt, eyebrow: 'Avis clientes', title: 'Elles nous *font confiance*.', lead: 'Chaque avis publié ici est laissé par une cliente après son rendez-vous, depuis le lien personnel reçu par email. Nous ne les modifions jamais.' }) %>
 
 <!-- TODO-PROPRIO : avis d'exemple, à remplacer par les vrais avis avant la mise en ligne -->
+<% if (it.summary.count === 0) { %>
+<section class="section reviews-page" aria-labelledby="titre-vide">
+  <div class="container reviews-empty">
+    <h2 id="titre-vide" class="review-form__subtitle">Les premiers avis <em>arrivent bientôt</em>.</h2>
+    <p>Chaque avis publié ici vient d’une cliente, après son rendez-vous. Nous préférons attendre les vrais plutôt que d’en inventer.</p>
+<% if (it.googleReviewUrl) { %>
+    <a class="btn btn--secondary" href="<%= it.googleReviewUrl %>" target="_blank" rel="noopener noreferrer"><span class="btn__label">Voir les avis Google<span class="visually-hidden"> (nouvel onglet)</span></span></a>
+<% } %>
+  </div>
+</section>
+<% } else { %>
 <section class="section reviews-page" aria-labelledby="titre-note">
   <div class="container reviews-page__grid">
     <aside class="score">
@@ -25,7 +36,14 @@
       <li data-reveal="card"><%~ include('../partials/review-card', { review: r, fmt: fmt, serviceName: it.serviceNames[r.service] }) %></li>
 <% }) %>
     </ul>
+<% if (it.googleReviewUrl) { %>
+    <p class="reviews-page__google">
+      Vous avez déjà un rendez-vous chez nous ?
+      <a class="link" href="<%= it.googleReviewUrl %>" target="_blank" rel="noopener noreferrer">Voir et laisser un avis sur Google<span class="visually-hidden"> (nouvel onglet)</span></a>
+    </p>
+<% } %>
   </div>
 </section>
+<% } %>
 
 <%~ include('../partials/cta-band', { fmt: fmt, bookingHref: it.bookingHref, title: 'À votre tour, *prenez soin* de vous.' }) %>

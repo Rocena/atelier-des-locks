@@ -2,6 +2,15 @@
 <article class="review">
   <%~ include('./stars', { rating: it.review.rating, label: 'Note : ' + it.review.rating + ' sur 5' }) %>
   <blockquote class="review__text"><p><%= it.review.text %></p></blockquote>
+<% if (it.review.hasPhoto) { %>
+  <img class="review__photo" src="/avis/photos/<%= it.review.id %>" alt="Photo du résultat, partagée par <%= it.review.author %>" width="352" height="352" loading="lazy" decoding="async" />
+<% } %>
+<% if (it.review.ownerReply) { %>
+  <div class="review__reply">
+    <p class="review__reply-label">Réponse de L’Atelier des Locks</p>
+    <p><%= it.review.ownerReply %></p>
+  </div>
+<% } %>
   <footer class="review__meta">
     <span>
       <span class="review__author"><%= it.review.author %></span>

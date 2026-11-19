@@ -9,6 +9,8 @@ declare module 'fastify' {
     db: import('pg').Pool;
     /** Fournisseur de réservation actif (adaptateur BOOKING_PROVIDER, §7.1). */
     bookingProvider: 'internal' | 'fresha_link';
+    /** Notifications (§7.6) : planifie les emails et SMS d'un rendez-vous. Ne lève jamais d'erreur. */
+    notifications: import('./modules/notifications/service.js').Notifier;
   }
   interface FastifyReply {
     /** Rend un template Eta dans le layout, avec les assets de la page `entry`. */

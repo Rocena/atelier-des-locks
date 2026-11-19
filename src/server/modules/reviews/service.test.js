@@ -12,6 +12,8 @@ const review = (r) => ({
   featured: false,
   verified: true,
   text: '…',
+  hasPhoto: false,
+  ownerReply: null,
   ...r,
 });
 

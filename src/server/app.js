@@ -29,6 +29,9 @@ import { findSettings } from './modules/content/repo.js';
 import styleguideRoutes from './modules/styleguide/routes.js';
 import bookingRoutes from './modules/booking/routes.js';
 import { MAX_PHOTO_BYTES } from './modules/booking/upload.js';
+import { createNotifier } from './modules/notifications/service.js';
+import { createProvider } from './modules/notifications/providers.js';
+import { createMemoryQueue, createPgBossQueue } from './modules/notifications/queue.js';
 
 /**
  * @typedef {object} BuildOptions
@@ -37,6 +40,8 @@ import { MAX_PHOTO_BYTES } from './modules/booking/upload.js';
  * @property {boolean} [logger]
  * @property {import('pg').Pool} [db]  pool PostgreSQL (créé depuis la config s'il est absent)
  * @property {() => Date} [now]  horloge (les tests la figent)
+ * @property {import('./modules/notifications/queue.js').JobQueue} [queue]  file de jobs (mémoire en test, pg-boss sinon)
+ * @property {import('./modules/notifications/providers.js').NotificationProvider} [provider]  fournisseur d'envoi (config sinon)
  */
 
 /**
@@ -62,7 +67,7 @@ function cspDirectives(dev) {
 }
 
 /** @param {BuildOptions} options */
-export async function buildApp({ config, vite, logger = true, db, now }) {
+export async function buildApp({ config, vite, logger = true, db, now, queue, provider }) {
   const dev = !config.isProd;
   const app = Fastify({
     logger: logger && {
@@ -128,6 +133,28 @@ export async function buildApp({ config, vite, logger = true, db, now }) {
   const pool = db ?? createPool(config.databaseUrl);
   app.decorate('db', pool);
   if (!db) app.addHook('onClose', () => pool.end());
+
+  // Notifications (§7.6) : jobs pg-boss en base. En test, file en mémoire (rien ne part, rien ne dort).
+  // Le démarrage des workers se fait dans index.js (app.notifications.start()), pas ici.
+  const notifications = createNotifier({
+    db: pool,
+    queue:
+      queue ??
+      (config.env === 'test'
+        ? createMemoryQueue()
+        : createPgBossQueue({
+            connectionString: config.databaseUrl,
+            onError: (error) => app.log.error({ err: error }, 'file de jobs'),
+          })),
+    provider:
+      provider ?? createProvider(config.notifications, { log: (line) => app.log.info(line) }),
+    config,
+    site,
+    now,
+    log: app.log,
+  });
+  app.decorate('notifications', notifications);
+  app.addHook('onClose', () => notifications.stop());
 
   const resolveAssets = createAssetResolver({ dev: !config.isProd });
   // Données communes à toutes les pages (méga-menu, bandeau d'annonce), relues en base au plus
@@ -198,7 +225,7 @@ export async function buildApp({ config, vite, logger = true, db, now }) {
   await app.register(siteRoutes);
   await app.register(servicesRoutes);
   await app.register(galleryRoutes);
-  await app.register(reviewsRoutes);
+  await app.register(reviewsRoutes, { config, now });
   await app.register(contentRoutes);
   await app.register(bookingRoutes, { config, now });
   if (config.styleguideEnabled) await app.register(styleguideRoutes);

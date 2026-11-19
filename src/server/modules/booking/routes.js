@@ -268,8 +268,9 @@ export default async function bookingRoutes(app, { config, now = () => new Date(
           const a = result.appointment;
           // Lien relatif : la page est déjà sur le bon domaine (les emails, eux, utiliseront PUBLIC_URL).
           const manageUrl = `/rdv/${result.token}`;
-          // Point d'accroche des notifications (phase suivante) : jamais de donnée personnelle.
+          // Confirmation, alerte propriétaire et rappels (§7.6). Jamais de donnée personnelle dans les logs.
           request.log.info({ event: 'appointment.created', appointmentId: a.id }, 'RDV créé');
+          await app.notifications.appointmentBooked({ appointmentId: a.id, token: result.token });
           return reply.code(201).send({
             status: a.status,
             manageUrl,
@@ -405,7 +406,12 @@ export default async function bookingRoutes(app, { config, now = () => new Date(
       const token = params.data.token;
       if (!body.success) return reply.redirect(`/rdv/${token}/deplacer?erreur=pris`, 303);
       try {
-        await booking.reschedule(app.db, { token, startsAt: body.data.startsAt, now: now() });
+        const moved = await booking.reschedule(app.db, {
+          token,
+          startsAt: body.data.startsAt,
+          now: now(),
+        });
+        await app.notifications.appointmentRescheduled({ appointmentId: moved.id, token });
         request.log.info({ event: 'appointment.rescheduled' }, 'RDV déplacé');
         return reply.redirect(`/rdv/${token}?fait=deplace`, 303);
       } catch (error) {
@@ -428,11 +434,12 @@ export default async function bookingRoutes(app, { config, now = () => new Date(
       if (!params.success) return linkNotFound(reply);
       const token = params.data.token;
       try {
-        await booking.cancel(app.db, {
+        const cancelled = await booking.cancel(app.db, {
           token,
           reason: body.success ? body.data.reason : '',
           now: now(),
         });
+        await app.notifications.appointmentCancelled({ appointmentId: cancelled.id, by: 'client' });
         request.log.info({ event: 'appointment.cancelled' }, 'RDV annulé par la cliente');
         return reply.redirect(`/rdv/${token}?fait=annule`, 303);
       } catch (error) {

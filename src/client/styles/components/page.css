@@ -243,6 +243,29 @@
     color: var(--success);
   }
 
+  /* Photo et réponse sur une carte d'avis publiée */
+  .review__photo {
+    inline-size: 100%;
+    max-inline-size: 22rem;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-sunken, var(--surface-raised));
+  }
+  .review__reply {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    border-left: var(--border-strong) solid var(--accent-display);
+    background-color: var(--surface);
+    font-size: var(--step--1);
+  }
+  .review__reply-label {
+    font-size: var(--text-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
   /* ---- Bandeau CTA final (fond ébène) ---- */
   .cta-band {
     position: relative;

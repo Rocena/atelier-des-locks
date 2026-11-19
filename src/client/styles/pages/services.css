@@ -2,6 +2,16 @@
 
 /* Pages /prestations, /prestations/:slug et /tarifs. */
 @layer pages {
+  .service-reviews__list {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 48rem) {
+    .service-reviews__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   /* ---- Barre de catégories (ancres) ---- */
   .category-nav {
     position: sticky;

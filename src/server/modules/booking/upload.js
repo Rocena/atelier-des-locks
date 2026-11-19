@@ -73,9 +73,10 @@ export async function sanitizePhoto(buffer) {
  * Enregistre une photo nettoyée sous un nom aléatoire. Renvoie le chemin relatif stocké en base.
  * @param {string} uploadDir  dossier racine (hors webroot)
  * @param {Buffer} webp
+ * @param {'hair'|'reviews'} [folder]  dossier : hair (photos des cheveux, privées) ou reviews (photos d'avis)
  */
-export async function storePhoto(uploadDir, webp) {
-  const relative = `hair/${randomUUID()}.webp`;
+export async function storePhoto(uploadDir, webp, folder = 'hair') {
+  const relative = `${folder}/${randomUUID()}.webp`;
   const target = path.join(uploadDir, relative);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, webp, { mode: 0o600, flag: 'wx' });
@@ -88,6 +89,6 @@ export async function storePhoto(uploadDir, webp) {
  * @param {string} relative
  */
 export async function removePhoto(uploadDir, relative) {
-  if (!/^hair\/[0-9a-f-]{36}\.webp$/.test(relative)) return;
+  if (!/^(hair|reviews)\/[0-9a-f-]{36}\.webp$/.test(relative)) return;
   await rm(path.join(uploadDir, relative), { force: true });
 }

@@ -1,4 +1,5 @@
 @import '../main.css';
+@import '../components/review-form.css';
 
 /* Pages éditoriales : le salon, avis, conseils (liste + article), FAQ, contact,
    pages légales, 404. */
@@ -230,6 +231,9 @@
   .reviews-page__list {
     display: grid;
     gap: var(--space-5);
+  }
+  .reviews-page__google {
+    grid-column: 1 / -1;
   }
   @media (min-width: 64rem) {
     .reviews-page__grid {

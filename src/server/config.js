@@ -35,8 +35,34 @@ const envSchema = z
     // Réservations acceptées par adresse IP et par fenêtre de 10 minutes.
     BOOKING_RATE_LIMIT: z.coerce.number().int().min(1).max(10000).default(5),
     STYLEGUIDE_ENABLED: booleanString.optional(),
+    // Notifications (§7.6) : « console » écrit les messages dans le terminal (dev, tests),
+    // « brevo » les envoie vraiment (emails et SMS transactionnels).
+    NOTIFICATIONS_PROVIDER: z.enum(['console', 'brevo']).default('console'),
+    BREVO_API_KEY: z.string().default(''),
+    BREVO_SENDER_EMAIL: z.union([z.email(), z.literal('')]).default(''),
+    BREVO_SENDER_NAME: z.string().min(1).max(80).default('L’Atelier des Locks'),
+    // Expéditeur alphanumérique des SMS : 11 caractères maximum, sans espace ni accent.
+    SMS_SENDER: z
+      .string()
+      .regex(/^[A-Za-z0-9]{1,11}$/, 'SMS_SENDER : 11 caractères alphanumériques au maximum')
+      .default('AtelierLock'),
+    // Destinataire de l'alerte « nouveau rendez-vous » (la propriétaire). Vide = pas d'alerte.
+    OWNER_EMAIL: z.union([z.email(), z.literal('')]).default(''),
+    // Lien « Laisser un avis Google » proposé après le dépôt d'un avis (§8). Vide = pas de lien.
+    GOOGLE_REVIEW_URL: z.union([z.url(), z.literal('')]).default(''),
   })
   .superRefine((env, ctx) => {
+    if (env.NOTIFICATIONS_PROVIDER === 'brevo') {
+      for (const key of /** @type {const} */ (['BREVO_API_KEY', 'BREVO_SENDER_EMAIL'])) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [key],
+            message: `${key} est obligatoire quand NOTIFICATIONS_PROVIDER=brevo`,
+          });
+        }
+      }
+    }
     if (env.BOOKING_PROVIDER === 'fresha_link' && !env.FRESHA_BOOKING_URL) {
       ctx.addIssue({
         code: 'custom',
@@ -56,6 +82,8 @@ const envSchema = z
  * @property {string} databaseUrl
  * @property {string} sessionSecret
  * @property {{ provider: 'internal'|'fresha_link', freshaUrl: string, icalFeedToken: string, uploadDir: string, rateLimit: number }} booking
+ * @property {{ provider: 'console'|'brevo', brevoApiKey: string, senderEmail: string, senderName: string, smsSender: string, ownerEmail: string }} notifications
+ * @property {{ googleUrl: string }} reviews
  * @property {boolean} styleguideEnabled
  */
 
@@ -89,6 +117,15 @@ export function loadConfig(source = process.env) {
       uploadDir: env.UPLOAD_DIR,
       rateLimit: env.BOOKING_RATE_LIMIT,
     },
+    notifications: {
+      provider: env.NOTIFICATIONS_PROVIDER,
+      brevoApiKey: env.BREVO_API_KEY,
+      senderEmail: env.BREVO_SENDER_EMAIL,
+      senderName: env.BREVO_SENDER_NAME,
+      smsSender: env.SMS_SENDER,
+      ownerEmail: env.OWNER_EMAIL,
+    },
+    reviews: { googleUrl: env.GOOGLE_REVIEW_URL },
     styleguideEnabled: env.STYLEGUIDE_ENABLED ?? !isProd,
   };
 }

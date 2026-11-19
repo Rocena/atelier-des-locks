@@ -13,6 +13,8 @@ import {
 } from './service.js';
 import { publicService, slugParams, servicesQuery } from './schemas.js';
 import { site } from '../../lib/site.js';
+import { findPublishedReviews } from '../reviews/repo.js';
+import { sortByDate, summarizeReviews } from '../reviews/service.js';
 
 /** @param {import('fastify').FastifyInstance} app */
 export default async function catalogRoutes(app) {
@@ -34,6 +36,10 @@ export default async function catalogRoutes(app) {
     if (!service) return reply.callNotFound();
     const { methods } = await findMethods(app.db);
     const category = categories.find((c) => c.slug === service.category) ?? null;
+    // Avis publiés de cette prestation (§8) : le bloc est masqué tant qu'il n'y en a pas.
+    const serviceReviews = sortByDate(
+      (await findPublishedReviews(app.db)).filter((r) => r.service === service.slug),
+    );
     return reply.page('pages/prestation', 'services', {
       title: `${service.name} à Toulouse · L’Atelier des Locks`,
       description: service.summary,
@@ -41,6 +47,8 @@ export default async function catalogRoutes(app) {
       category,
       methods: methodsOf(service, methods),
       related: relatedServices(services, service),
+      serviceReviews,
+      reviewSummary: summarizeReviews(serviceReviews),
       categoryNames: Object.fromEntries(categories.map((c) => [c.slug, c.name])),
       breadcrumb: [
         { label: 'Accueil', href: '/' },

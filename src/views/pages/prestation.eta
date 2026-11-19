@@ -109,6 +109,23 @@
   </div>
 </article>
 
+<% if (it.serviceReviews && it.serviceReviews.length) { %>
+<section class="section service-reviews" aria-labelledby="titre-avis-prestation">
+  <div class="container">
+    <header class="section-head">
+      <p class="eyebrow">Avis vérifiés</p>
+      <h2 class="section-head__title" id="titre-avis-prestation">Elles l’ont <em>essayé</em>.</h2>
+      <p class="text-muted"><%= it.fmt.formatRating(it.reviewSummary.average) %>/5 · <%= it.reviewSummary.count %> avis pour cette prestation</p>
+    </header>
+    <ul class="service-reviews__list" role="list">
+<% it.serviceReviews.slice(0, 4).forEach(function (r) { %>
+      <li><%~ include('../partials/review-card', { review: r, fmt: it.fmt, serviceName: null }) %></li>
+<% }) %>
+    </ul>
+  </div>
+</section>
+<% } %>
+
 <section class="section section--alt related" aria-labelledby="titre-suggestions">
   <div class="container">
     <header class="section-head">

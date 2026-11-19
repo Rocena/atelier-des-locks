@@ -40,4 +40,33 @@ describe('loadConfig', () => {
       'https://exemple.fr',
     );
   });
+
+  it('notifications : fournisseur console par défaut, Brevo exige clé et expéditeur', () => {
+    const config = loadConfig(base);
+    expect(config.notifications.provider).toBe('console');
+    expect(config.notifications.smsSender).toBe('AtelierLock');
+    expect(() => loadConfig({ ...base, NOTIFICATIONS_PROVIDER: 'brevo' })).toThrow(/BREVO_API_KEY/);
+    const brevo = loadConfig({
+      ...base,
+      NOTIFICATIONS_PROVIDER: 'brevo',
+      BREVO_API_KEY: 'xkeysib-test',
+      BREVO_SENDER_EMAIL: 'salon@exemple.fr',
+    });
+    expect(brevo.notifications.brevoApiKey).toBe('xkeysib-test');
+  });
+
+  it('expéditeur SMS : 11 caractères alphanumériques au maximum', () => {
+    expect(() => loadConfig({ ...base, SMS_SENDER: 'Atelier des Locks' })).toThrow(/SMS_SENDER/);
+    expect(() => loadConfig({ ...base, SMS_SENDER: 'AtelierLocks1' })).toThrow(/SMS_SENDER/);
+    expect(loadConfig({ ...base, SMS_SENDER: 'AtelierLock' }).notifications.smsSender).toBe(
+      'AtelierLock',
+    );
+  });
+
+  it('lien d’avis Google : URL valide ou vide', () => {
+    expect(loadConfig(base).reviews.googleUrl).toBe('');
+    expect(() => loadConfig({ ...base, GOOGLE_REVIEW_URL: 'pas une url' })).toThrow(
+      /GOOGLE_REVIEW_URL/,
+    );
+  });
 });

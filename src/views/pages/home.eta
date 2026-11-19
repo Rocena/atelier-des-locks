@@ -171,7 +171,8 @@
   </div>
 </section>
 
-<%/* 7. Avis */%>
+<%/* 7. Avis : masqué tant qu'il n'y a aucun avis publié (§8) */%>
+<% if (it.summary.count > 0) { %>
 <section class="section section--alt reviews-home" aria-labelledby="titre-avis">
   <!-- TODO-PROPRIO : avis d'exemple, à remplacer par les vrais avis avant la mise en ligne -->
   <div class="container reviews-home__grid">
@@ -192,6 +193,7 @@
     </ul>
   </div>
 </section>
+<% } %>
 
 <%/* 8. Le parcours d'une cliente, relié par le fil de loc */%>
 <section class="section journey" aria-labelledby="titre-parcours" data-thread-scope>
