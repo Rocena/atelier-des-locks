@@ -19,6 +19,21 @@ describe('application (mode test, sans Vite)', () => {
     expect(res.json()).toEqual({ status: 'ok' });
   });
 
+  it('/health : 503 sans détail si la base est injoignable', async () => {
+    const local = await buildApp({ config, logger: false });
+    // La base « tombe » après le démarrage.
+    local.db.query = /** @type {any} */ (
+      async () => {
+        throw new Error('connect ECONNREFUSED 10.0.0.5:5432 password=secret');
+      }
+    );
+    const res = await local.inject({ method: 'GET', url: '/health' });
+    expect(res.statusCode).toBe(503);
+    expect(res.json()).toEqual({ status: 'error' });
+    expect(res.body).not.toContain('secret');
+    await local.close();
+  });
+
   it('Permissions-Policy fermée', async () => {
     const res = await app.inject({ method: 'GET', url: '/health' });
     expect(res.headers['permissions-policy']).toContain('camera=()');

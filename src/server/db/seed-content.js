@@ -26,11 +26,15 @@ async function readJson(name) {
 /** Euros → centimes (null conservé). @param {number|null|undefined} euros */
 const toCents = (euros) => (euros == null ? null : Math.round(euros * 100));
 
-/** @param {import('pg').PoolClient} db */
-export async function seedContent(db) {
+/**
+ * @param {import('pg').PoolClient} db
+ * @param {{ sampleReviews?: boolean }} [options]  `sampleReviews: false` en production : les avis
+ *   d'exemple ne doivent jamais être publiés (§8), les vrais avis arrivent par le site.
+ */
+export async function seedContent(db, { sampleReviews = true } = {}) {
   await seedCatalog(db);
   await seedGallery(db);
-  await seedReviews(db);
+  if (sampleReviews) await seedReviews(db);
   await seedContentTables(db);
   await seedStaff(db);
 }

@@ -247,7 +247,27 @@ export async function buildApp({ config, vite, logger = true, db, now, queue, pr
   }
   app.decorateReply('page', page);
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  // Sonde de santé (Docker, Caddy, supervision) : 200 si le serveur ET la base répondent.
+  // Aucun détail dans la réponse : l'erreur réelle est journalisée.
+  app.get('/health', async (request, reply) => {
+    try {
+      // La base doit répondre en moins de 2 s (sinon la sonde échoue au lieu de rester suspendue).
+      /** @type {NodeJS.Timeout | undefined} */
+      let timer;
+      const deadline = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('base de données trop lente (> 2 s)')), 2000);
+      });
+      try {
+        await Promise.race([app.db.query('SELECT 1'), deadline]);
+      } finally {
+        clearTimeout(timer);
+      }
+      return { status: 'ok' };
+    } catch (error) {
+      request.log.error(error, 'sonde de santé : base injoignable');
+      return reply.code(503).send({ status: 'error' });
+    }
+  });
 
   await app.register(siteRoutes);
   await app.register(servicesRoutes);

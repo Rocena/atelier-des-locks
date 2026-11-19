@@ -84,11 +84,17 @@ test('captures de l’espace pro', async ({ browser }, info) => {
     ['prestations', '/admin/prestations'],
     ['reglages', '/admin/reglages'],
     ['horaires', '/admin/reglages/horaires'],
+    ['contenus', '/admin/contenus'],
+    ['messages', '/admin/notifications'],
     ['journal', '/admin/journal'],
+    ['compte', '/admin/compte'],
     ['plus', '/admin/plus'],
     ['connexion-publique', '/admin/connexion'],
   ]);
+  // ADMIN_SHOTS_ONLY=reglages,plus : ne refaire que certaines captures.
+  const only = process.env.ADMIN_SHOTS_ONLY?.split(',');
   for (const [label, url] of pages) {
+    if (only && !only.includes(label)) continue;
     if (label === 'connexion-publique') await context.clearCookies();
     const response = await page.goto(url);
     expect(response?.status()).toBeLessThan(500);

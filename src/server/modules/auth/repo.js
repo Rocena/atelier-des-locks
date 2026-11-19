@@ -236,3 +236,34 @@ export async function deleteUserSessions(db, userId, except = null) {
 export async function purgeExpiredSessions(db, now) {
   await db.query('DELETE FROM sessions WHERE expires_at < $1', [now]);
 }
+
+/**
+ * Dépannage (script admin-recover) : remet à zéro le verrouillage d'un compte.
+ * @param {Db} db @param {string} email
+ * @returns {Promise<string|null>} identifiant du compte, ou null s'il n'existe pas
+ */
+export async function unlockUserByEmail(db, email) {
+  const { rows } = await db.query(
+    `UPDATE users SET failed_login_count = 0, locked_until = NULL WHERE email = $1 RETURNING id`,
+    [email],
+  );
+  return rows[0]?.id ?? null;
+}
+
+/**
+ * Dépannage : la personne a perdu son téléphone ET ses codes de secours. Efface sa 2FA (elle
+ * rescannera un QR code à la prochaine connexion), ferme ses sessions et lève le verrouillage.
+ * @param {Db} db @param {string} email
+ * @returns {Promise<string|null>} identifiant du compte, ou null s'il n'existe pas
+ */
+export async function resetTwoFactorByEmail(db, email) {
+  const { rows } = await db.query(
+    `UPDATE users SET totp_secret_encrypted = NULL, totp_confirmed_at = NULL, totp_last_step = NULL,
+            recovery_code_hashes = '{}', failed_login_count = 0, locked_until = NULL
+      WHERE email = $1 RETURNING id`,
+    [email],
+  );
+  const id = rows[0]?.id ?? null;
+  if (id) await db.query('DELETE FROM sessions WHERE user_id = $1', [id]);
+  return id;
+}

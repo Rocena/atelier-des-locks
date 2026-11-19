@@ -1,0 +1,25 @@
+# Rien de tout cela ne doit entrer dans l'image : secrets, données, outils de développement.
+.git
+.github
+.husky
+.claude
+.env
+.env.*
+!.env.example
+node_modules
+dist
+storage
+content
+test-results
+playwright-report
+coverage
+docs
+brand
+tests
+*.md
+*.log
+Dockerfile
+docker-compose*.yml
+deploy
+.DS_Store
+Thumbs.db

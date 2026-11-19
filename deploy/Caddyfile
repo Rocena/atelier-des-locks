@@ -1,0 +1,47 @@
+# ---------------------------------------------------------------------------
+# Caddy : HTTPS automatique (certificat Let's Encrypt, renouvelé tout seul).
+# DOMAIN et ACME_EMAIL viennent du fichier .env (docker-compose.prod.yml).
+# ---------------------------------------------------------------------------
+{
+	email {$ACME_EMAIL}
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+{$DOMAIN} {
+	# Photos des clientes : 8 Mo au plus (+ marge du formulaire). Au-delà, refusé avant d'atteindre l'application.
+	request_body {
+		max_size 12MB
+	}
+
+	# L'application compresse déjà (brotli/gzip) et pose HSTS + CSP : Caddy ne fait que relayer.
+	reverse_proxy app:3000 {
+		# Sonde active : si l'application ne répond plus, Caddy le voit avant les visiteurs.
+		health_uri /health
+		health_interval 30s
+		health_timeout 5s
+	}
+
+	header -Server
+
+	# Journal d'accès SANS donnée personnelle (§13) : ni adresse IP, ni en-têtes (cookies),
+	# ni jetons des liens « Gérer mon RDV », « Laisser un avis », « agenda », ni paramètres d'URL.
+	log {
+		output stdout
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip delete
+				request>client_ip delete
+				request>remote_port delete
+				request>headers delete
+				request>tls delete
+				# Une seule règle : le jeton (après /rdv/, /avis/laisser/, /agenda/) et tout paramètre (?…) disparaissent.
+				request>uri regexp "(/(?:rdv|avis/laisser|agenda)/)[^/?]*|\?.*$" "$1"
+
+			}
+		}
+	}
+}

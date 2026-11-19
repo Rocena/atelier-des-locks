@@ -21,6 +21,7 @@
     "db:down": "docker compose down",
     "db:migrate": "node src/server/db/migrate.js",
     "db:seed": "node src/server/db/seed.js",
+    "db:init": "node scripts/init-production.js",
     "screenshots": "node scripts/screenshots.js",
     "check:contrast": "node scripts/check-contrast.js",
     "prepare": "husky",

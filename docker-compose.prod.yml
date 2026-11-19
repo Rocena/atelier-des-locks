@@ -1,0 +1,207 @@
+# ---------------------------------------------------------------------------
+# L'Atelier des Locks : production (VPS dans l'UE)
+#
+#   caddy   : HTTPS automatique, seul service exposé sur Internet (ports 80 et 443)
+#   app     : le site et l'admin (Node), jamais exposé directement
+#   db      : PostgreSQL 17, jamais exposé (réseau interne sans accès à Internet)
+#   backup  : sauvegarde chiffrée chaque nuit (base + photos)
+#   restore : outil de restauration, lancé à la demande (profil « tools »)
+#
+# Toutes les valeurs viennent du fichier .env (modèle : .env.production.example).
+# Commandes : voir docs/DEPLOIEMENT.md. Rien ne démarre tant que vous ne lancez pas « docker compose up ».
+# Utilisation : docker compose -f docker-compose.prod.yml ...   (ou COMPOSE_FILE=docker-compose.prod.yml dans .env)
+# ---------------------------------------------------------------------------
+name: atelier
+
+x-logging:
+  &logging # Journaux conservés sur le serveur uniquement, pivotés : 5 fichiers de 10 Mo au plus par service.
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    <<: *hardening
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID] # minimum requis par l'image PostgreSQL
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-atelier}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Renseignez POSTGRES_PASSWORD dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:-atelier_des_locks}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [backend]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    logging: *logging
+    # Aucune section « ports » : la base n'est joignable que par les autres services.
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: atelier-des-locks:latest
+    restart: unless-stopped
+    <<: *hardening
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: '3000'
+      PUBLIC_URL: https://${DOMAIN:?Renseignez DOMAIN dans .env}
+      DATABASE_URL: postgres://${POSTGRES_USER:-atelier}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-atelier_des_locks}
+      SESSION_SECRET: ${SESSION_SECRET:?Renseignez SESSION_SECRET dans .env}
+      ICAL_FEED_TOKEN: ${ICAL_FEED_TOKEN:-}
+      UPLOAD_DIR: /app/storage/uploads
+      # Seul Caddy (adresse fixe ci-dessous) peut indiquer l'adresse réelle du visiteur.
+      TRUST_PROXY: 172.30.10.2
+      BOOKING_PROVIDER: ${BOOKING_PROVIDER:-internal}
+      FRESHA_BOOKING_URL: ${FRESHA_BOOKING_URL:-}
+      NOTIFICATIONS_PROVIDER: brevo
+      BREVO_API_KEY: ${BREVO_API_KEY:?Renseignez BREVO_API_KEY dans .env}
+      BREVO_SENDER_EMAIL: ${BREVO_SENDER_EMAIL:?Renseignez BREVO_SENDER_EMAIL dans .env}
+      BREVO_SENDER_NAME: ${BREVO_SENDER_NAME:-L’Atelier des Locks}
+      SMS_SENDER: ${SMS_SENDER:-AtelierLock}
+      OWNER_EMAIL: ${OWNER_EMAIL:-}
+      GOOGLE_REVIEW_URL: ${GOOGLE_REVIEW_URL:-}
+    volumes:
+      - uploads:/app/storage/uploads
+    # Les migrations s'appliquent avant le démarrage (sans effet si la base est à jour).
+    command: ['sh', '-c', 'node src/server/db/migrate.js && exec node src/server/index.js']
+    networks: [backend, web]
+    logging: *logging
+    # Aucune section « ports » : seul Caddy parle à l'application.
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?Renseignez ACME_EMAIL dans .env}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificats : à conserver (sinon Let's Encrypt limite les nouvelles demandes).
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      web:
+        ipv4_address: 172.30.10.2
+    logging: *logging
+
+  backup:
+    build:
+      context: ./deploy/backup
+    image: atelier-backup:latest
+    restart: unless-stopped
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /work:size=512m,mode=0700 # copies en clair : en mémoire seulement, jamais sur le disque
+      - /tmp
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-atelier}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-atelier_des_locks}
+      BACKUP_AGE_RECIPIENTS: ${BACKUP_AGE_RECIPIENTS:?Renseignez BACKUP_AGE_RECIPIENTS dans .env (voir docs/DEPLOIEMENT.md, étape sauvegardes)}
+      BACKUP_HOUR: ${BACKUP_HOUR:-03}
+      BACKUP_MINUTE: ${BACKUP_MINUTE:-30}
+      BACKUP_ON_START: ${BACKUP_ON_START:-false}
+      BACKUP_REMOTE: ${BACKUP_REMOTE:-}
+      BACKUP_PING_URL: ${BACKUP_PING_URL:-}
+      # Copie hors serveur (rclone) : voir docs/DEPLOIEMENT.md. Ces variables sont lues par rclone.
+      RCLONE_CONFIG_OFFSITE_TYPE: ${RCLONE_CONFIG_OFFSITE_TYPE:-}
+      RCLONE_CONFIG_OFFSITE_PROVIDER: ${RCLONE_CONFIG_OFFSITE_PROVIDER:-}
+      RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID: ${RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID:-}
+      RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY: ${RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY:-}
+      RCLONE_CONFIG_OFFSITE_ENDPOINT: ${RCLONE_CONFIG_OFFSITE_ENDPOINT:-}
+      RCLONE_CONFIG_OFFSITE_REGION: ${RCLONE_CONFIG_OFFSITE_REGION:-}
+    volumes:
+      - ${BACKUP_PATH:-./backups}:/backups
+      - uploads:/uploads:ro
+    networks: [backend, web] # « web » : seulement pour la copie hors serveur et le signal de supervision
+    healthcheck:
+      # Sain si une sauvegarde a réussi dans les dernières 26 h (30 h de grâce au premier démarrage).
+      test: ['CMD-SHELL', 'find /backups/.last-success -mmin -1560 | grep -q .']
+      interval: 1h
+      timeout: 10s
+      retries: 1
+      start_period: 30h
+    logging: *logging
+
+  # Outil de restauration : docker compose --profile tools run --rm restore verify
+  restore:
+    profiles: [tools]
+    build:
+      context: ./deploy/backup
+    image: atelier-backup:latest
+    entrypoint: ['/ops/restore.sh']
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER:-atelier}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-atelier_des_locks}
+      BACKUP_AGE_RECIPIENTS: ${BACKUP_AGE_RECIPIENTS:-}
+    tmpfs:
+      - /work:size=512m,mode=0700
+    volumes:
+      - ${BACKUP_PATH:-./backups}:/backups
+      - uploads:/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [backend]
+
+networks:
+  # Réseau interne : la base et les sauvegardes n'ont aucun accès à Internet par ce réseau.
+  backend:
+    internal: true
+  web:
+    ipam:
+      config:
+        - subnet: 172.30.10.0/24
+          # Adresses automatiques réservées à la moitié haute : 172.30.10.2 reste libre pour Caddy.
+          ip_range: 172.30.10.128/25
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
