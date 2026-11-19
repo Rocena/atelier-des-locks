@@ -1,0 +1,73 @@
+{
+  "_note": "FAQ (phase 2, données temporaires). TODO-PROPRIO : confirmer délai d'annulation, moyens de paiement, retard toléré.",
+  "groups": [
+    {
+      "slug": "preparation",
+      "title": "Avant le rendez-vous",
+      "items": [
+        {
+          "q": "Comment préparer mes cheveux ?",
+          "a": "Venez les cheveux démêlés, secs, sans huile ni crème. Pour une création, inutile de les laver : le lavage clarifiant est compris."
+        },
+        {
+          "q": "Dois-je faire une consultation avant une création ?",
+          "a": "Elle est conseillée pour toutes les créations, et obligatoire pour les micro-locks et les extensions. Elle permet de choisir la méthode et de vous donner un prix précis. Son prix est déduit de la création."
+        },
+        {
+          "q": "Je veux une coloration : que dois-je savoir ?",
+          "a": "Un test d'allergie est obligatoire 48 heures avant, même si vous avez déjà été colorée. Il se fait au salon en cinq minutes."
+        }
+      ]
+    },
+    {
+      "slug": "duree",
+      "title": "Durée et déroulé",
+      "items": [
+        {
+          "q": "Combien de temps dure une création de locks ?",
+          "a": "De 3 à 6 heures pour une création classique, de 5 à 8 heures au crochet, et de 10 à 20 heures (en plusieurs séances) pour des micro-locks. Prévoyez de quoi lire ou écouter : on s'occupe du thé."
+        },
+        {
+          "q": "Puis-je venir accompagnée ?",
+          "a": "Une personne, oui. Le salon est petit et calme : nous gardons cette tranquillité pour toutes nos clientes."
+        }
+      ]
+    },
+    {
+      "slug": "entretien",
+      "title": "Entretien",
+      "items": [
+        {
+          "q": "À quelle fréquence faire un resserrage ?",
+          "a": "Toutes les 4 à 6 semaines au palm rolling, toutes les 4 à 8 semaines à l'interlocking. Plus souvent, la racine s'affine."
+        },
+        {
+          "q": "Puis-je me baigner avec des locks neuves ?",
+          "a": "Attendez deux à trois semaines après une création classique. Ensuite, rincez à l'eau claire après la piscine ou la mer, et séchez bien."
+        },
+        {
+          "q": "Mes locks sentent l'humidité, que faire ?",
+          "a": "C'est le signe d'un séchage incomplet ou de résidus au cœur des locks. Un bain détox suivi d'un séchage complet règle le problème dans la grande majorité des cas."
+        }
+      ]
+    },
+    {
+      "slug": "annulation",
+      "title": "Annulation et paiement",
+      "items": [
+        {
+          "q": "Puis-je annuler ou déplacer mon rendez-vous ?",
+          "a": "Oui, gratuitement jusqu'à 48 heures avant, depuis le lien reçu par email ou par SMS. Au-delà, contactez-nous : nous trouverons une solution, mais nous ne pourrons peut-être pas proposer le créneau à une autre cliente."
+        },
+        {
+          "q": "Et si je suis en retard ?",
+          "a": "Prévenez-nous. Au-delà de 15 minutes, nous devrons peut-être raccourcir la prestation ou la reporter, pour respecter les clientes suivantes."
+        },
+        {
+          "q": "Comment puis-je payer ?",
+          "a": "Au salon, par carte bancaire ou en espèces."
+        }
+      ]
+    }
+  ]
+}

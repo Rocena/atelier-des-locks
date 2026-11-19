@@ -1,0 +1,137 @@
+{
+  "_note": "Galerie (phase 2) : placeholders en attendant les photos d'origine de la propriétaire (§12). Aucune photo récupérée sur le web.",
+  "sizes": [
+    { "slug": "micro", "label": "Micro" },
+    { "slug": "fines", "label": "Fines" },
+    { "slug": "moyennes", "label": "Moyennes" },
+    { "slug": "epaisses", "label": "Épaisses" }
+  ],
+  "items": [
+    {
+      "id": "g01",
+      "title": "Création en comb coils, cheveux courts",
+      "category": "installation",
+      "method": "comb-coils",
+      "size": "moyennes",
+      "ratio": "portrait",
+      "featured": true
+    },
+    {
+      "id": "g02",
+      "title": "Barrel sur locks matures",
+      "category": "coiffure",
+      "method": null,
+      "size": "moyennes",
+      "ratio": "square",
+      "featured": true
+    },
+    {
+      "id": "g03",
+      "title": "Micro-locks après 18 mois",
+      "category": "installation",
+      "method": "microlocks",
+      "size": "micro",
+      "ratio": "portrait",
+      "featured": true
+    },
+    {
+      "id": "g04",
+      "title": "Resserrage des racines au palm rolling",
+      "category": "resserrage",
+      "method": "palm-rolling",
+      "size": "moyennes",
+      "ratio": "landscape",
+      "featured": false
+    },
+    {
+      "id": "g05",
+      "title": "Pointes cuivrées",
+      "category": "coloration",
+      "method": null,
+      "size": "epaisses",
+      "ratio": "portrait",
+      "featured": true
+    },
+    {
+      "id": "g06",
+      "title": "Vanilles deux brins, premier jour",
+      "category": "installation",
+      "method": "two-strand-twists",
+      "size": "moyennes",
+      "ratio": "square",
+      "featured": false
+    },
+    {
+      "id": "g07",
+      "title": "Chignon de mariée",
+      "category": "coiffure",
+      "method": null,
+      "size": "fines",
+      "ratio": "portrait",
+      "featured": true
+    },
+    {
+      "id": "g08",
+      "title": "Locks instantanées au crochet",
+      "category": "installation",
+      "method": "crochet",
+      "size": "fines",
+      "ratio": "landscape",
+      "featured": false
+    },
+    {
+      "id": "g09",
+      "title": "Bain détox : avant, après",
+      "category": "detox",
+      "method": null,
+      "size": "epaisses",
+      "ratio": "square",
+      "featured": true
+    },
+    {
+      "id": "g10",
+      "title": "Interlocking sur micro-locks",
+      "category": "resserrage",
+      "method": "interlocking",
+      "size": "micro",
+      "ratio": "portrait",
+      "featured": false
+    },
+    {
+      "id": "g11",
+      "title": "Pétales et fils dorés",
+      "category": "coiffure",
+      "method": null,
+      "size": "moyennes",
+      "ratio": "portrait",
+      "featured": false
+    },
+    {
+      "id": "g12",
+      "title": "Extensions naturelles, longueur taille",
+      "category": "installation",
+      "method": "extensions",
+      "size": "moyennes",
+      "ratio": "portrait",
+      "featured": false
+    },
+    {
+      "id": "g13",
+      "title": "Réparation de pointes au crochet",
+      "category": "resserrage",
+      "method": "crochet",
+      "size": "epaisses",
+      "ratio": "landscape",
+      "featured": false
+    },
+    {
+      "id": "g14",
+      "title": "Coloration miel sur locks fines",
+      "category": "coloration",
+      "method": null,
+      "size": "fines",
+      "ratio": "square",
+      "featured": false
+    }
+  ]
+}

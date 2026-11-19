@@ -1,0 +1,718 @@
+{
+  "_note": "Données temporaires de la phase 2 (migreront en base en phase 3). TODO-PROPRIO : tous les prix et durées sont des valeurs d'exemple (isPlaceholder).",
+  "categories": [
+    {
+      "slug": "installation",
+      "order": 1,
+      "name": "Installation",
+      "headline": "Faire naître vos *locks*",
+      "summary": "La création de vos locks, au peigne, en vanilles, en tresses, à l'interlocking ou au crochet. On choisit ensemble la méthode qui respecte votre texture et votre rythme.",
+      "intro": "Une loc ne s'improvise pas : elle se construit. Tout commence par un diagnostic de votre texture, de votre densité et de la taille souhaitée. Ensuite, chaque section est mesurée, montée puis fixée avec la méthode qui lui convient.",
+      "media": "Création de locks"
+    },
+    {
+      "slug": "resserrage",
+      "order": 2,
+      "name": "Resserrage",
+      "headline": "Entretenir vos *racines*",
+      "summary": "Le retwist régulier qui garde vos locks nettes et solides : palm rolling, interlocking ou crochet, selon l'âge et la structure de vos locks.",
+      "intro": "Vos cheveux poussent environ d'un centimètre par mois. Le resserrage intègre cette repousse à la loc, sans la fragiliser. Le bon rythme, c'est celui qui protège vos racines : ni trop souvent, ni trop serré.",
+      "media": "Resserrage des racines"
+    },
+    {
+      "slug": "detox",
+      "order": 3,
+      "name": "Locks détox",
+      "headline": "Rendre à vos locks leur *légèreté*",
+      "summary": "Un bain clarifiant qui libère vos locks des résidus de produits, de calcaire et de pollution, puis un soin pour réhydrater en profondeur.",
+      "intro": "Même lavées régulièrement, les locks retiennent des résidus au cœur de la mèche : cire, crème, calcaire, peluches. La détox les dissout en douceur. Vos locks sont plus légères, plus souples, et elles sentent le propre jusqu'au centre.",
+      "media": "Bain détox"
+    },
+    {
+      "slug": "coloration",
+      "order": 4,
+      "name": "Coloration",
+      "headline": "Oser la *couleur*",
+      "summary": "Coloration complète, mèches, pointes ou décoloration, appliquées avec des produits adaptés aux locks et un rinçage minutieux.",
+      "intro": "Une loc est dense : la couleur doit pénétrer de façon homogène, puis être rincée jusqu'au cœur pour ne rien laisser derrière elle. On travaille par étapes, en préservant la fibre.",
+      "media": "Coloration sur locks"
+    },
+    {
+      "slug": "coiffure",
+      "order": 5,
+      "name": "Coiffure",
+      "headline": "Sublimer vos *locks*",
+      "summary": "Chignons, pétales, barrel, tresses de locks : des coiffures qui tiennent, pour tous les jours ou pour un grand jour.",
+      "intro": "Vos locks se coiffent de mille façons. On compose une coiffure qui vous ressemble, qui tient sans tirer sur les racines et qui se défait sans casse.",
+      "media": "Coiffure sur locks"
+    }
+  ],
+  "services": [
+    {
+      "slug": "creation-locks",
+      "name": "Création de locks",
+      "category": "installation",
+      "methods": ["comb-coils", "two-strand-twists", "braid-locks", "backcombing"],
+      "summary": "Démarrer vos locks au peigne, en vanilles deux brins, en tresses ou au crêpage, selon la longueur et la texture de vos cheveux.",
+      "body": [
+        {
+          "title": "Pour qui ?",
+          "paragraphs": [
+            "Pour vous qui commencez vos locks sur cheveux naturels, courts ou longs. Les comb coils conviennent aux cheveux de 3 à 8 cm ; les vanilles et les tresses, aux cheveux plus longs. Le crêpage est surtout utile sur les textures plus lisses, qui ont du mal à se nouer seules."
+          ]
+        },
+        {
+          "title": "Comment se passe le rendez-vous",
+          "paragraphs": [
+            "On commence par un lavage clarifiant : des cheveux sans résidus se nouent mieux. Puis on trace un quadrillage régulier, en carrés, en briques ou en triangles. La taille des sections décide de l'épaisseur de vos futures locks. Chaque section est ensuite montée avec la méthode choisie.",
+            "Vous repartez avec des « bébés locks » nettes, et avec une fiche de conseils pour les premières semaines."
+          ]
+        },
+        {
+          "title": "Les premiers mois",
+          "paragraphs": [
+            "Les premières semaines, les locks peuvent gonfler, se défaire un peu aux pointes ou faire des frisottis. C'est normal : c'est le début du nouage. Un premier resserrage est conseillé entre 4 et 6 semaines après la création."
+          ]
+        }
+      ],
+      "durationMin": 180,
+      "durationMax": 360,
+      "bufferAfter": 15,
+      "price": 150,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Création au peigne", "Vanilles deux brins", "Quadrillage en briques"],
+      "faq": [
+        {
+          "q": "Quelle longueur faut-il pour commencer ?",
+          "a": "Trois centimètres suffisent pour des comb coils. Pour des vanilles ou des tresses, comptez au moins 8 à 10 centimètres."
+        },
+        {
+          "q": "Faut-il venir les cheveux lavés ?",
+          "a": "Non, le lavage clarifiant est compris. Venez simplement les cheveux démêlés, sans huile ni crème."
+        },
+        {
+          "q": "Combien de locks vais-je avoir ?",
+          "a": "Cela dépend de votre densité et de la taille choisie : souvent entre 60 et 150 locks. On en parle pendant le diagnostic."
+        }
+      ],
+      "options": [
+        { "label": "Cheveux au-delà des épaules", "price": 30 },
+        { "label": "Locks fines (sections de moins de 1 cm)", "price": 40 }
+      ],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": false,
+      "featured": true,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "locks-instantanees-crochet",
+      "name": "Locks instantanées au crochet",
+      "category": "installation",
+      "methods": ["crochet", "interlocking"],
+      "summary": "Des locks matures dès la fin du rendez-vous : chaque mèche est nouée au crochet, de la racine à la pointe.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "Au lieu d'attendre que le cheveu se noue seul, on le noue à la main, au crochet fin. La loc est dense et formée dès le premier jour. Elle ne se défait pas au lavage."
+          ]
+        },
+        {
+          "title": "Pour qui ?",
+          "paragraphs": [
+            "Pour vous qui voulez des locks nettes tout de suite, ou qui avez une vie active (sport, piscine) et ne voulez pas traverser la phase de nouage. Il faut au moins 10 centimètres de cheveux."
+          ]
+        },
+        {
+          "title": "À savoir",
+          "paragraphs": [
+            "C'est un travail long et minutieux : prévoyez une grande journée, parfois deux séances. Un crochet trop serré fragilise la fibre ; nous travaillons avec un outil fin et sans arracher."
+          ]
+        }
+      ],
+      "durationMin": 300,
+      "durationMax": 480,
+      "bufferAfter": 15,
+      "price": 280,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Locks au crochet", "Détail de la racine"],
+      "faq": [
+        {
+          "q": "Les locks au crochet sont-elles plus fragiles ?",
+          "a": "Non, si le crochet est fait avec un outil fin et sans forcer. Elles sont même plus résistantes au lavage les premiers mois."
+        },
+        {
+          "q": "Peut-on faire la séance en deux fois ?",
+          "a": "Oui, c'est souvent plus confortable. On réserve alors deux rendez-vous rapprochés."
+        }
+      ],
+      "options": [{ "label": "Cheveux au-delà des épaules", "price": 50 }],
+      "active": true,
+      "bookableOnline": true,
+      "order": 2,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "micro-locks",
+      "name": "Micro-locks à l'interlocking",
+      "category": "installation",
+      "methods": ["microlocks", "interlocking"],
+      "summary": "Des centaines de locks très fines, montées à l'outil depuis la racine. Une chevelure libre, qui se coiffe presque comme des cheveux.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "Les micro-locks sont montées sur des sections de quelques millimètres, à l'interlocking : on fait passer la pointe de la mèche à travers sa base, avec un outil, pour former une loc fine et régulière.",
+            "Elles offrent une grande liberté de coiffure : chignons, boucles, coupes structurées."
+          ]
+        },
+        {
+          "title": "Un engagement",
+          "paragraphs": [
+            "Selon la densité, la création prend entre 10 et 20 heures, sur deux ou trois séances. L'entretien se fait aussi à l'interlocking, toutes les 4 à 8 semaines.",
+            "Nous ne proposons pas la méthode Sisterlocks™, une marque déposée réservée aux consultantes certifiées. Nos micro-locks à l'interlocking suivent notre propre savoir-faire."
+          ]
+        }
+      ],
+      "durationMin": 600,
+      "durationMax": 1200,
+      "bufferAfter": 30,
+      "price": 450,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Micro-locks", "Grille de sections"],
+      "faq": [
+        {
+          "q": "Combien de séances faut-il ?",
+          "a": "En général deux ou trois séances de 5 à 7 heures, rapprochées. On les planifie ensemble après la consultation."
+        },
+        {
+          "q": "La consultation est-elle obligatoire ?",
+          "a": "Oui : elle permet d'estimer le nombre de locks, la durée et le prix exact, et de faire un test de quelques locks."
+        }
+      ],
+      "options": [{ "label": "Cheveux au-delà des épaules", "price": 80 }],
+      "active": true,
+      "bookableOnline": false,
+      "order": 3,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "extensions-locks",
+      "name": "Extensions de locks",
+      "category": "installation",
+      "methods": ["extensions"],
+      "summary": "De la longueur ou du volume tout de suite, avec des locks naturelles ou synthétiques fixées au crochet sur vos propres cheveux.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "Chaque extension est attachée au crochet sur une section de vos cheveux, puis fondue dans la racine pour un rendu invisible. Vos cheveux continuent de se loquer à l'intérieur."
+          ]
+        },
+        {
+          "title": "Naturelles ou synthétiques",
+          "paragraphs": [
+            "Les extensions en cheveux naturels se lavent, se colorent et vieillissent comme vos locks. Les synthétiques sont plus légères et moins chères, mais durent moins. On choisit selon votre usage."
+          ]
+        }
+      ],
+      "durationMin": 360,
+      "durationMax": 540,
+      "bufferAfter": 15,
+      "price": 350,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Extensions naturelles"],
+      "faq": [
+        {
+          "q": "Puis-je apporter mes propres extensions ?",
+          "a": "Oui, après vérification de leur qualité pendant la consultation. Sinon, nous les commandons pour vous."
+        }
+      ],
+      "options": [
+        { "label": "Extensions naturelles fournies par le salon", "price": 200 },
+        { "label": "Extensions synthétiques fournies par le salon", "price": 80 }
+      ],
+      "active": true,
+      "bookableOnline": false,
+      "order": 4,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "accompagnement-freeform",
+      "name": "Accompagnement freeform",
+      "category": "installation",
+      "methods": ["freeform"],
+      "summary": "Vous laissez vos locks se former librement ? On les sépare, on les nourrit et on garde des racines saines, sans les contraindre.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "Les freeform se forment sans quadrillage ni resserrage. Notre rôle : séparer les locks qui fusionnent trop, soigner le cuir chevelu, garder la forme que vous aimez."
+          ]
+        }
+      ],
+      "durationMin": 60,
+      "durationMax": 120,
+      "bufferAfter": 10,
+      "price": 60,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Locks freeform"],
+      "faq": [],
+      "options": [],
+      "active": true,
+      "bookableOnline": true,
+      "order": 5,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "resserrage-palm-rolling",
+      "name": "Resserrage au palm rolling",
+      "category": "resserrage",
+      "methods": ["palm-rolling"],
+      "summary": "Le retwist classique : la repousse est roulée entre les paumes avec un gel léger, puis séchée sous casque.",
+      "body": [
+        {
+          "title": "Pour qui ?",
+          "paragraphs": [
+            "Pour les jeunes locks et pour les locks montées en vanilles ou au peigne. Le palm rolling respecte la racine et donne un rendu lisse et rond."
+          ]
+        },
+        {
+          "title": "Le rendez-vous",
+          "paragraphs": [
+            "Shampoing, resserrage section par section, pinces pour fixer, puis séchage sous casque. On termine par un coiffage simple. Vous pouvez ajouter une coiffure ou une détox."
+          ]
+        },
+        {
+          "title": "Le bon rythme",
+          "paragraphs": [
+            "Toutes les 4 à 6 semaines. Plus souvent, la racine s'affine et se fragilise : c'est le piège du resserrage trop fréquent."
+          ]
+        }
+      ],
+      "durationMin": 90,
+      "durationMax": 150,
+      "bufferAfter": 15,
+      "price": 60,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Racines resserrées", "Séchage sous casque"],
+      "faq": [
+        {
+          "q": "Le shampoing est-il compris ?",
+          "a": "Oui, le resserrage commence toujours par un shampoing doux."
+        },
+        {
+          "q": "Puis-je ajouter une coiffure ?",
+          "a": "Oui, choisissez l'option coiffure en réservant, ou demandez-la sur place si le planning le permet."
+        }
+      ],
+      "options": [
+        { "label": "Locks au-delà des épaules", "price": 15 },
+        { "label": "Coiffure simple (barrel, pétales, chignon)", "price": 15 }
+      ],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": false,
+      "featured": true,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "resserrage-interlocking",
+      "name": "Resserrage à l'interlocking",
+      "category": "resserrage",
+      "methods": ["interlocking"],
+      "summary": "Un resserrage à l'outil, qui tient plus longtemps et résiste mieux au sport et aux lavages fréquents.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "La pointe de la loc est passée à travers la repousse, en trois ou quatre mouvements, pour tisser la racine. Pas de gel, pas de séchage : le resserrage tient seul."
+          ]
+        },
+        {
+          "title": "Pour qui ?",
+          "paragraphs": [
+            "Pour les micro-locks, pour les locks fines, et pour vous qui voulez espacer les rendez-vous (6 à 8 semaines). Attention : un interlocking trop serré ou trop fréquent peut créer des trous à la racine. Nous suivons toujours le même motif pour l'éviter."
+          ]
+        }
+      ],
+      "durationMin": 120,
+      "durationMax": 240,
+      "bufferAfter": 15,
+      "price": 80,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Interlocking à l'outil"],
+      "faq": [
+        {
+          "q": "Peut-on passer du palm rolling à l'interlocking ?",
+          "a": "Oui, quand les locks sont assez matures. On en parle avant : le changement modifie un peu l'aspect des racines."
+        }
+      ],
+      "options": [{ "label": "Micro-locks (plus de 200 locks)", "price": 60 }],
+      "active": true,
+      "bookableOnline": true,
+      "order": 2,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "reparation-locks",
+      "name": "Réparation de locks",
+      "category": "resserrage",
+      "methods": ["crochet"],
+      "summary": "Locks amincies, cassées, fusionnées ou racines défaites : on répare au crochet, loc par loc.",
+      "body": [
+        {
+          "title": "Ce que l'on répare",
+          "paragraphs": [
+            "Les zones amincies à la racine, les pointes qui se défont, les locks qui ont fusionné, les cassures. On peut aussi rattacher une loc tombée.",
+            "La durée dépend du nombre de locks à reprendre : on l'estime ensemble sur photo ou en consultation."
+          ]
+        }
+      ],
+      "durationMin": 60,
+      "durationMax": 180,
+      "bufferAfter": 10,
+      "price": 40,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Réparation au crochet"],
+      "faq": [],
+      "options": [],
+      "active": true,
+      "bookableOnline": true,
+      "order": 3,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "bain-detox",
+      "name": "Bain détox",
+      "category": "detox",
+      "methods": [],
+      "summary": "Un bain clarifiant qui dissout les résidus au cœur de vos locks, suivi d'un rinçage minutieux et d'un séchage complet.",
+      "body": [
+        {
+          "title": "Pourquoi une détox ?",
+          "paragraphs": [
+            "Les locks sont denses : les produits, le calcaire de l'eau toulousaine et les peluches s'y accumulent sans se voir. À la longue, elles deviennent lourdes, ternes, et peuvent garder une odeur d'humidité.",
+            "Le bain détox les libère en douceur. L'eau du bain change de couleur : c'est souvent très parlant."
+          ]
+        },
+        {
+          "title": "Le rituel",
+          "paragraphs": [
+            "Un bain tiède clarifiant (bicarbonate, vinaigre de cidre, argile), un massage du cuir chevelu, un rinçage long, puis un séchage complet sous casque, jusqu'au cœur de la loc."
+          ]
+        }
+      ],
+      "durationMin": 60,
+      "durationMax": 90,
+      "bufferAfter": 15,
+      "price": 45,
+      "priceFrom": false,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Le bain détox"],
+      "faq": [
+        {
+          "q": "Quelle est la composition du bain ?",
+          "a": "Une base de bicarbonate, de vinaigre de cidre et d'argile. Dites-nous si vous avez une sensibilité du cuir chevelu."
+        },
+        {
+          "q": "À quelle fréquence faire une détox ?",
+          "a": "Deux à quatre fois par an suffisent, ou avant une coloration."
+        }
+      ],
+      "options": [],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": false,
+      "featured": true,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "detox-resserrage",
+      "name": "Détox et resserrage",
+      "category": "detox",
+      "methods": ["palm-rolling", "interlocking"],
+      "summary": "Le soin complet : bain détox, resserrage des racines et coiffure simple. Vos locks repartent à neuf.",
+      "body": [
+        {
+          "title": "Le rendez-vous complet",
+          "paragraphs": [
+            "On commence par la détox, qui ouvre et allège les locks. Le resserrage se fait ensuite sur des racines propres : il tient mieux. On termine par une coiffure simple."
+          ]
+        }
+      ],
+      "durationMin": 150,
+      "durationMax": 210,
+      "bufferAfter": 15,
+      "price": 85,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Avant et après la détox"],
+      "faq": [],
+      "options": [{ "label": "Locks au-delà des épaules", "price": 15 }],
+      "active": true,
+      "bookableOnline": true,
+      "order": 2,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "soin-profond",
+      "name": "Soin profond et hydratation",
+      "category": "detox",
+      "methods": [],
+      "summary": "Un masque nourrissant sous vapeur, pour des locks souples et un cuir chevelu apaisé.",
+      "body": [
+        {
+          "title": "Pour qui ?",
+          "paragraphs": [
+            "Pour les locks sèches, cassantes ou colorées, et pour les cuirs chevelus qui tiraillent. Le soin pénètre sous la chaleur douce de la vapeur, puis on rince sans laisser de résidu."
+          ]
+        }
+      ],
+      "durationMin": 60,
+      "durationMax": 75,
+      "bufferAfter": 10,
+      "price": 50,
+      "priceFrom": false,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Soin à la vapeur"],
+      "faq": [],
+      "options": [],
+      "active": true,
+      "bookableOnline": true,
+      "order": 3,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "coloration-locks",
+      "name": "Coloration sur locks",
+      "category": "coloration",
+      "methods": [],
+      "summary": "Couleur complète, mèches, pointes ou décoloration, avec un rinçage jusqu'au cœur de la loc.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "La couleur est appliquée loc par loc, puis massée pour pénétrer de façon homogène. Le rinçage est long : une loc mal rincée garde des produits qui la fragilisent.",
+            "Pour une décoloration, on procède par étapes et on renforce la fibre entre chaque passage."
+          ]
+        },
+        {
+          "title": "Test d'allergie obligatoire",
+          "paragraphs": [
+            "Un test cutané est nécessaire 48 heures avant toute coloration, même si vous avez déjà été colorée. Il prend cinq minutes au salon, ou nous vous indiquons comment le faire chez vous."
+          ]
+        }
+      ],
+      "durationMin": 120,
+      "durationMax": 240,
+      "bufferAfter": 15,
+      "price": 70,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Pointes cuivrées", "Coloration complète"],
+      "faq": [
+        {
+          "q": "Peut-on colorer des locks très jeunes ?",
+          "a": "Mieux vaut attendre que les locks soient bien formées, environ six mois, pour ne pas freiner le nouage."
+        },
+        {
+          "q": "Faut-il une détox avant ?",
+          "a": "C'est conseillé : la couleur prend mieux sur des locks propres jusqu'au cœur."
+        }
+      ],
+      "options": [
+        { "label": "Décoloration (par passage)", "price": 40 },
+        { "label": "Locks au-delà des épaules", "price": 30 }
+      ],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": true,
+      "featured": true,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "coiffure-sur-locks",
+      "name": "Coiffure sur locks",
+      "category": "coiffure",
+      "methods": [],
+      "summary": "Chignon, pétales, barrel, tresses de locks ou coiffure de soirée, sur locks propres et sèches.",
+      "body": [
+        {
+          "title": "Nos coiffures",
+          "paragraphs": [
+            "Le barrel (rouleaux de locks), les pétales, le chignon haut ou bas, les tresses de locks, les coiffures de soirée. Montrez-nous une photo : on adapte à la longueur de vos locks."
+          ]
+        },
+        {
+          "title": "Bien la garder",
+          "paragraphs": [
+            "Dormez avec un foulard ou un bonnet en satin. Une coiffure se garde une à deux semaines ; au-delà, elle tire sur les racines."
+          ]
+        }
+      ],
+      "durationMin": 45,
+      "durationMax": 90,
+      "bufferAfter": 10,
+      "price": 35,
+      "priceFrom": true,
+      "onQuote": false,
+      "deposit": null,
+      "photos": ["Barrel", "Pétales", "Chignon de soirée"],
+      "faq": [],
+      "options": [{ "label": "Accessoires (fils, bagues)", "price": 10 }],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": false,
+      "featured": true,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "coiffure-mariage-evenement",
+      "name": "Coiffure mariage et événement",
+      "category": "coiffure",
+      "methods": [],
+      "summary": "Pour votre mariage, votre baptême ou une cérémonie : un essai, puis la coiffure du jour J, au salon ou chez vous.",
+      "body": [
+        {
+          "title": "Comment ça se passe",
+          "paragraphs": [
+            "On se rencontre pour parler de la tenue, du lieu, des accessoires. On fait un essai quelques semaines avant. Le jour J, on vient à vous, ou vous venez au salon, pour vous et vos proches si vous le souhaitez."
+          ]
+        }
+      ],
+      "durationMin": 90,
+      "durationMax": 180,
+      "bufferAfter": 30,
+      "price": null,
+      "priceFrom": false,
+      "onQuote": true,
+      "deposit": null,
+      "photos": ["Coiffure de mariée"],
+      "faq": [
+        {
+          "q": "Vous déplacez-vous ?",
+          "a": "Oui, à Toulouse et dans les environs. Les frais de déplacement sont indiqués dans le devis."
+        }
+      ],
+      "options": [],
+      "active": true,
+      "bookableOnline": false,
+      "order": 2,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "consultation-diagnostic",
+      "name": "Consultation et diagnostic",
+      "category": null,
+      "methods": [],
+      "summary": "Trente minutes pour faire le point sur vos cheveux ou vos locks, choisir une méthode et obtenir un prix précis. En salon ou en visio.",
+      "body": [
+        {
+          "title": "Pourquoi commencer par là",
+          "paragraphs": [
+            "Chaque chevelure est différente. La consultation permet d'observer votre texture, votre densité et l'état de votre cuir chevelu, de répondre à vos questions et d'estimer précisément la durée et le prix de votre projet.",
+            "Si vous réservez ensuite une création, le prix de la consultation en est déduit."
+          ]
+        }
+      ],
+      "durationMin": 30,
+      "durationMax": 45,
+      "bufferAfter": 10,
+      "price": 25,
+      "priceFrom": false,
+      "onQuote": false,
+      "deposit": null,
+      "photos": [],
+      "faq": [
+        {
+          "q": "Comment se passe la visio ?",
+          "a": "Vous recevez un lien par email. Prévoyez une bonne lumière et un miroir pour nous montrer l'arrière de la tête."
+        }
+      ],
+      "options": [],
+      "active": true,
+      "bookableOnline": true,
+      "order": 1,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    },
+    {
+      "slug": "depart-de-locks",
+      "name": "Départ de locks",
+      "category": null,
+      "methods": [],
+      "summary": "Retirer vos locks sans tout couper : on les ouvre une à une, avec patience et beaucoup de soin.",
+      "body": [
+        {
+          "title": "Le principe",
+          "paragraphs": [
+            "Après un long trempage dans un soin démêlant, chaque loc est ouverte à la main et au peigne fin, de la pointe vers la racine. C'est long, mais vous gardez votre longueur.",
+            "La durée dépend du nombre et de l'âge de vos locks : on l'estime en consultation."
+          ]
+        }
+      ],
+      "durationMin": 240,
+      "durationMax": 600,
+      "bufferAfter": 30,
+      "price": null,
+      "priceFrom": false,
+      "onQuote": true,
+      "deposit": null,
+      "photos": [],
+      "faq": [],
+      "options": [],
+      "active": true,
+      "bookableOnline": false,
+      "order": 2,
+      "allergyTest": false,
+      "featured": false,
+      "isPlaceholder": true
+    }
+  ]
+}

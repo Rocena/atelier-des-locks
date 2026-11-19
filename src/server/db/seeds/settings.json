@@ -1,0 +1,32 @@
+{
+  "_note": "Réglages éditables en admin (phase 3 : table settings). TODO-PROPRIO : valeurs à confirmer.",
+  "announcement": {
+    "enabled": true,
+    "id": "ouverture-2026",
+    "text": "Nouveau nom, même savoir-faire : Glow in Locks devient L'Atelier des Locks.",
+    "linkLabel": "Notre histoire",
+    "href": "/le-salon"
+  },
+  "founder": {
+    "firstName": "",
+    "displayName": "La fondatrice",
+    "role": "Locticienne et fondatrice"
+  },
+  "stats": {
+    "clients": 400,
+    "yearsOfPractice": 8,
+    "isPlaceholder": true
+  },
+  "instagram": {
+    "handle": "",
+    "url": "",
+    "tiles": [
+      "Racines du jour",
+      "Barrel du samedi",
+      "Bain détox",
+      "Micro-locks, 1 an",
+      "Pointes cuivrées",
+      "Le geste"
+    ]
+  }
+}

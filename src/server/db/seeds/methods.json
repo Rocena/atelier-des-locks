@@ -1,0 +1,215 @@
+{
+  "_note": "Guide des méthodes (phase 2, données temporaires). TODO-PROPRIO : relire et valider le contenu technique.",
+  "methods": [
+    {
+      "slug": "comb-coils",
+      "name": "Comb coils",
+      "aka": "Vanilles au peigne",
+      "family": "installation",
+      "featured": true,
+      "summary": "Chaque section est enroulée sur elle-même avec un peigne fin, comme un petit ressort.",
+      "principle": "On pose la pointe du peigne à la racine, puis on tourne en descendant jusqu'à la pointe. La mèche forme un coil serré qui, avec le temps et les lavages, se noue de l'intérieur et devient une loc.",
+      "idealFor": "Cheveux courts (3 à 8 cm), textures crépues et frisées serrées.",
+      "duration": "3 à 5 h",
+      "maturation": "6 à 12 mois",
+      "maintenance": "Palm rolling toutes les 4 à 6 semaines.",
+      "pros": [
+        "Rendu net et rond dès le départ",
+        "Idéal sur cheveux courts",
+        "Locks très régulières"
+      ],
+      "watchouts": [
+        "Les coils peuvent se défaire aux premiers lavages : on lave avec douceur, sous un bonnet filet",
+        "Phase de « gonflement » visible les premiers mois"
+      ],
+      "service": "creation-locks"
+    },
+    {
+      "slug": "two-strand-twists",
+      "name": "Two-strand twists",
+      "aka": "Vanilles deux brins",
+      "family": "installation",
+      "featured": true,
+      "summary": "La mèche est divisée en deux brins torsadés l'un autour de l'autre, de la racine à la pointe.",
+      "principle": "Les deux brins s'enroulent et se figent peu à peu. Pendant les premiers mois, la torsade reste visible ; elle se fond ensuite en une loc pleine, souvent légèrement aplatie.",
+      "idealFor": "Cheveux de plus de 8 cm, envie de coiffer vos locks rapidement.",
+      "duration": "3 à 5 h",
+      "maturation": "8 à 14 mois",
+      "maintenance": "Palm rolling ou interlocking toutes les 4 à 6 semaines.",
+      "pros": [
+        "Joli rendu dès le premier jour",
+        "Plus résistant au lavage que les comb coils",
+        "Se coiffe tout de suite"
+      ],
+      "watchouts": [
+        "Les locks peuvent garder une forme un peu plate",
+        "Maturation un peu plus longue"
+      ],
+      "service": "creation-locks"
+    },
+    {
+      "slug": "braid-locks",
+      "name": "Tresses",
+      "aka": "Braid locks",
+      "family": "installation",
+      "featured": false,
+      "summary": "Chaque section est tressée en trois brins ; la tresse sert de squelette à la future loc.",
+      "principle": "La tresse se resserre avec les lavages et se transforme en loc. C'est une base solide, qui tient bien dès le départ, notamment sur les cheveux plus longs ou plus lisses.",
+      "idealFor": "Cheveux mi-longs à longs, vie active, lavages fréquents.",
+      "duration": "4 à 6 h",
+      "maturation": "8 à 12 mois",
+      "maintenance": "Palm rolling ou interlocking.",
+      "pros": ["Très résistant au lavage", "Convient à de nombreuses textures"],
+      "watchouts": ["Le motif de la tresse peut rester visible aux pointes plusieurs mois"],
+      "service": "creation-locks"
+    },
+    {
+      "slug": "interlocking",
+      "name": "Interlocking",
+      "aka": "Au crochet-outil, depuis la racine",
+      "family": "both",
+      "featured": true,
+      "summary": "La pointe de la mèche est passée à travers sa propre base avec un outil, pour tisser la loc depuis la racine.",
+      "principle": "En trois ou quatre passages croisés, la racine est « verrouillée ». Il n'y a ni gel ni séchage : le résultat tient seul. La méthode sert à créer des locks, notamment fines, et à les entretenir.",
+      "idealFor": "Micro-locks, locks fines, vie sportive, envie d'espacer les rendez-vous.",
+      "duration": "Création : 5 à 20 h selon la taille. Resserrage : 2 à 4 h",
+      "maturation": "Rapide : la racine est formée dès la séance",
+      "maintenance": "Interlocking toutes les 4 à 8 semaines.",
+      "pros": [
+        "Tenue longue, même avec le sport",
+        "Pas de produit, pas de résidus",
+        "Racines très nettes"
+      ],
+      "watchouts": [
+        "Toujours suivre le même motif, sinon des trous se forment",
+        "Trop serré ou trop fréquent, il affine la racine"
+      ],
+      "service": "resserrage-interlocking"
+    },
+    {
+      "slug": "crochet",
+      "name": "Crochet",
+      "aka": "Locks instantanées",
+      "family": "both",
+      "featured": true,
+      "summary": "Le cheveu est noué à la main, au crochet fin, pour une loc formée et dense dès la fin du rendez-vous.",
+      "principle": "Le crochet entre et sort de la mèche en tous sens pour emmêler les fibres et les compacter. On l'utilise pour créer des locks instantanées, mais aussi pour réparer : pointes défaites, zones amincies, locks à rattacher.",
+      "idealFor": "Envie de locks matures tout de suite, réparations, finitions.",
+      "duration": "Création : 5 à 8 h. Réparation : selon le nombre de locks",
+      "maturation": "Immédiate",
+      "maintenance": "Crochet léger ou interlocking.",
+      "pros": [
+        "Locks matures dès le premier jour",
+        "Ne se défait pas au lavage",
+        "Parfait pour réparer"
+      ],
+      "watchouts": ["Un crochet trop épais ou forcé casse la fibre", "Séance longue"],
+      "service": "locks-instantanees-crochet"
+    },
+    {
+      "slug": "backcombing",
+      "name": "Backcombing",
+      "aka": "Crêpage",
+      "family": "installation",
+      "featured": false,
+      "summary": "La mèche est crêpée de la pointe vers la racine pour créer un nœud de départ.",
+      "principle": "Le crêpage emmêle volontairement les cheveux. On le complète souvent au crochet pour compacter la loc. C'est la méthode des textures plus lisses, qui ne se nouent pas seules.",
+      "idealFor": "Cheveux ondulés ou lisses, textures fines.",
+      "duration": "4 à 6 h",
+      "maturation": "6 à 10 mois",
+      "maintenance": "Crochet ou palm rolling.",
+      "pros": ["Fonctionne sur les textures qui se nouent peu"],
+      "watchouts": ["Rendu un peu « flou » au début", "Demande de la patience"],
+      "service": "creation-locks"
+    },
+    {
+      "slug": "microlocks",
+      "name": "Micro-locks",
+      "aka": "Petites locks à l'interlocking, au twist ou en tresses",
+      "family": "installation",
+      "featured": true,
+      "summary": "Des centaines de locks de quelques millimètres, pour une chevelure libre et très versatile.",
+      "principle": "Les sections sont minuscules et parfaitement régulières. Le montage se fait le plus souvent à l'interlocking, parfois au twist ou en tresses. Le résultat bouge et se coiffe presque comme des cheveux libres.",
+      "idealFor": "Envie de liberté de coiffure, cheveux de 8 cm et plus.",
+      "duration": "10 à 20 h, en deux ou trois séances",
+      "maturation": "12 à 18 mois",
+      "maintenance": "Interlocking toutes les 4 à 8 semaines.",
+      "pros": ["Très grande versatilité", "Rendu fin et élégant"],
+      "watchouts": [
+        "Engagement en temps et en budget",
+        "Nous ne parlons pas de Sisterlocks™, marque réservée aux consultantes certifiées"
+      ],
+      "service": "micro-locks"
+    },
+    {
+      "slug": "extensions",
+      "name": "Extensions de locks",
+      "aka": "Naturelles ou synthétiques",
+      "family": "installation",
+      "featured": false,
+      "summary": "Des locks déjà formées sont fixées au crochet sur vos cheveux, pour de la longueur ou du volume immédiat.",
+      "principle": "Chaque extension est attachée sur une section, puis la jonction est fondue au crochet. Vos cheveux se loquent ensuite à l'intérieur de l'extension.",
+      "idealFor": "Envie de longueur tout de suite, cheveux courts, densité faible.",
+      "duration": "6 à 9 h",
+      "maturation": "Immédiate",
+      "maintenance": "Resserrage classique ; les jonctions se vérifient à chaque rendez-vous.",
+      "pros": ["Longueur immédiate", "Rendu naturel avec des extensions humaines"],
+      "watchouts": ["Plus lourd : attention à la tension sur les racines", "Coût des extensions"],
+      "service": "extensions-locks"
+    },
+    {
+      "slug": "freeform",
+      "name": "Freeform",
+      "aka": "Locks libres",
+      "family": "installation",
+      "featured": false,
+      "summary": "Les locks se forment d'elles-mêmes, sans quadrillage ni resserrage. Chaque loc a sa forme.",
+      "principle": "On laisse le cheveu se nouer naturellement. L'accompagnement consiste à séparer les locks qui fusionnent trop, à soigner le cuir chevelu et à respecter la forme choisie.",
+      "idealFor": "Envie d'un rendu organique, peu d'interventions.",
+      "duration": "Séances d'accompagnement d'1 à 2 h",
+      "maturation": "Variable",
+      "maintenance": "Séparation et soins, quand vous le souhaitez.",
+      "pros": ["Peu de rendez-vous", "Racines au repos"],
+      "watchouts": ["Tailles de locks très inégales", "Demande d'accepter l'imprévu"],
+      "service": "accompagnement-freeform"
+    },
+    {
+      "slug": "palm-rolling",
+      "name": "Palm rolling",
+      "aka": "Roulage entre les paumes",
+      "family": "maintenance",
+      "featured": true,
+      "summary": "La repousse est roulée entre les paumes, avec un gel léger, puis séchée sous casque.",
+      "principle": "Le roulage enroule la repousse autour de la loc et la lisse. Pincée pour garder sa forme, elle sèche sous casque. C'est l'entretien le plus doux pour la racine.",
+      "idealFor": "Jeunes locks, locks montées au peigne ou en vanilles.",
+      "duration": "1 h 30 à 2 h 30",
+      "maturation": "—",
+      "maintenance": "Toutes les 4 à 6 semaines.",
+      "pros": ["Doux pour la racine", "Rendu lisse et rond"],
+      "watchouts": ["Tient moins longtemps qu'un interlocking", "Trop de produit = résidus"],
+      "service": "resserrage-palm-rolling"
+    }
+  ],
+  "stages": [
+    {
+      "name": "Bébé locks",
+      "period": "0 à 3 mois",
+      "text": "Les locks sont encore des coils, des vanilles ou des tresses. Elles peuvent se défaire un peu au lavage. Patience et douceur."
+    },
+    {
+      "name": "Bourgeonnement",
+      "period": "3 à 6 mois",
+      "text": "Les cheveux commencent à se nouer à l'intérieur : de petits renflements apparaissent. Les locks gonflent, frisottent. C'est le signe que tout fonctionne."
+    },
+    {
+      "name": "Adolescence",
+      "period": "6 à 12 mois",
+      "text": "Les locks se densifient et prennent leur forme. Elles peuvent sembler indisciplinées, puis se posent peu à peu."
+    },
+    {
+      "name": "Maturité",
+      "period": "Après 12 à 18 mois",
+      "text": "Les locks sont pleines, solides, et poussent en longueur. L'entretien devient plus espacé."
+    }
+  ]
+}

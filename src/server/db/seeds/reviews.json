@@ -1,0 +1,85 @@
+{
+  "_note": "TODO-PROPRIO : AVIS D'EXEMPLE, à remplacer par les vrais avis (Google, anciens messages, avis post-RDV) AVANT la mise en ligne. Ne jamais publier ces textes tels quels.",
+  "reviews": [
+    {
+      "id": "r01",
+      "author": "Awa D.",
+      "rating": 5,
+      "date": "2026-10-02",
+      "service": "creation-locks",
+      "featured": true,
+      "verified": true,
+      "text": "Je suis arrivée avec mes cheveux courts et beaucoup de questions. Elle a pris le temps de tout m'expliquer, sans jamais me presser. Mes comb coils sont magnifiques, et pour la première fois je sais comment m'en occuper."
+    },
+    {
+      "id": "r02",
+      "author": "Mélissa K.",
+      "rating": 5,
+      "date": "2026-09-18",
+      "service": "detox-resserrage",
+      "featured": true,
+      "verified": true,
+      "text": "La détox a été une révélation : l'eau était presque marron ! Mes locks sont plus légères et le resserrage a tenu deux mois. Le salon est calme, on se sent attendue."
+    },
+    {
+      "id": "r03",
+      "author": "Fatou S.",
+      "rating": 5,
+      "date": "2026-09-05",
+      "service": "micro-locks",
+      "featured": true,
+      "verified": true,
+      "text": "Trois séances pour mes micro-locks, et un travail d'une régularité impressionnante. Elle connaît son métier et elle respecte vraiment le cheveu."
+    },
+    {
+      "id": "r04",
+      "author": "Inès B.",
+      "rating": 4,
+      "date": "2026-08-21",
+      "service": "coloration-locks",
+      "featured": false,
+      "verified": true,
+      "text": "Très belle couleur cuivrée, bien rincée, aucune irritation. Le rendez-vous a duré un peu plus longtemps que prévu, mais le résultat en valait la peine."
+    },
+    {
+      "id": "r05",
+      "author": "Christelle M.",
+      "rating": 5,
+      "date": "2026-08-09",
+      "service": "coiffure-mariage-evenement",
+      "featured": true,
+      "verified": true,
+      "text": "Coiffure de mariage parfaite, qui a tenu toute la nuit sans me faire mal. Elle est venue jusqu'au domaine, avec un calme qui m'a fait du bien ce matin-là."
+    },
+    {
+      "id": "r06",
+      "author": "Nadia T.",
+      "rating": 5,
+      "date": "2026-07-26",
+      "service": "resserrage-palm-rolling",
+      "featured": false,
+      "verified": true,
+      "text": "Je viens toutes les cinq semaines depuis deux ans. Mes racines n'ont jamais été aussi saines. Ponctuelle, douce, de bons conseils à chaque fois."
+    },
+    {
+      "id": "r07",
+      "author": "Aminata C.",
+      "rating": 5,
+      "date": "2026-07-11",
+      "service": "reparation-locks",
+      "featured": true,
+      "verified": true,
+      "text": "J'avais plusieurs locks presque cassées à la racine après un mauvais resserrage ailleurs. Elle les a toutes réparées au crochet, une par une. Merci pour la patience."
+    },
+    {
+      "id": "r08",
+      "author": "Laura P.",
+      "rating": 5,
+      "date": "2026-06-28",
+      "service": "consultation-diagnostic",
+      "featured": false,
+      "verified": true,
+      "text": "Consultation en visio très claire. Je savais exactement quoi réserver, combien de temps et à quel prix avant de me déplacer."
+    }
+  ]
+}
