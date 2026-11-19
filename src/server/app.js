@@ -5,12 +5,21 @@
  */
 import Fastify from 'fastify';
 import helmet from '@fastify/helmet';
+import compress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { createAssetResolver } from './lib/assets.js';
 import { createRenderer } from './lib/view.js';
 import { site } from './lib/site.js';
+import { fmt } from './lib/format.js';
 import siteRoutes from './modules/site/routes.js';
+import catalogRoutes from './modules/catalog/routes.js';
+import galleryRoutes from './modules/gallery/routes.js';
+import reviewsRoutes from './modules/reviews/routes.js';
+import journalRoutes from './modules/journal/routes.js';
+import { findCatalog } from './modules/catalog/repo.js';
+import { buildNavigation } from './modules/catalog/service.js';
+import { findSettings } from './modules/site/repo.js';
 import styleguideRoutes from './modules/styleguide/routes.js';
 
 /**
@@ -61,6 +70,9 @@ export async function buildApp({ config, vite, logger = true }) {
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   });
 
+  // Compression brotli/gzip des réponses (HTML, CSS, JS, SVG) : -70 % sur le transfert.
+  await app.register(compress, { global: true, threshold: 1024 });
+
   if (vite) {
     const middie = (await import('@fastify/middie')).default;
     await app.register(middie);
@@ -82,7 +94,14 @@ export async function buildApp({ config, vite, logger = true }) {
     });
   }
 
+  app.decorate('publicUrl', config.publicUrl);
+
   const resolveAssets = createAssetResolver({ dev: !config.isProd });
+  // Données communes à toutes les pages (méga-menu, bandeau d'annonce).
+  // Phase 3 : relues en base à chaque requête (ou mises en cache avec invalidation admin).
+  const { categories, services } = await findCatalog();
+  const navigation = buildNavigation(categories, services);
+  const settings = await findSettings();
   const render = createRenderer({ cache: config.isProd });
 
   /**
@@ -94,9 +113,21 @@ export async function buildApp({ config, vite, logger = true }) {
   function page(template, entry, data = {}) {
     // @ts-expect-error reply est injecté par Fastify (this)
     const reply = /** @type {import('fastify').FastifyReply} */ (this);
+    const pathname = reply.request.url.split('?')[0];
+    const jsonLd = /** @type {unknown[]} */ (data.jsonLd ?? []).map((item) =>
+      // JSON dans <script> : on neutralise « < » pour qu'aucune chaîne ne ferme la balise.
+      JSON.stringify(item).replaceAll('<', String.fromCharCode(92) + 'u003c'),
+    );
     const html = render(template, {
+      settings,
       ...data,
+      jsonLd,
       site,
+      navigation,
+      fmt,
+      pathname,
+      canonical: config.publicUrl + (pathname === '/' ? '/' : pathname),
+      publicUrl: config.publicUrl,
       assets: resolveAssets(entry),
       nonce: reply.cspNonce?.script ?? '',
       path: reply.request.url,
@@ -109,12 +140,20 @@ export async function buildApp({ config, vite, logger = true }) {
   app.get('/health', async () => ({ status: 'ok' }));
 
   await app.register(siteRoutes);
+  await app.register(catalogRoutes);
+  await app.register(galleryRoutes);
+  await app.register(reviewsRoutes);
+  await app.register(journalRoutes);
   if (config.styleguideEnabled) await app.register(styleguideRoutes);
 
   app.setNotFoundHandler((request, reply) => {
     reply.code(404);
     if (request.headers.accept?.includes('text/html')) {
-      return reply.page('pages/404', 'home', { title: 'Page introuvable' });
+      return reply.page('pages/404', 'editorial', {
+        title: 'Page introuvable · L’Atelier des Locks',
+        description: 'Cette page n’existe pas ou plus.',
+        noindex: true,
+      });
     }
     return { error: 'Not Found' };
   });

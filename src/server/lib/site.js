@@ -8,7 +8,7 @@ export const site = {
   name: "L'Atelier des Locks",
   tagline: 'Locticienne · Toulouse',
   city: 'Toulouse',
-  // TODO-PROPRIO : adresse exacte
+  // TODO-PROPRIO : adresse exacte (rue, quartier) et accès (métro, parking)
   address: { street: 'Adresse à confirmer', postalCode: '31000', city: 'Toulouse' },
   // TODO-PROPRIO : horaires réels
   hours: [
@@ -16,16 +16,28 @@ export const site = {
     { days: 'Samedi', time: '9h – 18h' },
     { days: 'Dimanche et lundi', time: 'Fermé' },
   ],
-  // TODO-PROPRIO : numéro et liens réels
+  /** Mêmes horaires, au format schema.org (1 = lundi). */
+  openingHours: [
+    { days: [2, 3, 4, 5], opens: '09:30', closes: '19:00' },
+    { days: [6], opens: '09:00', closes: '18:00' },
+  ],
+  // TODO-PROPRIO : numéro et liens réels (téléphone au format +33…, lien wa.me, URL Instagram)
   phone: '',
   whatsapp: '',
   instagram: '',
+  /** Navigation principale (desktop). « Prestations » ouvre le méga-menu. */
   nav: [
-    { href: '/prestations', label: 'Prestations' },
+    { href: '/prestations', label: 'Prestations', mega: true },
     { href: '/methodes', label: 'Méthodes' },
     { href: '/galerie', label: 'Galerie' },
     { href: '/tarifs', label: 'Tarifs' },
     { href: '/le-salon', label: 'Le salon' },
     { href: '/contact', label: 'Contact' },
+  ],
+  /** Liens secondaires du tiroir mobile et du footer. */
+  secondaryNav: [
+    { href: '/avis', label: 'Avis clientes' },
+    { href: '/conseils', label: 'Conseils' },
+    { href: '/faq', label: 'Questions fréquentes' },
   ],
 };

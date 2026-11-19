@@ -23,7 +23,8 @@
     "db:seed": "node src/server/db/seed.js",
     "screenshots": "node scripts/screenshots.js",
     "check:contrast": "node scripts/check-contrast.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "og-image": "node scripts/og-image.js"
   },
   "lint-staged": {
     "*.{js,mjs}": [
@@ -33,12 +34,15 @@
     "*.{css,json,md,yml,yaml,eta,html}": "prettier --write"
   },
   "dependencies": {
+    "@fastify/compress": "^9.3.0",
     "@fastify/helmet": "^13.2.0",
     "@fastify/middie": "^9.3.7",
     "@fastify/static": "^10.1.11",
     "@fastify/view": "^12.0.1",
     "eta": "^4.6.0",
     "fastify": "^5.12.8",
+    "gsap": "^3.15.1",
+    "lenis": "^1.3.27",
     "pg": "^8.23.1",
     "zod": "^4.6.7"
   },
@@ -53,6 +57,7 @@
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.14.0",
     "husky": "^9.1.7",
+    "lighthouse": "^13.6.0",
     "lint-staged": "^17.6.1",
     "prettier": "^3.10.1",
     "typescript": "^7.0.2",

@@ -38,7 +38,7 @@ describe('application (mode test, sans Vite)', () => {
   it("rend l'accueil en français, sans lorem ipsum", async () => {
     const res = await app.inject({ method: 'GET', url: '/' });
     expect(res.statusCode).toBe(200);
-    expect(res.body).toContain('<html lang="fr">');
+    expect(res.body).toContain('<html lang="fr"');
     expect(res.body).toContain('L’art de la <em>loc</em>');
     expect(res.body.toLowerCase()).not.toContain('lorem');
   });
