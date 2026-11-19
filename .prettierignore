@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+playwright-report
+test-results
+package-lock.json
+public/brand
+brand
+docs/CAHIER_DES_CHARGES.md
+PROMPTS_CLAUDE_CODE.md
+.claude
+*.eta
+*.svg

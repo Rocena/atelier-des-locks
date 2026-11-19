@@ -1,0 +1,25 @@
+# Environnement local : PostgreSQL 17 (cahier des charges : 16+).
+# Démarrer : npm run db:up   |   Arrêter : npm run db:down
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-atelier}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-atelier_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-atelier_des_locks}
+      TZ: UTC
+      PGTZ: UTC
+    ports:
+      - '127.0.0.1:${DB_PORT:-5432}:5432'
+    volumes:
+      # Volume nommé : les données ne vivent pas dans le dossier synchronisé (OneDrive).
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

@@ -1,0 +1,61 @@
+{
+  "name": "atelier-des-locks",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Site et plateforme de réservation du salon L'Atelier des Locks (Toulouse)",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --watch-path=src/server --watch-path=src/views src/server/index.js",
+    "build": "vite build",
+    "start": "node src/server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc -p jsconfig.json",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "node src/server/db/migrate.js",
+    "db:seed": "node src/server/db/seed.js",
+    "screenshots": "node scripts/screenshots.js",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,json,md,yml,yaml,eta,html}": "prettier --write"
+  },
+  "dependencies": {
+    "@fastify/helmet": "^13.2.0",
+    "@fastify/middie": "^9.3.7",
+    "@fastify/static": "^10.1.11",
+    "@fastify/view": "^12.0.1",
+    "eta": "^4.6.0",
+    "fastify": "^5.12.8",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.14.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.1",
+    "prettier": "^3.10.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  }
+}

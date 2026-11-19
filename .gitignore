@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+coverage/
+playwright-report/
+test-results/
+.vite/
+*.log
+.DS_Store
+Thumbs.db
+# Photos fournies par la propriétaire et uploads : jamais commités
+content/photos-a-importer/*
+!content/photos-a-importer/.gitkeep
+storage/
