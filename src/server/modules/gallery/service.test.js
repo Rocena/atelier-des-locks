@@ -13,6 +13,8 @@ const items = [
     size: 'moyennes',
     ratio: 'portrait',
     featured: true,
+    image: null,
+    alt: 'Réalisation',
   },
   {
     id: 'b',
@@ -22,6 +24,8 @@ const items = [
     size: 'fines',
     ratio: 'square',
     featured: false,
+    image: null,
+    alt: 'Réalisation',
   },
   {
     id: 'c',
@@ -31,6 +35,8 @@ const items = [
     size: 'fines',
     ratio: 'landscape',
     featured: false,
+    image: null,
+    alt: 'Réalisation',
   },
 ];
 
