@@ -56,6 +56,7 @@
     <form method="post" action="/admin/agenda/rdv/<%= ap.id %>/statut">
       <input type="hidden" name="_csrf" value="<%= it.csrf %>" />
       <input type="hidden" name="status" value="<%= s %>" />
+      <% if (s === 'confirmed' && ap.status === 'pending') { %><input type="hidden" name="notify" value="1" /><% } %>
       <button class="btn <%= s === 'confirmed' || s === 'completed' ? 'btn--primary' : 'btn--secondary' %> btn--small" type="submit"><span class="btn__label"><%= labels[s] %></span></button>
     </form>
 <% }) %>

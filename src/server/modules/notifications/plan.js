@@ -137,6 +137,31 @@ export function planBooked(p) {
 }
 
 /**
+ * RDV « à valider » validé par le salon : message de confirmation (email + .ics + lien, SMS court).
+ * La clé de dédoublonnage est distincte de celle de la demande reçue, sinon rien ne partirait.
+ * Les rappels sont déjà planifiés à la demande ; on les redépose (clés identiques : jamais de doublon).
+ * @param {{ appointmentId: string, startsAt: Date, smsEnabled: boolean, now: Date, timeZone: string, tk?: string }} p
+ * @returns {PlannedJob[]}
+ */
+export function planValidated(p) {
+  const { appointmentId, startsAt, now, tk } = p;
+  return [
+    {
+      queue: QUEUES.confirmation,
+      startAfter: now,
+      data: {
+        appointmentId,
+        startsAt: startsAt.toISOString(),
+        ...(tk ? { tk } : {}),
+        kind: 'validated',
+        dedupeKey: `confirmation:validated:${appointmentId}:${epoch(startsAt)}`,
+      },
+    },
+    ...planReminders(p),
+  ];
+}
+
+/**
  * RDV déplacé : message à la cliente, alerte propriétaire, nouveaux rappels. Les anciens rappels
  * (même RDV, ancien horaire) sont écartés à l'exécution : `startsAt` du job ≠ `startsAt` réel.
  * @param {{ appointmentId: string, startsAt: Date, smsEnabled: boolean, now: Date, timeZone: string, tk?: string }} p
@@ -238,6 +263,10 @@ export function evaluateJob(queue, ctx, data, now) {
 
   switch (queue) {
     case QUEUES.confirmation:
+      // Validation : le RDV doit être confirmé au moment de l'envoi (annulé ou remis en attente depuis).
+      if (data.kind === 'validated' && ctx.status !== 'confirmed') {
+        return { send: false, reason: 'not_confirmed' };
+      }
       // Annulé avant même l'envoi : la confirmation n'a plus de sens (l'annulation part seule).
       if (!ACTIVE.includes(ctx.status)) return { send: false, reason: 'not_active' };
       if (!sameSlot) return { send: false, reason: 'rescheduled' };

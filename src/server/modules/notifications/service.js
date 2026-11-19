@@ -23,6 +23,7 @@ import {
   planCancelled,
   planCompleted,
   planRescheduled,
+  planValidated,
 } from './plan.js';
 import { buildMessages } from './messages.js';
 import { ProviderError } from './providers.js';
@@ -150,6 +151,28 @@ export function createNotifier({
       if (!p) return;
       await enqueue(
         planRescheduled({
+          appointmentId,
+          startsAt: p.ctx.startsAt,
+          smsEnabled: p.smsEnabled,
+          now: now(),
+          timeZone: p.timeZone,
+          tk: sealToken(token, config.sessionSecret),
+        }),
+      );
+    },
+  );
+
+  /**
+   * Le salon valide une demande « à valider » : confirmation à la cliente (lien « Gérer mon RDV » renouvelé).
+   * @param {{ appointmentId: string, token: string }} e
+   */
+  const appointmentValidated = safe(
+    'validated',
+    async function appointmentValidated({ appointmentId, token }) {
+      const p = await planningContext(appointmentId);
+      if (!p) return;
+      await enqueue(
+        planValidated({
           appointmentId,
           startsAt: p.ctx.startsAt,
           smsEnabled: p.smsEnabled,
@@ -342,6 +365,7 @@ export function createNotifier({
   return {
     appointmentBooked,
     appointmentRescheduled,
+    appointmentValidated,
     appointmentCancelled,
     appointmentCompleted,
     process,

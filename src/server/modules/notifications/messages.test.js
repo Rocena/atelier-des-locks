@@ -318,3 +318,37 @@ describe('scellement du jeton', () => {
     expect(openToken('court', secret)).toBeNull();
   });
 });
+
+describe('message « rendez-vous validé »', () => {
+  const validated = () => build(QUEUES.confirmation, {}, { kind: 'validated' });
+
+  it('email et SMS dédiés, avec le lien « Gérer mon RDV » et le fichier agenda', () => {
+    const { messages } = validated();
+    const email = messages.find((m) => m.channel === 'email');
+    const sms = messages.find((m) => m.channel === 'sms');
+    expect(email?.template).toBe('booking_validated');
+    expect(sms?.template).toBe('booking_validated');
+    const payload = /** @type {any} */ (email?.payload);
+    expect(payload.subject).toContain('est confirmé');
+    expect(payload.html).toContain('est validé');
+    expect(payload.html).toContain(LINKS.manageUrl);
+    expect(payload.attachments?.[0].name).toMatch(/\.ics$/);
+    const text = String(/** @type {any} */ (sms).payload.text);
+    expect(text).toContain('RDV validé');
+    expect(text).toContain(LINKS.manageUrl);
+    expect(text.length).toBeLessThanOrEqual(SMS_MAX);
+  });
+
+  it('une cliente sans email reçoit le SMS, sans téléphone seulement l’email', () => {
+    const noEmail = build(QUEUES.confirmation, { email: '' }, { kind: 'validated' });
+    expect(noEmail.messages.map((m) => m.channel)).toEqual(['sms']);
+    const noPhone = build(QUEUES.confirmation, { phone: null }, { kind: 'validated' });
+    expect(noPhone.messages.map((m) => m.channel)).toEqual(['email']);
+  });
+
+  it('la confirmation d’origine reste inchangée', () => {
+    const { messages } = build(QUEUES.confirmation, { status: 'pending' }, { kind: 'created' });
+    expect(messages[0].template).toBe('booking_confirmation');
+    expect(/** @type {any} */ (messages[0].payload).subject).toContain('bien reçue');
+  });
+});

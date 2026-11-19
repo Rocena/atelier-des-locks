@@ -31,6 +31,8 @@ const notifications = {
   appointmentBooked: async (/** @type {any} */ args) => void events.push({ event: 'booked', args }),
   appointmentRescheduled: async (/** @type {any} */ args) =>
     void events.push({ event: 'rescheduled', args }),
+  appointmentValidated: async (/** @type {any} */ args) =>
+    void events.push({ event: 'validated', args }),
   appointmentCancelled: async (/** @type {any} */ args) =>
     void events.push({ event: 'cancelled', args }),
   appointmentCompleted: async (/** @type {any} */ args) =>
@@ -475,6 +477,51 @@ describe('statuts', () => {
       notify: false,
       now: NOW,
     });
+    expect(events).toHaveLength(0);
+  });
+
+  it('valider une demande : nouveau lien, message à la cliente (sauf si on ne veut pas la prévenir)', async () => {
+    const pending = (id) =>
+      pool.query("UPDATE appointments SET status = 'pending' WHERE id = $1", [id]);
+    const hashOf = async (id) =>
+      (await pool.query('SELECT manage_token_hash FROM appointments WHERE id = $1', [id])).rows[0]
+        .manage_token_hash;
+    const a = await createManual(
+      pool,
+      deps,
+      form({ date: '2026-12-19', time: '10:00', notify: undefined }),
+      NOW,
+    );
+    await pending(a.id);
+    const oldHash = await hashOf(a.id);
+    events = [];
+    await changeStatus(pool, deps, { id: a.id, status: 'confirmed', notify: true, now: NOW });
+    expect((await repo.findAppointment(pool, a.id))?.status).toBe('confirmed');
+    expect(events.map((e) => e.event)).toEqual(['validated']);
+    const newHash = await hashOf(a.id);
+    expect(newHash).not.toEqual(oldHash);
+    expect(newHash).toEqual(hashToken(events[0].args.token));
+
+    const b = await createManual(
+      pool,
+      deps,
+      form({ date: '2026-12-19', time: '15:00', notify: undefined }),
+      NOW,
+    );
+    await pending(b.id);
+    events = [];
+    await changeStatus(pool, deps, { id: b.id, status: 'confirmed', notify: false, now: NOW });
+    expect(events).toHaveLength(0);
+
+    // Rouvrir un RDV annulé n'est pas une validation : aucun message.
+    await changeStatus(pool, deps, {
+      id: b.id,
+      status: 'cancelled_by_salon',
+      notify: false,
+      now: NOW,
+    });
+    events = [];
+    await changeStatus(pool, deps, { id: b.id, status: 'confirmed', notify: true, now: NOW });
     expect(events).toHaveLength(0);
   });
 

@@ -13,6 +13,7 @@ import {
   planCompleted,
   planReminders,
   planRescheduled,
+  planValidated,
   reminderInstant,
 } from './plan.js';
 
@@ -308,5 +309,47 @@ describe('evaluateJob : le job doit-il encore partir ?', () => {
 
   it('file inconnue : on n’envoie rien', () => {
     expect(evaluateJob('autre', ctx(), data, now)).toMatchObject({ send: false });
+  });
+});
+
+describe('planValidated : demande validée par le salon', () => {
+  const base = {
+    appointmentId: ID,
+    startsAt: new Date('2026-12-02T08:00:00Z'),
+    smsEnabled: true,
+    timeZone: TZ,
+    tk: 'jeton-scelle',
+    now: new Date('2026-11-20T10:00:00Z'),
+  };
+
+  it('dépose une confirmation « validated » avec sa propre clé, puis les rappels', () => {
+    const jobs = planValidated(base);
+    expect(jobs.map((j) => j.queue)).toEqual([
+      QUEUES.confirmation,
+      QUEUES.reminderD2,
+      QUEUES.reminderD1,
+    ]);
+    const confirmation = byQueue(jobs, QUEUES.confirmation);
+    expect(confirmation.data.kind).toBe('validated');
+    expect(confirmation.data.tk).toBe('jeton-scelle');
+    // Autre clé que la demande reçue : sinon le dédoublonnage empêcherait tout envoi.
+    const booked = byQueue(planBooked(base), QUEUES.confirmation);
+    expect(confirmation.data.dedupeKey).not.toBe(booked.data.dedupeKey);
+    // Aucune alerte propriétaire : c'est elle qui valide.
+    expect(jobs.some((j) => j.queue === QUEUES.ownerAlert)).toBe(false);
+  });
+
+  it('ne part que si le RDV est confirmé au moment de l’envoi', () => {
+    const ctx = (/** @type {string} */ status) =>
+      /** @type {any} */ ({ status, startsAt: base.startsAt, anonymized: false });
+    const data = /** @type {any} */ ({ kind: 'validated', startsAt: base.startsAt.toISOString() });
+    expect(evaluateJob(QUEUES.confirmation, ctx('confirmed'), data, base.now)).toEqual({
+      send: true,
+    });
+    for (const status of ['pending', 'cancelled_by_client', 'cancelled_by_salon']) {
+      expect(evaluateJob(QUEUES.confirmation, ctx(status), data, base.now)).toMatchObject({
+        send: false,
+      });
+    }
   });
 });

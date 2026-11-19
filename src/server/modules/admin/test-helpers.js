@@ -88,6 +88,7 @@ export async function makeAdminApp(pool, { env = {}, now = TEST_NOW } = {}) {
   for (const event of [
     'appointmentBooked',
     'appointmentRescheduled',
+    'appointmentValidated',
     'appointmentCancelled',
     'appointmentCompleted',
   ]) {

@@ -137,9 +137,15 @@ export async function getSlots(db, q) {
   };
 }
 
-/** @param {unknown} error */
+/**
+ * Créneau pris : contrainte d'exclusion (23P01), ou interblocage (40P01) quand plusieurs réservations
+ * du même créneau s'insèrent en même temps (PostgreSQL en annule une : même sens, « créneau pris »).
+ * @param {unknown} error
+ */
 export const isOverlap = (error) =>
-  typeof error === 'object' && error !== null && /** @type {any} */ (error).code === '23P01';
+  typeof error === 'object' &&
+  error !== null &&
+  ['23P01', '40P01'].includes(/** @type {any} */ (error).code);
 
 /**
  * Crée un rendez-vous. Double protection contre la double réservation (§7.3) :

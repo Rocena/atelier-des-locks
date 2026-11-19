@@ -220,6 +220,21 @@ function bookingEmail(kind, ctx, env, links) {
       cta: { label: 'Prendre un nouveau rendez-vous', url: env.bookingUrl },
     };
   }
+  if (kind === 'validated') {
+    return {
+      subject: `Bonne nouvelle : votre rendez-vous du ${day} à ${time} est confirmé`,
+      preheader: `${ctx.serviceName}, ${day} à ${time}. Le fichier joint l’ajoute à votre agenda.`,
+      title: 'Votre rendez-vous *est validé*.',
+      paragraphs: [
+        `Bonjour ${ctx.firstName}, bonne nouvelle : nous avons validé votre demande. Votre place est réservée, voici le récapitulatif.`,
+        'Le fichier joint ajoute le rendez-vous à votre agenda.',
+      ],
+      details: appointmentDetails(ctx, env),
+      cta: manage,
+      notes: [policyNote(env)],
+      list: { heading: 'Pour bien vous préparer', items: env.tips },
+    };
+  }
   // Confirmation (created)
   const pending = ctx.status === 'pending';
   return {
@@ -327,6 +342,7 @@ function bookingSms(kind, ctx, env, links) {
   if (kind === 'rescheduled') return sms(`${env.site.name} : RDV déplacé au ${when}.`, link);
   if (isCancel(kind))
     return sms(`${env.site.name} : RDV du ${when} annulé.`, ` Reprendre : ${env.bookingUrl}`);
+  if (kind === 'validated') return sms(`${env.site.name} : RDV validé, ${when}.`, link);
   const state = ctx.status === 'pending' ? 'demande reçue' : 'RDV confirmé';
   return sms(`${env.site.name} : ${state}, ${when}.`, link);
 }
@@ -419,10 +435,15 @@ export function buildMessages({ queue, data, ctx, env, links = {}, now }) {
   };
 
   switch (queue) {
-    case QUEUES.confirmation:
-      email('booking_confirmation', bookingEmail('created', ctx, env, links), FOOTER_BOOKING, true);
-      smsOut('booking_confirmation', bookingSms('created', ctx, env, links));
+    case QUEUES.confirmation: {
+      // Validation par le salon : même file, autre texte et autre modèle (visible dans le journal).
+      const validated = kind === 'validated';
+      const template = validated ? 'booking_validated' : 'booking_confirmation';
+      const confirmKind = validated ? 'validated' : 'created';
+      email(template, bookingEmail(confirmKind, ctx, env, links), FOOTER_BOOKING, true);
+      smsOut(template, bookingSms(confirmKind, ctx, env, links));
       break;
+    }
     case QUEUES.change: {
       const template = isCancel(kind) ? 'booking_cancelled' : 'booking_rescheduled';
       email(template, bookingEmail(kind, ctx, env, links), FOOTER_BOOKING, kind === 'rescheduled');

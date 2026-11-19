@@ -179,6 +179,7 @@ Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélior
 - **Avis** : publier, refuser, réponse publique, mise en avant ; jamais de publication sans consentement.
 - **Contenus** : bandeau d'annonce, chiffres et fondatrice, FAQ, articles du journal, étapes de la vie d'une loc.
 - **Réglages** : réservation (délais, annulation, validation manuelle, politique), horaires, congés et fermetures (avertissement si des RDV existent), coordonnées et réseaux (appliquées au site). Réglages techniques en lecture seule.
+- **Message « rendez-vous validé »** : valider une demande « à valider » envoie un email (avec fichier agenda et lien « Gérer mon RDV » renouvelé) et un SMS, modèle `booking_validated` visible dans le journal. Case « prévenir la cliente » cochée d'office ; rien ne part si on rouvre un RDV annulé. Les rappels déjà planifiés à la demande partent normalement.
 - **Messages envoyés** (journal des notifications, destinataires masqués, filtre par état) et **Journal d'activité** (filtre par rubrique).
 
 ### Tests
@@ -187,13 +188,13 @@ Back-office complet sous `/admin`, rendu serveur (Eta) et JavaScript en amélior
 - **Unitaires et intégration** : **UNIT** tests dans **FILES** fichiers (auth, TOTP, verrouillage, sessions, rotation, codes de secours, agenda sur base réelle, parcours HTTP, fonctions pures, CSV, RGPD, galerie, réglages, contenus, journaux, script de création de compte).
 - **e2e** (`tests/e2e/admin.spec.js`, mobile et desktop) : connexion avec 2FA et première connexion (QR, codes de secours), RDV manuel, déplacement par créneaux libres et par glisser-déposer, annulation d'un glisser, blocage, clientes (recherche, CSV, suppression RGPD), modération d'un avis, prestation (création, prix, masquage), envoi d'une photo recadrée, droits de l'équipe, **axe-core WCAG A/AA sur 20 pages**, aucun défilement horizontal, zones tactiles ≥ 44 px, aucune erreur de console (donc aucune violation de la CSP).
 - Revue visuelle (design-craft §10) à 390 et 1440 px : captures `docs/screenshots/admin-*-top.png` (`ADMIN_SHOTS=1 npx playwright test tests/e2e/admin-shots.spec.js`).
+- Réservation en ligne : un interblocage PostgreSQL (`40P01`) lors de trois réservations simultanées du même créneau est maintenant traité comme « créneau pris » (le test pouvait échouer de façon aléatoire).
 - Défauts trouvés par les tests et corrigés : horizon de réservation appliqué au déplacement par le salon ; barre de dates et filtres qui débordaient à 390 px ; boutons dont l'étiquette visible n'était pas dans le nom accessible ; prestation sans praticienne associée impossible à réserver par le salon ; erreurs affichées en JSON brut sur les formulaires classiques ; recherche par téléphone en format national.
 
 ## Reste à faire (phase 7 et suivantes)
 
 - **Notifications en production** : créer le compte Brevo, valider l'expéditeur (SPF, DKIM), renseigner `NOTIFICATIONS_PROVIDER=brevo`, `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `OWNER_EMAIL`, `GOOGLE_REVIEW_URL`, puis envoyer un message réel. Le fournisseur Brevo n'a été testé qu'avec un faux `fetch`. Tester aussi les emails dans Gmail, Outlook et Apple Mail (§7.6).
 - **Phase 6 : suites** :
-  - **« RDV validé »** : valider un rendez-vous `pending` ne prévient pas encore la cliente (pas de modèle de message dédié ; la confirmation « demande reçue » est déjà partie). À écrire avec la propriétaire.
   - **Textes des emails et SMS éditables** (`messages.js`) : lecture seule pour l'instant ; l'édition doit garder les garde-fous (160 caractères GSM, lien jamais tronqué).
   - **Textes de l'accueil et de « Le salon »** : toujours dans les gabarits (le bandeau, les chiffres, la FAQ, les articles et les étapes sont éditables). Les passer en blocs de contenu est une évolution.
   - **Réglages d'infrastructure** (`BOOKING_PROVIDER`, lien Fresha, lien avis Google, fournisseur d'envoi) : restent dans l'environnement du serveur.

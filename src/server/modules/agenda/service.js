@@ -335,7 +335,22 @@ export async function changeStatus(pool, { notifications }, { id, status, reason
       if (isOverlap(error)) throw new AgendaError('slot_taken');
       throw error;
     }
+    // Validation d'une demande : nouveau lien « Gérer mon RDV » pour le message (le clair n'est pas gardé).
+    let validationToken = null;
+    if (appointment.status === 'pending' && status === 'confirmed') {
+      const generated = generateToken();
+      validationToken = generated.token;
+      await repo.setManageToken(
+        client,
+        id,
+        generated.hash,
+        new Date(appointment.endsAt.getTime() + MANAGE_LINK_DAYS_AFTER * DAY),
+      );
+    }
     await client.query('COMMIT');
+    if (validationToken && notify) {
+      await notifications.appointmentValidated({ appointmentId: id, token: validationToken });
+    }
     if (status === 'completed') {
       await notifications.appointmentCompleted({ appointmentId: id, completedAt: now });
     } else if (status === 'cancelled_by_salon' && notify) {
